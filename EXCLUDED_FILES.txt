@@ -1,0 +1,181 @@
+# Files present in the source repository and deliberately not deposited
+#
+# Built from commit 5b93e04 on 2026-08-29T02:44:01Z
+# Tier A payload: withheld
+#
+# Reasons, by prefix:
+#   Email_Discussion/  advisor correspondence and outgoing letters; private
+#   release/           descriptor and packaging planning
+#   archive/           superseded drafts; archive/manuscript_JBI.md is a different paper
+#   paper/             the manuscript itself; this deposit is code, not the article
+#   cases/             KDCA daily case counts; upstream licence not yet checked
+#   CLAUDE.md          agent instructions
+#   OVERVIEW.md        internal status board
+#   results_*.json     Tier A derived aggregates, wherever they sit (including
+#                      the frozen snapshots under eda/archive/); see EXCLUSIONS.md
+#
+# Not listed here because git never tracked them: the parquet tree (42 GB),
+# derived/ (9.2 GB), raw/ (~77 GB of source zips) and .env. The download
+# helpers under eda/ retrieve the source files and verify them by SHA-256.
+
+CLAUDE.md
+Email_Discussion/Technical notes 20260822.md
+Email_Discussion/advisor_report_20260818.md
+Email_Discussion/advisor_report_20260819.md
+Email_Discussion/advisor_report_20260821.md
+Email_Discussion/advisor_report_20260824.md
+Email_Discussion/advisor_report_20260827.md
+Email_Discussion/advisor_suggestion_20260816.md
+Email_Discussion/advisor_suggestion_20260819.md
+Email_Discussion/advisor_suggestion_20260821.md
+Email_Discussion/advisor_suggestion_20260824.md
+Email_Discussion/advisor_suggestion_20260827.md
+Email_Discussion/bigdata_campus_application_20260821.md
+Email_Discussion/figure_captions_20260824.md
+Email_Discussion/figure_captions_20260827.md
+Email_Discussion/nims_enquiry_20260824.md
+JRSI_投稿規定整理.md
+OVERVIEW.md
+archive/README.md
+archive/REVISION_PLAN.md
+archive/decisions_and_todos.md
+archive/figure_captions_draft.md
+archive/figures/fig_screen_protocol/fig_screen_protocol.excalidraw
+archive/figures/fig_screen_protocol/fig_screen_protocol.mmd
+archive/figures/fig_screen_protocol/fig_screen_protocol.pdf
+archive/figures/fig_screen_protocol/fig_screen_protocol.png
+archive/figures/fig_screen_protocol/fig_screen_protocol.svg
+archive/figures/fig_screen_protocol/render.py
+archive/letter_to_advisor.md
+archive/manuscript_JBI.md
+archive/related_work_lim2026.md
+archive/report.html
+archive/section_coverage_draft.md
+archive/section_semester_draft.md
+archive/seoul_topic_memo.md
+cases/daily_panel.csv
+cases/daily_panel.parquet
+cases/kdca_20230831.xlsx
+eda/archive/20260818/results_p19.json
+eda/archive/20260818/results_p21.json
+eda/archive/20260818/results_p21b.json
+eda/archive/20260818/results_p25.json
+eda/archive/20260818/results_p26.json
+eda/archive/20260818/results_p27.json
+eda/archive/20260818/results_p28.json
+eda/archive/20260818/results_p29.json
+eda/archive/20260818/results_p30.json
+eda/archive/20260818/results_p9.json
+eda/archive/20260822/results_inventory.json
+eda/archive/20260822/results_p32.json
+eda/archive/20260822/results_p33.json
+eda/archive/20260822/results_p35.json
+eda/archive/20260822/results_p36.json
+eda/archive/20260822/results_p39.json
+eda/archive/20260822/results_p40.json
+eda/archive/20260822/results_p41.json
+eda/archive/20260822/results_p42.json
+eda/archive/20260822/results_p44.json
+eda/archive/20260822/results_p45.json
+eda/archive/20260824/results_p44.json
+eda/archive/20260824/results_p49.json
+eda/archive/20260824/results_p50.json
+eda/archive/20260824/results_p51.json
+eda/archive/20260824/results_p52.json
+eda/archive/20260824/results_p53.json
+eda/archive/20260824/results_p54.json
+eda/archive/20260824/results_p57.json
+eda/results_inventory.json
+eda/results_p0.json
+eda/results_p1.json
+eda/results_p10.json
+eda/results_p11.json
+eda/results_p12.json
+eda/results_p13.json
+eda/results_p14.json
+eda/results_p15.json
+eda/results_p16.json
+eda/results_p17.json
+eda/results_p18.json
+eda/results_p18b.json
+eda/results_p19.json
+eda/results_p2.json
+eda/results_p20.json
+eda/results_p20b.json
+eda/results_p20c.json
+eda/results_p20d.json
+eda/results_p21.json
+eda/results_p21b.json
+eda/results_p22.json
+eda/results_p23.json
+eda/results_p24.json
+eda/results_p25.json
+eda/results_p26.json
+eda/results_p27.json
+eda/results_p28.json
+eda/results_p29.json
+eda/results_p29b.json
+eda/results_p30.json
+eda/results_p32.json
+eda/results_p33.json
+eda/results_p34.json
+eda/results_p34_E.json
+eda/results_p34_W.json
+eda/results_p35.json
+eda/results_p36.json
+eda/results_p37.json
+eda/results_p38.json
+eda/results_p38_E.json
+eda/results_p38_W.json
+eda/results_p39.json
+eda/results_p4.json
+eda/results_p40.json
+eda/results_p41.json
+eda/results_p42.json
+eda/results_p43_core.json
+eda/results_p43_dedup.json
+eda/results_p44.json
+eda/results_p45.json
+eda/results_p46.json
+eda/results_p47.json
+eda/results_p48.json
+eda/results_p49.json
+eda/results_p5.json
+eda/results_p50.json
+eda/results_p51.json
+eda/results_p52.json
+eda/results_p53.json
+eda/results_p54.json
+eda/results_p55.json
+eda/results_p56.json
+eda/results_p57.json
+eda/results_p58.json
+eda/results_p59.json
+eda/results_p6.json
+eda/results_p60.json
+eda/results_p61.json
+eda/results_p62.json
+eda/results_p63.json
+eda/results_p6b.json
+eda/results_p8.json
+eda/results_p9.json
+meeting_note_20260827.md
+paper/editorial_constraints.md
+paper/latex/JRSI/.olcli.json
+paper/latex/JRSI/main.tex
+paper/latex/JRSI_SI/main.tex
+paper/latex/README.md
+paper/manuscript_JRSI.md
+paper/manuscript_JRSI_SI.md
+paper/paper_structure.md
+paper/preprint_plan.md
+paper/related_work_positioning.md
+release/data_descriptor_plan.md
+release/data_release_and_packaging.md
+release/deposit/CITATION.cff
+release/deposit/EXCLUSIONS.md
+release/deposit/LICENSE
+release/deposit/LICENSE-DATA
+release/deposit/README.md
+release/zenodo_manifests/v1.0.0.txt
+release/zenodo_metadata.json

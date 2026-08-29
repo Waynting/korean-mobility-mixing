@@ -1,0 +1,4322 @@
+[
+ {
+  "ym": "202001",
+  "hour": "00",
+  "rows": 3000267,
+  "expected": 3000267,
+  "masked": 1237812,
+  "bad_dow": 0,
+  "hours_in_file": [
+   0
+  ],
+  "ym_in_file": [
+   202001
+  ],
+  "secs": 2.5
+ },
+ {
+  "ym": "202001",
+  "hour": "01",
+  "rows": 1807591,
+  "expected": 1807591,
+  "masked": 753408,
+  "bad_dow": 0,
+  "hours_in_file": [
+   1
+  ],
+  "ym_in_file": [
+   202001
+  ],
+  "secs": 1.5
+ },
+ {
+  "ym": "202001",
+  "hour": "02",
+  "rows": 1190595,
+  "expected": 1190595,
+  "masked": 503979,
+  "bad_dow": 0,
+  "hours_in_file": [
+   2
+  ],
+  "ym_in_file": [
+   202001
+  ],
+  "secs": 1.0
+ },
+ {
+  "ym": "202001",
+  "hour": "03",
+  "rows": 863397,
+  "expected": 863397,
+  "masked": 364160,
+  "bad_dow": 0,
+  "hours_in_file": [
+   3
+  ],
+  "ym_in_file": [
+   202001
+  ],
+  "secs": 0.8
+ },
+ {
+  "ym": "202001",
+  "hour": "04",
+  "rows": 786832,
+  "expected": 786832,
+  "masked": 290877,
+  "bad_dow": 0,
+  "hours_in_file": [
+   4
+  ],
+  "ym_in_file": [
+   202001
+  ],
+  "secs": 0.7
+ },
+ {
+  "ym": "202001",
+  "hour": "05",
+  "rows": 1050641,
+  "expected": 1050641,
+  "masked": 291184,
+  "bad_dow": 0,
+  "hours_in_file": [
+   5
+  ],
+  "ym_in_file": [
+   202001
+  ],
+  "secs": 0.9
+ },
+ {
+  "ym": "202001",
+  "hour": "06",
+  "rows": 1886590,
+  "expected": 1886590,
+  "masked": 434598,
+  "bad_dow": 0,
+  "hours_in_file": [
+   6
+  ],
+  "ym_in_file": [
+   202001
+  ],
+  "secs": 1.5
+ },
+ {
+  "ym": "202001",
+  "hour": "07",
+  "rows": 3198314,
+  "expected": 3198314,
+  "masked": 719918,
+  "bad_dow": 0,
+  "hours_in_file": [
+   7
+  ],
+  "ym_in_file": [
+   202001
+  ],
+  "secs": 2.5
+ },
+ {
+  "ym": "202001",
+  "hour": "08",
+  "rows": 5634192,
+  "expected": 5634192,
+  "masked": 1155584,
+  "bad_dow": 0,
+  "hours_in_file": [
+   8
+  ],
+  "ym_in_file": [
+   202001
+  ],
+  "secs": 4.4
+ },
+ {
+  "ym": "202001",
+  "hour": "09",
+  "rows": 6283696,
+  "expected": 6283696,
+  "masked": 1413183,
+  "bad_dow": 0,
+  "hours_in_file": [
+   9
+  ],
+  "ym_in_file": [
+   202001
+  ],
+  "secs": 4.8
+ },
+ {
+  "ym": "202001",
+  "hour": "10",
+  "rows": 6248266,
+  "expected": 6248266,
+  "masked": 1457595,
+  "bad_dow": 0,
+  "hours_in_file": [
+   10
+  ],
+  "ym_in_file": [
+   202001
+  ],
+  "secs": 4.8
+ },
+ {
+  "ym": "202001",
+  "hour": "11",
+  "rows": 6763628,
+  "expected": 6763628,
+  "masked": 1601025,
+  "bad_dow": 0,
+  "hours_in_file": [
+   11
+  ],
+  "ym_in_file": [
+   202001
+  ],
+  "secs": 5.2
+ },
+ {
+  "ym": "202001",
+  "hour": "12",
+  "rows": 7542149,
+  "expected": 7542149,
+  "masked": 1850027,
+  "bad_dow": 0,
+  "hours_in_file": [
+   12
+  ],
+  "ym_in_file": [
+   202001
+  ],
+  "secs": 5.8
+ },
+ {
+  "ym": "202001",
+  "hour": "13",
+  "rows": 7900104,
+  "expected": 7900104,
+  "masked": 2015880,
+  "bad_dow": 0,
+  "hours_in_file": [
+   13
+  ],
+  "ym_in_file": [
+   202001
+  ],
+  "secs": 6.0
+ },
+ {
+  "ym": "202001",
+  "hour": "14",
+  "rows": 7804825,
+  "expected": 7804825,
+  "masked": 2005124,
+  "bad_dow": 0,
+  "hours_in_file": [
+   14
+  ],
+  "ym_in_file": [
+   202001
+  ],
+  "secs": 6.1
+ },
+ {
+  "ym": "202001",
+  "hour": "15",
+  "rows": 7836945,
+  "expected": 7836945,
+  "masked": 2020100,
+  "bad_dow": 0,
+  "hours_in_file": [
+   15
+  ],
+  "ym_in_file": [
+   202001
+  ],
+  "secs": 6.0
+ },
+ {
+  "ym": "202001",
+  "hour": "16",
+  "rows": 8122768,
+  "expected": 8122768,
+  "masked": 2107470,
+  "bad_dow": 0,
+  "hours_in_file": [
+   16
+  ],
+  "ym_in_file": [
+   202001
+  ],
+  "secs": 6.2
+ },
+ {
+  "ym": "202001",
+  "hour": "17",
+  "rows": 8766505,
+  "expected": 8766505,
+  "masked": 2300338,
+  "bad_dow": 0,
+  "hours_in_file": [
+   17
+  ],
+  "ym_in_file": [
+   202001
+  ],
+  "secs": 6.7
+ },
+ {
+  "ym": "202001",
+  "hour": "18",
+  "rows": 9745560,
+  "expected": 9745560,
+  "masked": 2642368,
+  "bad_dow": 0,
+  "hours_in_file": [
+   18
+  ],
+  "ym_in_file": [
+   202001
+  ],
+  "secs": 7.6
+ },
+ {
+  "ym": "202001",
+  "hour": "19",
+  "rows": 9559762,
+  "expected": 9559762,
+  "masked": 2775755,
+  "bad_dow": 0,
+  "hours_in_file": [
+   19
+  ],
+  "ym_in_file": [
+   202001
+  ],
+  "secs": 7.5
+ },
+ {
+  "ym": "202001",
+  "hour": "20",
+  "rows": 7682302,
+  "expected": 7682302,
+  "masked": 2366524,
+  "bad_dow": 0,
+  "hours_in_file": [
+   20
+  ],
+  "ym_in_file": [
+   202001
+  ],
+  "secs": 6.2
+ },
+ {
+  "ym": "202001",
+  "hour": "21",
+  "rows": 6610541,
+  "expected": 6610541,
+  "masked": 2113170,
+  "bad_dow": 0,
+  "hours_in_file": [
+   21
+  ],
+  "ym_in_file": [
+   202001
+  ],
+  "secs": 5.3
+ },
+ {
+  "ym": "202001",
+  "hour": "22",
+  "rows": 5859813,
+  "expected": 5859813,
+  "masked": 1981122,
+  "bad_dow": 0,
+  "hours_in_file": [
+   22
+  ],
+  "ym_in_file": [
+   202001
+  ],
+  "secs": 4.7
+ },
+ {
+  "ym": "202001",
+  "hour": "23",
+  "rows": 4475216,
+  "expected": 4475216,
+  "masked": 1697817,
+  "bad_dow": 0,
+  "hours_in_file": [
+   23
+  ],
+  "ym_in_file": [
+   202001
+  ],
+  "secs": 3.7
+ },
+ {
+  "ym": "202002",
+  "hour": "00",
+  "rows": 2541079,
+  "expected": 2541079,
+  "masked": 1081647,
+  "bad_dow": 0,
+  "hours_in_file": [
+   0
+  ],
+  "ym_in_file": [
+   202002
+  ],
+  "secs": 2.1
+ },
+ {
+  "ym": "202002",
+  "hour": "01",
+  "rows": 1481277,
+  "expected": 1481277,
+  "masked": 638208,
+  "bad_dow": 0,
+  "hours_in_file": [
+   1
+  ],
+  "ym_in_file": [
+   202002
+  ],
+  "secs": 1.2
+ },
+ {
+  "ym": "202002",
+  "hour": "02",
+  "rows": 990461,
+  "expected": 990461,
+  "masked": 427325,
+  "bad_dow": 0,
+  "hours_in_file": [
+   2
+  ],
+  "ym_in_file": [
+   202002
+  ],
+  "secs": 0.8
+ },
+ {
+  "ym": "202002",
+  "hour": "03",
+  "rows": 736338,
+  "expected": 736338,
+  "masked": 312574,
+  "bad_dow": 0,
+  "hours_in_file": [
+   3
+  ],
+  "ym_in_file": [
+   202002
+  ],
+  "secs": 0.6
+ },
+ {
+  "ym": "202002",
+  "hour": "04",
+  "rows": 671974,
+  "expected": 671974,
+  "masked": 248688,
+  "bad_dow": 0,
+  "hours_in_file": [
+   4
+  ],
+  "ym_in_file": [
+   202002
+  ],
+  "secs": 0.6
+ },
+ {
+  "ym": "202002",
+  "hour": "05",
+  "rows": 909965,
+  "expected": 909965,
+  "masked": 247637,
+  "bad_dow": 0,
+  "hours_in_file": [
+   5
+  ],
+  "ym_in_file": [
+   202002
+  ],
+  "secs": 0.7
+ },
+ {
+  "ym": "202002",
+  "hour": "06",
+  "rows": 1689808,
+  "expected": 1689808,
+  "masked": 374058,
+  "bad_dow": 0,
+  "hours_in_file": [
+   6
+  ],
+  "ym_in_file": [
+   202002
+  ],
+  "secs": 1.3
+ },
+ {
+  "ym": "202002",
+  "hour": "07",
+  "rows": 2970275,
+  "expected": 2970275,
+  "masked": 638211,
+  "bad_dow": 0,
+  "hours_in_file": [
+   7
+  ],
+  "ym_in_file": [
+   202002
+  ],
+  "secs": 2.3
+ },
+ {
+  "ym": "202002",
+  "hour": "08",
+  "rows": 5197824,
+  "expected": 5197824,
+  "masked": 1024959,
+  "bad_dow": 0,
+  "hours_in_file": [
+   8
+  ],
+  "ym_in_file": [
+   202002
+  ],
+  "secs": 4.1
+ },
+ {
+  "ym": "202002",
+  "hour": "09",
+  "rows": 5682442,
+  "expected": 5682442,
+  "masked": 1277477,
+  "bad_dow": 0,
+  "hours_in_file": [
+   9
+  ],
+  "ym_in_file": [
+   202002
+  ],
+  "secs": 4.5
+ },
+ {
+  "ym": "202002",
+  "hour": "10",
+  "rows": 5458607,
+  "expected": 5458607,
+  "masked": 1294292,
+  "bad_dow": 0,
+  "hours_in_file": [
+   10
+  ],
+  "ym_in_file": [
+   202002
+  ],
+  "secs": 4.4
+ },
+ {
+  "ym": "202002",
+  "hour": "11",
+  "rows": 5700512,
+  "expected": 5700512,
+  "masked": 1393923,
+  "bad_dow": 0,
+  "hours_in_file": [
+   11
+  ],
+  "ym_in_file": [
+   202002
+  ],
+  "secs": 4.6
+ },
+ {
+  "ym": "202002",
+  "hour": "12",
+  "rows": 6293027,
+  "expected": 6293027,
+  "masked": 1598899,
+  "bad_dow": 0,
+  "hours_in_file": [
+   12
+  ],
+  "ym_in_file": [
+   202002
+  ],
+  "secs": 5.1
+ },
+ {
+  "ym": "202002",
+  "hour": "13",
+  "rows": 6628794,
+  "expected": 6628794,
+  "masked": 1746736,
+  "bad_dow": 0,
+  "hours_in_file": [
+   13
+  ],
+  "ym_in_file": [
+   202002
+  ],
+  "secs": 5.4
+ },
+ {
+  "ym": "202002",
+  "hour": "14",
+  "rows": 6567741,
+  "expected": 6567741,
+  "masked": 1747555,
+  "bad_dow": 0,
+  "hours_in_file": [
+   14
+  ],
+  "ym_in_file": [
+   202002
+  ],
+  "secs": 5.4
+ },
+ {
+  "ym": "202002",
+  "hour": "15",
+  "rows": 6581081,
+  "expected": 6581081,
+  "masked": 1757680,
+  "bad_dow": 0,
+  "hours_in_file": [
+   15
+  ],
+  "ym_in_file": [
+   202002
+  ],
+  "secs": 5.4
+ },
+ {
+  "ym": "202002",
+  "hour": "16",
+  "rows": 6779275,
+  "expected": 6779275,
+  "masked": 1814412,
+  "bad_dow": 0,
+  "hours_in_file": [
+   16
+  ],
+  "ym_in_file": [
+   202002
+  ],
+  "secs": 5.6
+ },
+ {
+  "ym": "202002",
+  "hour": "17",
+  "rows": 7358866,
+  "expected": 7358866,
+  "masked": 1989383,
+  "bad_dow": 0,
+  "hours_in_file": [
+   17
+  ],
+  "ym_in_file": [
+   202002
+  ],
+  "secs": 6.0
+ },
+ {
+  "ym": "202002",
+  "hour": "18",
+  "rows": 8382860,
+  "expected": 8382860,
+  "masked": 2331722,
+  "bad_dow": 0,
+  "hours_in_file": [
+   18
+  ],
+  "ym_in_file": [
+   202002
+  ],
+  "secs": 6.9
+ },
+ {
+  "ym": "202002",
+  "hour": "19",
+  "rows": 8368457,
+  "expected": 8368457,
+  "masked": 2472421,
+  "bad_dow": 0,
+  "hours_in_file": [
+   19
+  ],
+  "ym_in_file": [
+   202002
+  ],
+  "secs": 6.9
+ },
+ {
+  "ym": "202002",
+  "hour": "20",
+  "rows": 6682449,
+  "expected": 6682449,
+  "masked": 2111044,
+  "bad_dow": 0,
+  "hours_in_file": [
+   20
+  ],
+  "ym_in_file": [
+   202002
+  ],
+  "secs": 5.6
+ },
+ {
+  "ym": "202002",
+  "hour": "21",
+  "rows": 5611451,
+  "expected": 5611451,
+  "masked": 1859835,
+  "bad_dow": 0,
+  "hours_in_file": [
+   21
+  ],
+  "ym_in_file": [
+   202002
+  ],
+  "secs": 4.7
+ },
+ {
+  "ym": "202002",
+  "hour": "22",
+  "rows": 4911989,
+  "expected": 4911989,
+  "masked": 1732160,
+  "bad_dow": 0,
+  "hours_in_file": [
+   22
+  ],
+  "ym_in_file": [
+   202002
+  ],
+  "secs": 4.2
+ },
+ {
+  "ym": "202002",
+  "hour": "23",
+  "rows": 3744412,
+  "expected": 3744412,
+  "masked": 1475112,
+  "bad_dow": 0,
+  "hours_in_file": [
+   23
+  ],
+  "ym_in_file": [
+   202002
+  ],
+  "secs": 3.2
+ },
+ {
+  "ym": "202003",
+  "hour": "00",
+  "rows": 2250394,
+  "expected": 2250394,
+  "masked": 982087,
+  "bad_dow": 0,
+  "hours_in_file": [
+   0
+  ],
+  "ym_in_file": [
+   202003
+  ],
+  "secs": 1.9
+ },
+ {
+  "ym": "202003",
+  "hour": "01",
+  "rows": 1352047,
+  "expected": 1352047,
+  "masked": 595212,
+  "bad_dow": 0,
+  "hours_in_file": [
+   1
+  ],
+  "ym_in_file": [
+   202003
+  ],
+  "secs": 1.2
+ },
+ {
+  "ym": "202003",
+  "hour": "02",
+  "rows": 926971,
+  "expected": 926971,
+  "masked": 405813,
+  "bad_dow": 0,
+  "hours_in_file": [
+   2
+  ],
+  "ym_in_file": [
+   202003
+  ],
+  "secs": 0.8
+ },
+ {
+  "ym": "202003",
+  "hour": "03",
+  "rows": 693814,
+  "expected": 693814,
+  "masked": 297051,
+  "bad_dow": 0,
+  "hours_in_file": [
+   3
+  ],
+  "ym_in_file": [
+   202003
+  ],
+  "secs": 0.6
+ },
+ {
+  "ym": "202003",
+  "hour": "04",
+  "rows": 624910,
+  "expected": 624910,
+  "masked": 237799,
+  "bad_dow": 0,
+  "hours_in_file": [
+   4
+  ],
+  "ym_in_file": [
+   202003
+  ],
+  "secs": 0.5
+ },
+ {
+  "ym": "202003",
+  "hour": "05",
+  "rows": 842002,
+  "expected": 842002,
+  "masked": 231319,
+  "bad_dow": 0,
+  "hours_in_file": [
+   5
+  ],
+  "ym_in_file": [
+   202003
+  ],
+  "secs": 0.7
+ },
+ {
+  "ym": "202003",
+  "hour": "06",
+  "rows": 1657948,
+  "expected": 1657948,
+  "masked": 351401,
+  "bad_dow": 0,
+  "hours_in_file": [
+   6
+  ],
+  "ym_in_file": [
+   202003
+  ],
+  "secs": 1.4
+ },
+ {
+  "ym": "202003",
+  "hour": "07",
+  "rows": 2906284,
+  "expected": 2906284,
+  "masked": 601982,
+  "bad_dow": 0,
+  "hours_in_file": [
+   7
+  ],
+  "ym_in_file": [
+   202003
+  ],
+  "secs": 2.4
+ },
+ {
+  "ym": "202003",
+  "hour": "08",
+  "rows": 4773320,
+  "expected": 4773320,
+  "masked": 936680,
+  "bad_dow": 0,
+  "hours_in_file": [
+   8
+  ],
+  "ym_in_file": [
+   202003
+  ],
+  "secs": 4.0
+ },
+ {
+  "ym": "202003",
+  "hour": "09",
+  "rows": 5118759,
+  "expected": 5118759,
+  "masked": 1141846,
+  "bad_dow": 0,
+  "hours_in_file": [
+   9
+  ],
+  "ym_in_file": [
+   202003
+  ],
+  "secs": 4.3
+ },
+ {
+  "ym": "202003",
+  "hour": "10",
+  "rows": 4957826,
+  "expected": 4957826,
+  "masked": 1181974,
+  "bad_dow": 0,
+  "hours_in_file": [
+   10
+  ],
+  "ym_in_file": [
+   202003
+  ],
+  "secs": 4.1
+ },
+ {
+  "ym": "202003",
+  "hour": "11",
+  "rows": 5265758,
+  "expected": 5265758,
+  "masked": 1286220,
+  "bad_dow": 0,
+  "hours_in_file": [
+   11
+  ],
+  "ym_in_file": [
+   202003
+  ],
+  "secs": 4.4
+ },
+ {
+  "ym": "202003",
+  "hour": "12",
+  "rows": 5865801,
+  "expected": 5865801,
+  "masked": 1500155,
+  "bad_dow": 0,
+  "hours_in_file": [
+   12
+  ],
+  "ym_in_file": [
+   202003
+  ],
+  "secs": 4.9
+ },
+ {
+  "ym": "202003",
+  "hour": "13",
+  "rows": 6188726,
+  "expected": 6188726,
+  "masked": 1659295,
+  "bad_dow": 0,
+  "hours_in_file": [
+   13
+  ],
+  "ym_in_file": [
+   202003
+  ],
+  "secs": 5.3
+ },
+ {
+  "ym": "202003",
+  "hour": "14",
+  "rows": 6223180,
+  "expected": 6223180,
+  "masked": 1681158,
+  "bad_dow": 0,
+  "hours_in_file": [
+   14
+  ],
+  "ym_in_file": [
+   202003
+  ],
+  "secs": 5.2
+ },
+ {
+  "ym": "202003",
+  "hour": "15",
+  "rows": 6334344,
+  "expected": 6334344,
+  "masked": 1705495,
+  "bad_dow": 0,
+  "hours_in_file": [
+   15
+  ],
+  "ym_in_file": [
+   202003
+  ],
+  "secs": 5.3
+ },
+ {
+  "ym": "202003",
+  "hour": "16",
+  "rows": 6548110,
+  "expected": 6548110,
+  "masked": 1767167,
+  "bad_dow": 0,
+  "hours_in_file": [
+   16
+  ],
+  "ym_in_file": [
+   202003
+  ],
+  "secs": 5.5
+ },
+ {
+  "ym": "202003",
+  "hour": "17",
+  "rows": 7081631,
+  "expected": 7081631,
+  "masked": 1936429,
+  "bad_dow": 0,
+  "hours_in_file": [
+   17
+  ],
+  "ym_in_file": [
+   202003
+  ],
+  "secs": 5.9
+ },
+ {
+  "ym": "202003",
+  "hour": "18",
+  "rows": 8003466,
+  "expected": 8003466,
+  "masked": 2258175,
+  "bad_dow": 0,
+  "hours_in_file": [
+   18
+  ],
+  "ym_in_file": [
+   202003
+  ],
+  "secs": 6.7
+ },
+ {
+  "ym": "202003",
+  "hour": "19",
+  "rows": 7906161,
+  "expected": 7906161,
+  "masked": 2361119,
+  "bad_dow": 0,
+  "hours_in_file": [
+   19
+  ],
+  "ym_in_file": [
+   202003
+  ],
+  "secs": 6.7
+ },
+ {
+  "ym": "202003",
+  "hour": "20",
+  "rows": 6374477,
+  "expected": 6374477,
+  "masked": 2044168,
+  "bad_dow": 0,
+  "hours_in_file": [
+   20
+  ],
+  "ym_in_file": [
+   202003
+  ],
+  "secs": 5.4
+ },
+ {
+  "ym": "202003",
+  "hour": "21",
+  "rows": 5254500,
+  "expected": 5254500,
+  "masked": 1789852,
+  "bad_dow": 0,
+  "hours_in_file": [
+   21
+  ],
+  "ym_in_file": [
+   202003
+  ],
+  "secs": 4.5
+ },
+ {
+  "ym": "202003",
+  "hour": "22",
+  "rows": 4428722,
+  "expected": 4428722,
+  "masked": 1615753,
+  "bad_dow": 0,
+  "hours_in_file": [
+   22
+  ],
+  "ym_in_file": [
+   202003
+  ],
+  "secs": 3.8
+ },
+ {
+  "ym": "202003",
+  "hour": "23",
+  "rows": 3232778,
+  "expected": 3232778,
+  "masked": 1311924,
+  "bad_dow": 0,
+  "hours_in_file": [
+   23
+  ],
+  "ym_in_file": [
+   202003
+  ],
+  "secs": 2.8
+ },
+ {
+  "ym": "202004",
+  "hour": "00",
+  "rows": 2440845,
+  "expected": 2440845,
+  "masked": 1058093,
+  "bad_dow": 0,
+  "hours_in_file": [
+   0
+  ],
+  "ym_in_file": [
+   202004
+  ],
+  "secs": 2.1
+ },
+ {
+  "ym": "202004",
+  "hour": "01",
+  "rows": 1417111,
+  "expected": 1417111,
+  "masked": 620328,
+  "bad_dow": 0,
+  "hours_in_file": [
+   1
+  ],
+  "ym_in_file": [
+   202004
+  ],
+  "secs": 1.2
+ },
+ {
+  "ym": "202004",
+  "hour": "02",
+  "rows": 963193,
+  "expected": 963193,
+  "masked": 425918,
+  "bad_dow": 0,
+  "hours_in_file": [
+   2
+  ],
+  "ym_in_file": [
+   202004
+  ],
+  "secs": 0.8
+ },
+ {
+  "ym": "202004",
+  "hour": "03",
+  "rows": 708966,
+  "expected": 708966,
+  "masked": 305476,
+  "bad_dow": 0,
+  "hours_in_file": [
+   3
+  ],
+  "ym_in_file": [
+   202004
+  ],
+  "secs": 0.6
+ },
+ {
+  "ym": "202004",
+  "hour": "04",
+  "rows": 642937,
+  "expected": 642937,
+  "masked": 240486,
+  "bad_dow": 0,
+  "hours_in_file": [
+   4
+  ],
+  "ym_in_file": [
+   202004
+  ],
+  "secs": 0.6
+ },
+ {
+  "ym": "202004",
+  "hour": "05",
+  "rows": 886969,
+  "expected": 886969,
+  "masked": 234965,
+  "bad_dow": 0,
+  "hours_in_file": [
+   5
+  ],
+  "ym_in_file": [
+   202004
+  ],
+  "secs": 0.8
+ },
+ {
+  "ym": "202004",
+  "hour": "06",
+  "rows": 1784738,
+  "expected": 1784738,
+  "masked": 361320,
+  "bad_dow": 0,
+  "hours_in_file": [
+   6
+  ],
+  "ym_in_file": [
+   202004
+  ],
+  "secs": 1.5
+ },
+ {
+  "ym": "202004",
+  "hour": "07",
+  "rows": 3041315,
+  "expected": 3041315,
+  "masked": 609407,
+  "bad_dow": 0,
+  "hours_in_file": [
+   7
+  ],
+  "ym_in_file": [
+   202004
+  ],
+  "secs": 2.5
+ },
+ {
+  "ym": "202004",
+  "hour": "08",
+  "rows": 4937025,
+  "expected": 4937025,
+  "masked": 947868,
+  "bad_dow": 0,
+  "hours_in_file": [
+   8
+  ],
+  "ym_in_file": [
+   202004
+  ],
+  "secs": 4.2
+ },
+ {
+  "ym": "202004",
+  "hour": "09",
+  "rows": 5340749,
+  "expected": 5340749,
+  "masked": 1177942,
+  "bad_dow": 0,
+  "hours_in_file": [
+   9
+  ],
+  "ym_in_file": [
+   202004
+  ],
+  "secs": 4.5
+ },
+ {
+  "ym": "202004",
+  "hour": "10",
+  "rows": 5237439,
+  "expected": 5237439,
+  "masked": 1229309,
+  "bad_dow": 0,
+  "hours_in_file": [
+   10
+  ],
+  "ym_in_file": [
+   202004
+  ],
+  "secs": 4.4
+ },
+ {
+  "ym": "202004",
+  "hour": "11",
+  "rows": 5688877,
+  "expected": 5688877,
+  "masked": 1361994,
+  "bad_dow": 0,
+  "hours_in_file": [
+   11
+  ],
+  "ym_in_file": [
+   202004
+  ],
+  "secs": 4.8
+ },
+ {
+  "ym": "202004",
+  "hour": "12",
+  "rows": 6349613,
+  "expected": 6349613,
+  "masked": 1598448,
+  "bad_dow": 0,
+  "hours_in_file": [
+   12
+  ],
+  "ym_in_file": [
+   202004
+  ],
+  "secs": 5.4
+ },
+ {
+  "ym": "202004",
+  "hour": "13",
+  "rows": 6634603,
+  "expected": 6634603,
+  "masked": 1758463,
+  "bad_dow": 0,
+  "hours_in_file": [
+   13
+  ],
+  "ym_in_file": [
+   202004
+  ],
+  "secs": 5.7
+ },
+ {
+  "ym": "202004",
+  "hour": "14",
+  "rows": 6592748,
+  "expected": 6592748,
+  "masked": 1761055,
+  "bad_dow": 0,
+  "hours_in_file": [
+   14
+  ],
+  "ym_in_file": [
+   202004
+  ],
+  "secs": 5.8
+ },
+ {
+  "ym": "202004",
+  "hour": "15",
+  "rows": 6686135,
+  "expected": 6686135,
+  "masked": 1781516,
+  "bad_dow": 0,
+  "hours_in_file": [
+   15
+  ],
+  "ym_in_file": [
+   202004
+  ],
+  "secs": 5.8
+ },
+ {
+  "ym": "202004",
+  "hour": "16",
+  "rows": 6915164,
+  "expected": 6915164,
+  "masked": 1840075,
+  "bad_dow": 0,
+  "hours_in_file": [
+   16
+  ],
+  "ym_in_file": [
+   202004
+  ],
+  "secs": 6.0
+ },
+ {
+  "ym": "202004",
+  "hour": "17",
+  "rows": 7567232,
+  "expected": 7567232,
+  "masked": 2029926,
+  "bad_dow": 0,
+  "hours_in_file": [
+   17
+  ],
+  "ym_in_file": [
+   202004
+  ],
+  "secs": 6.5
+ },
+ {
+  "ym": "202004",
+  "hour": "18",
+  "rows": 8467416,
+  "expected": 8467416,
+  "masked": 2351332,
+  "bad_dow": 0,
+  "hours_in_file": [
+   18
+  ],
+  "ym_in_file": [
+   202004
+  ],
+  "secs": 7.2
+ },
+ {
+  "ym": "202004",
+  "hour": "19",
+  "rows": 8323316,
+  "expected": 8323316,
+  "masked": 2447963,
+  "bad_dow": 0,
+  "hours_in_file": [
+   19
+  ],
+  "ym_in_file": [
+   202004
+  ],
+  "secs": 7.1
+ },
+ {
+  "ym": "202004",
+  "hour": "20",
+  "rows": 6758930,
+  "expected": 6758930,
+  "masked": 2126997,
+  "bad_dow": 0,
+  "hours_in_file": [
+   20
+  ],
+  "ym_in_file": [
+   202004
+  ],
+  "secs": 5.8
+ },
+ {
+  "ym": "202004",
+  "hour": "21",
+  "rows": 5637396,
+  "expected": 5637396,
+  "masked": 1882021,
+  "bad_dow": 0,
+  "hours_in_file": [
+   21
+  ],
+  "ym_in_file": [
+   202004
+  ],
+  "secs": 4.8
+ },
+ {
+  "ym": "202004",
+  "hour": "22",
+  "rows": 4787859,
+  "expected": 4787859,
+  "masked": 1711186,
+  "bad_dow": 0,
+  "hours_in_file": [
+   22
+  ],
+  "ym_in_file": [
+   202004
+  ],
+  "secs": 4.1
+ },
+ {
+  "ym": "202004",
+  "hour": "23",
+  "rows": 3468802,
+  "expected": 3468802,
+  "masked": 1380461,
+  "bad_dow": 0,
+  "hours_in_file": [
+   23
+  ],
+  "ym_in_file": [
+   202004
+  ],
+  "secs": 3.0
+ },
+ {
+  "ym": "202005",
+  "hour": "00",
+  "rows": 2768138,
+  "expected": 2768138,
+  "masked": 1174011,
+  "bad_dow": 0,
+  "hours_in_file": [
+   0
+  ],
+  "ym_in_file": [
+   202005
+  ],
+  "secs": 2.4
+ },
+ {
+  "ym": "202005",
+  "hour": "01",
+  "rows": 1606940,
+  "expected": 1606940,
+  "masked": 689220,
+  "bad_dow": 0,
+  "hours_in_file": [
+   1
+  ],
+  "ym_in_file": [
+   202005
+  ],
+  "secs": 1.4
+ },
+ {
+  "ym": "202005",
+  "hour": "02",
+  "rows": 1073078,
+  "expected": 1073078,
+  "masked": 467253,
+  "bad_dow": 0,
+  "hours_in_file": [
+   2
+  ],
+  "ym_in_file": [
+   202005
+  ],
+  "secs": 1.0
+ },
+ {
+  "ym": "202005",
+  "hour": "03",
+  "rows": 787020,
+  "expected": 787020,
+  "masked": 335718,
+  "bad_dow": 0,
+  "hours_in_file": [
+   3
+  ],
+  "ym_in_file": [
+   202005
+  ],
+  "secs": 0.7
+ },
+ {
+  "ym": "202005",
+  "hour": "04",
+  "rows": 703967,
+  "expected": 703967,
+  "masked": 261171,
+  "bad_dow": 0,
+  "hours_in_file": [
+   4
+  ],
+  "ym_in_file": [
+   202005
+  ],
+  "secs": 0.6
+ },
+ {
+  "ym": "202005",
+  "hour": "05",
+  "rows": 1004551,
+  "expected": 1004551,
+  "masked": 258827,
+  "bad_dow": 0,
+  "hours_in_file": [
+   5
+  ],
+  "ym_in_file": [
+   202005
+  ],
+  "secs": 0.8
+ },
+ {
+  "ym": "202005",
+  "hour": "06",
+  "rows": 1950906,
+  "expected": 1950906,
+  "masked": 387797,
+  "bad_dow": 0,
+  "hours_in_file": [
+   6
+  ],
+  "ym_in_file": [
+   202005
+  ],
+  "secs": 1.7
+ },
+ {
+  "ym": "202005",
+  "hour": "07",
+  "rows": 3247482,
+  "expected": 3247482,
+  "masked": 645823,
+  "bad_dow": 0,
+  "hours_in_file": [
+   7
+  ],
+  "ym_in_file": [
+   202005
+  ],
+  "secs": 2.7
+ },
+ {
+  "ym": "202005",
+  "hour": "08",
+  "rows": 5267416,
+  "expected": 5267416,
+  "masked": 1019488,
+  "bad_dow": 0,
+  "hours_in_file": [
+   8
+  ],
+  "ym_in_file": [
+   202005
+  ],
+  "secs": 4.4
+ },
+ {
+  "ym": "202005",
+  "hour": "09",
+  "rows": 5696049,
+  "expected": 5696049,
+  "masked": 1254371,
+  "bad_dow": 0,
+  "hours_in_file": [
+   9
+  ],
+  "ym_in_file": [
+   202005
+  ],
+  "secs": 4.8
+ },
+ {
+  "ym": "202005",
+  "hour": "10",
+  "rows": 5656855,
+  "expected": 5656855,
+  "masked": 1307235,
+  "bad_dow": 0,
+  "hours_in_file": [
+   10
+  ],
+  "ym_in_file": [
+   202005
+  ],
+  "secs": 4.7
+ },
+ {
+  "ym": "202005",
+  "hour": "11",
+  "rows": 6226686,
+  "expected": 6226686,
+  "masked": 1466490,
+  "bad_dow": 0,
+  "hours_in_file": [
+   11
+  ],
+  "ym_in_file": [
+   202005
+  ],
+  "secs": 5.2
+ },
+ {
+  "ym": "202005",
+  "hour": "12",
+  "rows": 6981611,
+  "expected": 6981611,
+  "masked": 1728516,
+  "bad_dow": 0,
+  "hours_in_file": [
+   12
+  ],
+  "ym_in_file": [
+   202005
+  ],
+  "secs": 5.9
+ },
+ {
+  "ym": "202005",
+  "hour": "13",
+  "rows": 7271939,
+  "expected": 7271939,
+  "masked": 1894578,
+  "bad_dow": 0,
+  "hours_in_file": [
+   13
+  ],
+  "ym_in_file": [
+   202005
+  ],
+  "secs": 6.1
+ },
+ {
+  "ym": "202005",
+  "hour": "14",
+  "rows": 7185252,
+  "expected": 7185252,
+  "masked": 1890512,
+  "bad_dow": 0,
+  "hours_in_file": [
+   14
+  ],
+  "ym_in_file": [
+   202005
+  ],
+  "secs": 6.1
+ },
+ {
+  "ym": "202005",
+  "hour": "15",
+  "rows": 7274307,
+  "expected": 7274307,
+  "masked": 1902628,
+  "bad_dow": 0,
+  "hours_in_file": [
+   15
+  ],
+  "ym_in_file": [
+   202005
+  ],
+  "secs": 6.1
+ },
+ {
+  "ym": "202005",
+  "hour": "16",
+  "rows": 7552894,
+  "expected": 7552894,
+  "masked": 1971192,
+  "bad_dow": 0,
+  "hours_in_file": [
+   16
+  ],
+  "ym_in_file": [
+   202005
+  ],
+  "secs": 6.3
+ },
+ {
+  "ym": "202005",
+  "hour": "17",
+  "rows": 8195952,
+  "expected": 8195952,
+  "masked": 2158703,
+  "bad_dow": 0,
+  "hours_in_file": [
+   17
+  ],
+  "ym_in_file": [
+   202005
+  ],
+  "secs": 6.9
+ },
+ {
+  "ym": "202005",
+  "hour": "18",
+  "rows": 9195357,
+  "expected": 9195357,
+  "masked": 2503523,
+  "bad_dow": 0,
+  "hours_in_file": [
+   18
+  ],
+  "ym_in_file": [
+   202005
+  ],
+  "secs": 7.8
+ },
+ {
+  "ym": "202005",
+  "hour": "19",
+  "rows": 9023012,
+  "expected": 9023012,
+  "masked": 2600804,
+  "bad_dow": 0,
+  "hours_in_file": [
+   19
+  ],
+  "ym_in_file": [
+   202005
+  ],
+  "secs": 7.7
+ },
+ {
+  "ym": "202005",
+  "hour": "20",
+  "rows": 7393178,
+  "expected": 7393178,
+  "masked": 2253379,
+  "bad_dow": 0,
+  "hours_in_file": [
+   20
+  ],
+  "ym_in_file": [
+   202005
+  ],
+  "secs": 6.3
+ },
+ {
+  "ym": "202005",
+  "hour": "21",
+  "rows": 6295920,
+  "expected": 6295920,
+  "masked": 2024679,
+  "bad_dow": 0,
+  "hours_in_file": [
+   21
+  ],
+  "ym_in_file": [
+   202005
+  ],
+  "secs": 5.5
+ },
+ {
+  "ym": "202005",
+  "hour": "22",
+  "rows": 5438403,
+  "expected": 5438403,
+  "masked": 1871386,
+  "bad_dow": 0,
+  "hours_in_file": [
+   22
+  ],
+  "ym_in_file": [
+   202005
+  ],
+  "secs": 4.7
+ },
+ {
+  "ym": "202005",
+  "hour": "23",
+  "rows": 3990520,
+  "expected": 3990520,
+  "masked": 1537265,
+  "bad_dow": 0,
+  "hours_in_file": [
+   23
+  ],
+  "ym_in_file": [
+   202005
+  ],
+  "secs": 3.7
+ },
+ {
+  "ym": "202006",
+  "hour": "00",
+  "rows": 2698882,
+  "expected": 2698882,
+  "masked": 1142119,
+  "bad_dow": 0,
+  "hours_in_file": [
+   0
+  ],
+  "ym_in_file": [
+   202006
+  ],
+  "secs": 2.2
+ },
+ {
+  "ym": "202006",
+  "hour": "01",
+  "rows": 1558200,
+  "expected": 1558200,
+  "masked": 667791,
+  "bad_dow": 0,
+  "hours_in_file": [
+   1
+  ],
+  "ym_in_file": [
+   202006
+  ],
+  "secs": 1.3
+ },
+ {
+  "ym": "202006",
+  "hour": "02",
+  "rows": 1041319,
+  "expected": 1041319,
+  "masked": 451611,
+  "bad_dow": 0,
+  "hours_in_file": [
+   2
+  ],
+  "ym_in_file": [
+   202006
+  ],
+  "secs": 0.9
+ },
+ {
+  "ym": "202006",
+  "hour": "03",
+  "rows": 761093,
+  "expected": 761093,
+  "masked": 321775,
+  "bad_dow": 0,
+  "hours_in_file": [
+   3
+  ],
+  "ym_in_file": [
+   202006
+  ],
+  "secs": 0.7
+ },
+ {
+  "ym": "202006",
+  "hour": "04",
+  "rows": 694047,
+  "expected": 694047,
+  "masked": 249497,
+  "bad_dow": 0,
+  "hours_in_file": [
+   4
+  ],
+  "ym_in_file": [
+   202006
+  ],
+  "secs": 0.6
+ },
+ {
+  "ym": "202006",
+  "hour": "05",
+  "rows": 1045495,
+  "expected": 1045495,
+  "masked": 253078,
+  "bad_dow": 0,
+  "hours_in_file": [
+   5
+  ],
+  "ym_in_file": [
+   202006
+  ],
+  "secs": 0.9
+ },
+ {
+  "ym": "202006",
+  "hour": "06",
+  "rows": 2054602,
+  "expected": 2054602,
+  "masked": 391565,
+  "bad_dow": 0,
+  "hours_in_file": [
+   6
+  ],
+  "ym_in_file": [
+   202006
+  ],
+  "secs": 1.6
+ },
+ {
+  "ym": "202006",
+  "hour": "07",
+  "rows": 3420609,
+  "expected": 3420609,
+  "masked": 649320,
+  "bad_dow": 0,
+  "hours_in_file": [
+   7
+  ],
+  "ym_in_file": [
+   202006
+  ],
+  "secs": 2.6
+ },
+ {
+  "ym": "202006",
+  "hour": "08",
+  "rows": 5498744,
+  "expected": 5498744,
+  "masked": 1031736,
+  "bad_dow": 0,
+  "hours_in_file": [
+   8
+  ],
+  "ym_in_file": [
+   202006
+  ],
+  "secs": 4.2
+ },
+ {
+  "ym": "202006",
+  "hour": "09",
+  "rows": 5859188,
+  "expected": 5859188,
+  "masked": 1272684,
+  "bad_dow": 0,
+  "hours_in_file": [
+   9
+  ],
+  "ym_in_file": [
+   202006
+  ],
+  "secs": 4.5
+ },
+ {
+  "ym": "202006",
+  "hour": "10",
+  "rows": 5676031,
+  "expected": 5676031,
+  "masked": 1304913,
+  "bad_dow": 0,
+  "hours_in_file": [
+   10
+  ],
+  "ym_in_file": [
+   202006
+  ],
+  "secs": 4.4
+ },
+ {
+  "ym": "202006",
+  "hour": "11",
+  "rows": 6058522,
+  "expected": 6058522,
+  "masked": 1427611,
+  "bad_dow": 0,
+  "hours_in_file": [
+   11
+  ],
+  "ym_in_file": [
+   202006
+  ],
+  "secs": 4.7
+ },
+ {
+  "ym": "202006",
+  "hour": "12",
+  "rows": 6648585,
+  "expected": 6648585,
+  "masked": 1649712,
+  "bad_dow": 0,
+  "hours_in_file": [
+   12
+  ],
+  "ym_in_file": [
+   202006
+  ],
+  "secs": 5.1
+ },
+ {
+  "ym": "202006",
+  "hour": "13",
+  "rows": 6836168,
+  "expected": 6836168,
+  "masked": 1787276,
+  "bad_dow": 0,
+  "hours_in_file": [
+   13
+  ],
+  "ym_in_file": [
+   202006
+  ],
+  "secs": 5.3
+ },
+ {
+  "ym": "202006",
+  "hour": "14",
+  "rows": 6680865,
+  "expected": 6680865,
+  "masked": 1768209,
+  "bad_dow": 0,
+  "hours_in_file": [
+   14
+  ],
+  "ym_in_file": [
+   202006
+  ],
+  "secs": 5.2
+ },
+ {
+  "ym": "202006",
+  "hour": "15",
+  "rows": 6773753,
+  "expected": 6773753,
+  "masked": 1780203,
+  "bad_dow": 0,
+  "hours_in_file": [
+   15
+  ],
+  "ym_in_file": [
+   202006
+  ],
+  "secs": 5.2
+ },
+ {
+  "ym": "202006",
+  "hour": "16",
+  "rows": 7069796,
+  "expected": 7069796,
+  "masked": 1839476,
+  "bad_dow": 0,
+  "hours_in_file": [
+   16
+  ],
+  "ym_in_file": [
+   202006
+  ],
+  "secs": 5.5
+ },
+ {
+  "ym": "202006",
+  "hour": "17",
+  "rows": 7743228,
+  "expected": 7743228,
+  "masked": 2018609,
+  "bad_dow": 0,
+  "hours_in_file": [
+   17
+  ],
+  "ym_in_file": [
+   202006
+  ],
+  "secs": 6.0
+ },
+ {
+  "ym": "202006",
+  "hour": "18",
+  "rows": 8859078,
+  "expected": 8859078,
+  "masked": 2368832,
+  "bad_dow": 0,
+  "hours_in_file": [
+   18
+  ],
+  "ym_in_file": [
+   202006
+  ],
+  "secs": 6.9
+ },
+ {
+  "ym": "202006",
+  "hour": "19",
+  "rows": 8825952,
+  "expected": 8825952,
+  "masked": 2487682,
+  "bad_dow": 0,
+  "hours_in_file": [
+   19
+  ],
+  "ym_in_file": [
+   202006
+  ],
+  "secs": 6.9
+ },
+ {
+  "ym": "202006",
+  "hour": "20",
+  "rows": 7219956,
+  "expected": 7219956,
+  "masked": 2150732,
+  "bad_dow": 0,
+  "hours_in_file": [
+   20
+  ],
+  "ym_in_file": [
+   202006
+  ],
+  "secs": 5.7
+ },
+ {
+  "ym": "202006",
+  "hour": "21",
+  "rows": 6171733,
+  "expected": 6171733,
+  "masked": 1943843,
+  "bad_dow": 0,
+  "hours_in_file": [
+   21
+  ],
+  "ym_in_file": [
+   202006
+  ],
+  "secs": 4.8
+ },
+ {
+  "ym": "202006",
+  "hour": "22",
+  "rows": 5392561,
+  "expected": 5392561,
+  "masked": 1825313,
+  "bad_dow": 0,
+  "hours_in_file": [
+   22
+  ],
+  "ym_in_file": [
+   202006
+  ],
+  "secs": 4.3
+ },
+ {
+  "ym": "202006",
+  "hour": "23",
+  "rows": 3986020,
+  "expected": 3986020,
+  "masked": 1526031,
+  "bad_dow": 0,
+  "hours_in_file": [
+   23
+  ],
+  "ym_in_file": [
+   202006
+  ],
+  "secs": 3.2
+ },
+ {
+  "ym": "202007",
+  "hour": "00",
+  "rows": 2928435,
+  "expected": 2928435,
+  "masked": 1227664,
+  "bad_dow": 0,
+  "hours_in_file": [
+   0
+  ],
+  "ym_in_file": [
+   202007
+  ],
+  "secs": 2.7
+ },
+ {
+  "ym": "202007",
+  "hour": "01",
+  "rows": 1678459,
+  "expected": 1678459,
+  "masked": 716127,
+  "bad_dow": 0,
+  "hours_in_file": [
+   1
+  ],
+  "ym_in_file": [
+   202007
+  ],
+  "secs": 1.6
+ },
+ {
+  "ym": "202007",
+  "hour": "02",
+  "rows": 1124799,
+  "expected": 1124799,
+  "masked": 483142,
+  "bad_dow": 0,
+  "hours_in_file": [
+   2
+  ],
+  "ym_in_file": [
+   202007
+  ],
+  "secs": 1.0
+ },
+ {
+  "ym": "202007",
+  "hour": "03",
+  "rows": 818721,
+  "expected": 818721,
+  "masked": 344023,
+  "bad_dow": 0,
+  "hours_in_file": [
+   3
+  ],
+  "ym_in_file": [
+   202007
+  ],
+  "secs": 0.7
+ },
+ {
+  "ym": "202007",
+  "hour": "04",
+  "rows": 744462,
+  "expected": 744462,
+  "masked": 269208,
+  "bad_dow": 0,
+  "hours_in_file": [
+   4
+  ],
+  "ym_in_file": [
+   202007
+  ],
+  "secs": 0.7
+ },
+ {
+  "ym": "202007",
+  "hour": "05",
+  "rows": 1084848,
+  "expected": 1084848,
+  "masked": 270358,
+  "bad_dow": 0,
+  "hours_in_file": [
+   5
+  ],
+  "ym_in_file": [
+   202007
+  ],
+  "secs": 1.0
+ },
+ {
+  "ym": "202007",
+  "hour": "06",
+  "rows": 2111129,
+  "expected": 2111129,
+  "masked": 415155,
+  "bad_dow": 0,
+  "hours_in_file": [
+   6
+  ],
+  "ym_in_file": [
+   202007
+  ],
+  "secs": 1.8
+ },
+ {
+  "ym": "202007",
+  "hour": "07",
+  "rows": 3500799,
+  "expected": 3500799,
+  "masked": 679769,
+  "bad_dow": 0,
+  "hours_in_file": [
+   7
+  ],
+  "ym_in_file": [
+   202007
+  ],
+  "secs": 2.9
+ },
+ {
+  "ym": "202007",
+  "hour": "08",
+  "rows": 5615884,
+  "expected": 5615884,
+  "masked": 1055250,
+  "bad_dow": 0,
+  "hours_in_file": [
+   8
+  ],
+  "ym_in_file": [
+   202007
+  ],
+  "secs": 4.6
+ },
+ {
+  "ym": "202007",
+  "hour": "09",
+  "rows": 5996133,
+  "expected": 5996133,
+  "masked": 1303584,
+  "bad_dow": 0,
+  "hours_in_file": [
+   9
+  ],
+  "ym_in_file": [
+   202007
+  ],
+  "secs": 5.0
+ },
+ {
+  "ym": "202007",
+  "hour": "10",
+  "rows": 5846844,
+  "expected": 5846844,
+  "masked": 1344644,
+  "bad_dow": 0,
+  "hours_in_file": [
+   10
+  ],
+  "ym_in_file": [
+   202007
+  ],
+  "secs": 4.9
+ },
+ {
+  "ym": "202007",
+  "hour": "11",
+  "rows": 6314542,
+  "expected": 6314542,
+  "masked": 1484148,
+  "bad_dow": 0,
+  "hours_in_file": [
+   11
+  ],
+  "ym_in_file": [
+   202007
+  ],
+  "secs": 5.3
+ },
+ {
+  "ym": "202007",
+  "hour": "12",
+  "rows": 6988186,
+  "expected": 6988186,
+  "masked": 1722473,
+  "bad_dow": 0,
+  "hours_in_file": [
+   12
+  ],
+  "ym_in_file": [
+   202007
+  ],
+  "secs": 5.8
+ },
+ {
+  "ym": "202007",
+  "hour": "13",
+  "rows": 7215622,
+  "expected": 7215622,
+  "masked": 1873913,
+  "bad_dow": 0,
+  "hours_in_file": [
+   13
+  ],
+  "ym_in_file": [
+   202007
+  ],
+  "secs": 5.9
+ },
+ {
+  "ym": "202007",
+  "hour": "14",
+  "rows": 7069003,
+  "expected": 7069003,
+  "masked": 1855767,
+  "bad_dow": 0,
+  "hours_in_file": [
+   14
+  ],
+  "ym_in_file": [
+   202007
+  ],
+  "secs": 5.8
+ },
+ {
+  "ym": "202007",
+  "hour": "15",
+  "rows": 7123453,
+  "expected": 7123453,
+  "masked": 1858866,
+  "bad_dow": 0,
+  "hours_in_file": [
+   15
+  ],
+  "ym_in_file": [
+   202007
+  ],
+  "secs": 5.9
+ },
+ {
+  "ym": "202007",
+  "hour": "16",
+  "rows": 7440393,
+  "expected": 7440393,
+  "masked": 1931937,
+  "bad_dow": 0,
+  "hours_in_file": [
+   16
+  ],
+  "ym_in_file": [
+   202007
+  ],
+  "secs": 6.2
+ },
+ {
+  "ym": "202007",
+  "hour": "17",
+  "rows": 8163406,
+  "expected": 8163406,
+  "masked": 2136426,
+  "bad_dow": 0,
+  "hours_in_file": [
+   17
+  ],
+  "ym_in_file": [
+   202007
+  ],
+  "secs": 6.9
+ },
+ {
+  "ym": "202007",
+  "hour": "18",
+  "rows": 9324484,
+  "expected": 9324484,
+  "masked": 2502798,
+  "bad_dow": 0,
+  "hours_in_file": [
+   18
+  ],
+  "ym_in_file": [
+   202007
+  ],
+  "secs": 7.7
+ },
+ {
+  "ym": "202007",
+  "hour": "19",
+  "rows": 9245764,
+  "expected": 9245764,
+  "masked": 2617942,
+  "bad_dow": 0,
+  "hours_in_file": [
+   19
+  ],
+  "ym_in_file": [
+   202007
+  ],
+  "secs": 7.7
+ },
+ {
+  "ym": "202007",
+  "hour": "20",
+  "rows": 7509618,
+  "expected": 7509618,
+  "masked": 2242055,
+  "bad_dow": 0,
+  "hours_in_file": [
+   20
+  ],
+  "ym_in_file": [
+   202007
+  ],
+  "secs": 6.3
+ },
+ {
+  "ym": "202007",
+  "hour": "21",
+  "rows": 6439246,
+  "expected": 6439246,
+  "masked": 2025414,
+  "bad_dow": 0,
+  "hours_in_file": [
+   21
+  ],
+  "ym_in_file": [
+   202007
+  ],
+  "secs": 5.4
+ },
+ {
+  "ym": "202007",
+  "hour": "22",
+  "rows": 5692174,
+  "expected": 5692174,
+  "masked": 1915156,
+  "bad_dow": 0,
+  "hours_in_file": [
+   22
+  ],
+  "ym_in_file": [
+   202007
+  ],
+  "secs": 4.8
+ },
+ {
+  "ym": "202007",
+  "hour": "23",
+  "rows": 4234210,
+  "expected": 4234210,
+  "masked": 1607919,
+  "bad_dow": 0,
+  "hours_in_file": [
+   23
+  ],
+  "ym_in_file": [
+   202007
+  ],
+  "secs": 3.7
+ },
+ {
+  "ym": "202008",
+  "hour": "00",
+  "rows": 2582652,
+  "expected": 2582652,
+  "masked": 1097527,
+  "bad_dow": 0,
+  "hours_in_file": [
+   0
+  ],
+  "ym_in_file": [
+   202008
+  ],
+  "secs": 2.3
+ },
+ {
+  "ym": "202008",
+  "hour": "01",
+  "rows": 1508443,
+  "expected": 1508443,
+  "masked": 649583,
+  "bad_dow": 0,
+  "hours_in_file": [
+   1
+  ],
+  "ym_in_file": [
+   202008
+  ],
+  "secs": 1.3
+ },
+ {
+  "ym": "202008",
+  "hour": "02",
+  "rows": 1023837,
+  "expected": 1023837,
+  "masked": 447257,
+  "bad_dow": 0,
+  "hours_in_file": [
+   2
+  ],
+  "ym_in_file": [
+   202008
+  ],
+  "secs": 0.9
+ },
+ {
+  "ym": "202008",
+  "hour": "03",
+  "rows": 754201,
+  "expected": 754201,
+  "masked": 322562,
+  "bad_dow": 0,
+  "hours_in_file": [
+   3
+  ],
+  "ym_in_file": [
+   202008
+  ],
+  "secs": 0.7
+ },
+ {
+  "ym": "202008",
+  "hour": "04",
+  "rows": 685022,
+  "expected": 685022,
+  "masked": 253441,
+  "bad_dow": 0,
+  "hours_in_file": [
+   4
+  ],
+  "ym_in_file": [
+   202008
+  ],
+  "secs": 0.6
+ },
+ {
+  "ym": "202008",
+  "hour": "05",
+  "rows": 979396,
+  "expected": 979396,
+  "masked": 253498,
+  "bad_dow": 0,
+  "hours_in_file": [
+   5
+  ],
+  "ym_in_file": [
+   202008
+  ],
+  "secs": 0.8
+ },
+ {
+  "ym": "202008",
+  "hour": "06",
+  "rows": 1939634,
+  "expected": 1939634,
+  "masked": 397377,
+  "bad_dow": 0,
+  "hours_in_file": [
+   6
+  ],
+  "ym_in_file": [
+   202008
+  ],
+  "secs": 1.6
+ },
+ {
+  "ym": "202008",
+  "hour": "07",
+  "rows": 3326831,
+  "expected": 3326831,
+  "masked": 682036,
+  "bad_dow": 0,
+  "hours_in_file": [
+   7
+  ],
+  "ym_in_file": [
+   202008
+  ],
+  "secs": 2.8
+ },
+ {
+  "ym": "202008",
+  "hour": "08",
+  "rows": 5370033,
+  "expected": 5370033,
+  "masked": 1078610,
+  "bad_dow": 0,
+  "hours_in_file": [
+   8
+  ],
+  "ym_in_file": [
+   202008
+  ],
+  "secs": 4.4
+ },
+ {
+  "ym": "202008",
+  "hour": "09",
+  "rows": 5680517,
+  "expected": 5680517,
+  "masked": 1288761,
+  "bad_dow": 0,
+  "hours_in_file": [
+   9
+  ],
+  "ym_in_file": [
+   202008
+  ],
+  "secs": 4.8
+ },
+ {
+  "ym": "202008",
+  "hour": "10",
+  "rows": 5523344,
+  "expected": 5523344,
+  "masked": 1307702,
+  "bad_dow": 0,
+  "hours_in_file": [
+   10
+  ],
+  "ym_in_file": [
+   202008
+  ],
+  "secs": 4.6
+ },
+ {
+  "ym": "202008",
+  "hour": "11",
+  "rows": 5899803,
+  "expected": 5899803,
+  "masked": 1427507,
+  "bad_dow": 0,
+  "hours_in_file": [
+   11
+  ],
+  "ym_in_file": [
+   202008
+  ],
+  "secs": 4.9
+ },
+ {
+  "ym": "202008",
+  "hour": "12",
+  "rows": 6555455,
+  "expected": 6555455,
+  "masked": 1658309,
+  "bad_dow": 0,
+  "hours_in_file": [
+   12
+  ],
+  "ym_in_file": [
+   202008
+  ],
+  "secs": 5.4
+ },
+ {
+  "ym": "202008",
+  "hour": "13",
+  "rows": 6826681,
+  "expected": 6826681,
+  "masked": 1813795,
+  "bad_dow": 0,
+  "hours_in_file": [
+   13
+  ],
+  "ym_in_file": [
+   202008
+  ],
+  "secs": 5.7
+ },
+ {
+  "ym": "202008",
+  "hour": "14",
+  "rows": 6671474,
+  "expected": 6671474,
+  "masked": 1791130,
+  "bad_dow": 0,
+  "hours_in_file": [
+   14
+  ],
+  "ym_in_file": [
+   202008
+  ],
+  "secs": 5.5
+ },
+ {
+  "ym": "202008",
+  "hour": "15",
+  "rows": 6697875,
+  "expected": 6697875,
+  "masked": 1794569,
+  "bad_dow": 0,
+  "hours_in_file": [
+   15
+  ],
+  "ym_in_file": [
+   202008
+  ],
+  "secs": 5.6
+ },
+ {
+  "ym": "202008",
+  "hour": "16",
+  "rows": 6951175,
+  "expected": 6951175,
+  "masked": 1856834,
+  "bad_dow": 0,
+  "hours_in_file": [
+   16
+  ],
+  "ym_in_file": [
+   202008
+  ],
+  "secs": 5.8
+ },
+ {
+  "ym": "202008",
+  "hour": "17",
+  "rows": 7595713,
+  "expected": 7595713,
+  "masked": 2040625,
+  "bad_dow": 0,
+  "hours_in_file": [
+   17
+  ],
+  "ym_in_file": [
+   202008
+  ],
+  "secs": 6.3
+ },
+ {
+  "ym": "202008",
+  "hour": "18",
+  "rows": 8598779,
+  "expected": 8598779,
+  "masked": 2374282,
+  "bad_dow": 0,
+  "hours_in_file": [
+   18
+  ],
+  "ym_in_file": [
+   202008
+  ],
+  "secs": 7.2
+ },
+ {
+  "ym": "202008",
+  "hour": "19",
+  "rows": 8446655,
+  "expected": 8446655,
+  "masked": 2460825,
+  "bad_dow": 0,
+  "hours_in_file": [
+   19
+  ],
+  "ym_in_file": [
+   202008
+  ],
+  "secs": 7.1
+ },
+ {
+  "ym": "202008",
+  "hour": "20",
+  "rows": 6872366,
+  "expected": 6872366,
+  "masked": 2120488,
+  "bad_dow": 0,
+  "hours_in_file": [
+   20
+  ],
+  "ym_in_file": [
+   202008
+  ],
+  "secs": 5.8
+ },
+ {
+  "ym": "202008",
+  "hour": "21",
+  "rows": 5816858,
+  "expected": 5816858,
+  "masked": 1895968,
+  "bad_dow": 0,
+  "hours_in_file": [
+   21
+  ],
+  "ym_in_file": [
+   202008
+  ],
+  "secs": 5.0
+ },
+ {
+  "ym": "202008",
+  "hour": "22",
+  "rows": 4990094,
+  "expected": 4990094,
+  "masked": 1739298,
+  "bad_dow": 0,
+  "hours_in_file": [
+   22
+  ],
+  "ym_in_file": [
+   202008
+  ],
+  "secs": 4.3
+ },
+ {
+  "ym": "202008",
+  "hour": "23",
+  "rows": 3650209,
+  "expected": 3650209,
+  "masked": 1425068,
+  "bad_dow": 0,
+  "hours_in_file": [
+   23
+  ],
+  "ym_in_file": [
+   202008
+  ],
+  "secs": 3.2
+ },
+ {
+  "ym": "202009",
+  "hour": "00",
+  "rows": 2135329,
+  "expected": 2135329,
+  "masked": 934046,
+  "bad_dow": 0,
+  "hours_in_file": [
+   0
+  ],
+  "ym_in_file": [
+   202009
+  ],
+  "secs": 1.8
+ },
+ {
+  "ym": "202009",
+  "hour": "01",
+  "rows": 1227312,
+  "expected": 1227312,
+  "masked": 545141,
+  "bad_dow": 0,
+  "hours_in_file": [
+   1
+  ],
+  "ym_in_file": [
+   202009
+  ],
+  "secs": 1.1
+ },
+ {
+  "ym": "202009",
+  "hour": "02",
+  "rows": 830518,
+  "expected": 830518,
+  "masked": 372506,
+  "bad_dow": 0,
+  "hours_in_file": [
+   2
+  ],
+  "ym_in_file": [
+   202009
+  ],
+  "secs": 0.7
+ },
+ {
+  "ym": "202009",
+  "hour": "03",
+  "rows": 606527,
+  "expected": 606527,
+  "masked": 261589,
+  "bad_dow": 0,
+  "hours_in_file": [
+   3
+  ],
+  "ym_in_file": [
+   202009
+  ],
+  "secs": 0.5
+ },
+ {
+  "ym": "202009",
+  "hour": "04",
+  "rows": 570209,
+  "expected": 570209,
+  "masked": 204676,
+  "bad_dow": 0,
+  "hours_in_file": [
+   4
+  ],
+  "ym_in_file": [
+   202009
+  ],
+  "secs": 0.5
+ },
+ {
+  "ym": "202009",
+  "hour": "05",
+  "rows": 881673,
+  "expected": 881673,
+  "masked": 210066,
+  "bad_dow": 0,
+  "hours_in_file": [
+   5
+  ],
+  "ym_in_file": [
+   202009
+  ],
+  "secs": 0.7
+ },
+ {
+  "ym": "202009",
+  "hour": "06",
+  "rows": 1872055,
+  "expected": 1872055,
+  "masked": 352593,
+  "bad_dow": 0,
+  "hours_in_file": [
+   6
+  ],
+  "ym_in_file": [
+   202009
+  ],
+  "secs": 1.5
+ },
+ {
+  "ym": "202009",
+  "hour": "07",
+  "rows": 3292698,
+  "expected": 3292698,
+  "masked": 631958,
+  "bad_dow": 0,
+  "hours_in_file": [
+   7
+  ],
+  "ym_in_file": [
+   202009
+  ],
+  "secs": 2.7
+ },
+ {
+  "ym": "202009",
+  "hour": "08",
+  "rows": 5271513,
+  "expected": 5271513,
+  "masked": 1006790,
+  "bad_dow": 0,
+  "hours_in_file": [
+   8
+  ],
+  "ym_in_file": [
+   202009
+  ],
+  "secs": 4.4
+ },
+ {
+  "ym": "202009",
+  "hour": "09",
+  "rows": 5527337,
+  "expected": 5527337,
+  "masked": 1222308,
+  "bad_dow": 0,
+  "hours_in_file": [
+   9
+  ],
+  "ym_in_file": [
+   202009
+  ],
+  "secs": 4.6
+ },
+ {
+  "ym": "202009",
+  "hour": "10",
+  "rows": 5355102,
+  "expected": 5355102,
+  "masked": 1246924,
+  "bad_dow": 0,
+  "hours_in_file": [
+   10
+  ],
+  "ym_in_file": [
+   202009
+  ],
+  "secs": 4.5
+ },
+ {
+  "ym": "202009",
+  "hour": "11",
+  "rows": 5821195,
+  "expected": 5821195,
+  "masked": 1394992,
+  "bad_dow": 0,
+  "hours_in_file": [
+   11
+  ],
+  "ym_in_file": [
+   202009
+  ],
+  "secs": 4.8
+ },
+ {
+  "ym": "202009",
+  "hour": "12",
+  "rows": 6353180,
+  "expected": 6353180,
+  "masked": 1597972,
+  "bad_dow": 0,
+  "hours_in_file": [
+   12
+  ],
+  "ym_in_file": [
+   202009
+  ],
+  "secs": 5.2
+ },
+ {
+  "ym": "202009",
+  "hour": "13",
+  "rows": 6562227,
+  "expected": 6562227,
+  "masked": 1733819,
+  "bad_dow": 0,
+  "hours_in_file": [
+   13
+  ],
+  "ym_in_file": [
+   202009
+  ],
+  "secs": 5.4
+ },
+ {
+  "ym": "202009",
+  "hour": "14",
+  "rows": 6490330,
+  "expected": 6490330,
+  "masked": 1722320,
+  "bad_dow": 0,
+  "hours_in_file": [
+   14
+  ],
+  "ym_in_file": [
+   202009
+  ],
+  "secs": 5.3
+ },
+ {
+  "ym": "202009",
+  "hour": "15",
+  "rows": 6598108,
+  "expected": 6598108,
+  "masked": 1744150,
+  "bad_dow": 0,
+  "hours_in_file": [
+   15
+  ],
+  "ym_in_file": [
+   202009
+  ],
+  "secs": 5.5
+ },
+ {
+  "ym": "202009",
+  "hour": "16",
+  "rows": 6895323,
+  "expected": 6895323,
+  "masked": 1812860,
+  "bad_dow": 0,
+  "hours_in_file": [
+   16
+  ],
+  "ym_in_file": [
+   202009
+  ],
+  "secs": 5.7
+ },
+ {
+  "ym": "202009",
+  "hour": "17",
+  "rows": 7497449,
+  "expected": 7497449,
+  "masked": 1991060,
+  "bad_dow": 0,
+  "hours_in_file": [
+   17
+  ],
+  "ym_in_file": [
+   202009
+  ],
+  "secs": 6.2
+ },
+ {
+  "ym": "202009",
+  "hour": "18",
+  "rows": 8358688,
+  "expected": 8358688,
+  "masked": 2292411,
+  "bad_dow": 0,
+  "hours_in_file": [
+   18
+  ],
+  "ym_in_file": [
+   202009
+  ],
+  "secs": 6.9
+ },
+ {
+  "ym": "202009",
+  "hour": "19",
+  "rows": 8178123,
+  "expected": 8178123,
+  "masked": 2374262,
+  "bad_dow": 0,
+  "hours_in_file": [
+   19
+  ],
+  "ym_in_file": [
+   202009
+  ],
+  "secs": 6.8
+ },
+ {
+  "ym": "202009",
+  "hour": "20",
+  "rows": 6630344,
+  "expected": 6630344,
+  "masked": 2053548,
+  "bad_dow": 0,
+  "hours_in_file": [
+   20
+  ],
+  "ym_in_file": [
+   202009
+  ],
+  "secs": 5.5
+ },
+ {
+  "ym": "202009",
+  "hour": "21",
+  "rows": 5716337,
+  "expected": 5716337,
+  "masked": 1892723,
+  "bad_dow": 0,
+  "hours_in_file": [
+   21
+  ],
+  "ym_in_file": [
+   202009
+  ],
+  "secs": 4.9
+ },
+ {
+  "ym": "202009",
+  "hour": "22",
+  "rows": 4627615,
+  "expected": 4627615,
+  "masked": 1669839,
+  "bad_dow": 0,
+  "hours_in_file": [
+   22
+  ],
+  "ym_in_file": [
+   202009
+  ],
+  "secs": 4.0
+ },
+ {
+  "ym": "202009",
+  "hour": "23",
+  "rows": 3177477,
+  "expected": 3177477,
+  "masked": 1278160,
+  "bad_dow": 0,
+  "hours_in_file": [
+   23
+  ],
+  "ym_in_file": [
+   202009
+  ],
+  "secs": 2.7
+ },
+ {
+  "ym": "202010",
+  "hour": "00",
+  "rows": 2655570,
+  "expected": 2655570,
+  "masked": 1136300,
+  "bad_dow": 0,
+  "hours_in_file": [
+   0
+  ],
+  "ym_in_file": [
+   202010
+  ],
+  "secs": 2.3
+ },
+ {
+  "ym": "202010",
+  "hour": "01",
+  "rows": 1551673,
+  "expected": 1551673,
+  "masked": 673397,
+  "bad_dow": 0,
+  "hours_in_file": [
+   1
+  ],
+  "ym_in_file": [
+   202010
+  ],
+  "secs": 1.4
+ },
+ {
+  "ym": "202010",
+  "hour": "02",
+  "rows": 1054223,
+  "expected": 1054223,
+  "masked": 461625,
+  "bad_dow": 0,
+  "hours_in_file": [
+   2
+  ],
+  "ym_in_file": [
+   202010
+  ],
+  "secs": 0.9
+ },
+ {
+  "ym": "202010",
+  "hour": "03",
+  "rows": 775210,
+  "expected": 775210,
+  "masked": 331915,
+  "bad_dow": 0,
+  "hours_in_file": [
+   3
+  ],
+  "ym_in_file": [
+   202010
+  ],
+  "secs": 0.7
+ },
+ {
+  "ym": "202010",
+  "hour": "04",
+  "rows": 707473,
+  "expected": 707473,
+  "masked": 259708,
+  "bad_dow": 0,
+  "hours_in_file": [
+   4
+  ],
+  "ym_in_file": [
+   202010
+  ],
+  "secs": 0.6
+ },
+ {
+  "ym": "202010",
+  "hour": "05",
+  "rows": 1005785,
+  "expected": 1005785,
+  "masked": 257789,
+  "bad_dow": 0,
+  "hours_in_file": [
+   5
+  ],
+  "ym_in_file": [
+   202010
+  ],
+  "secs": 0.8
+ },
+ {
+  "ym": "202010",
+  "hour": "06",
+  "rows": 1973632,
+  "expected": 1973632,
+  "masked": 396219,
+  "bad_dow": 0,
+  "hours_in_file": [
+   6
+  ],
+  "ym_in_file": [
+   202010
+  ],
+  "secs": 1.6
+ },
+ {
+  "ym": "202010",
+  "hour": "07",
+  "rows": 3448816,
+  "expected": 3448816,
+  "masked": 680344,
+  "bad_dow": 0,
+  "hours_in_file": [
+   7
+  ],
+  "ym_in_file": [
+   202010
+  ],
+  "secs": 2.9
+ },
+ {
+  "ym": "202010",
+  "hour": "08",
+  "rows": 5667405,
+  "expected": 5667405,
+  "masked": 1094005,
+  "bad_dow": 0,
+  "hours_in_file": [
+   8
+  ],
+  "ym_in_file": [
+   202010
+  ],
+  "secs": 4.7
+ },
+ {
+  "ym": "202010",
+  "hour": "09",
+  "rows": 6011626,
+  "expected": 6011626,
+  "masked": 1329994,
+  "bad_dow": 0,
+  "hours_in_file": [
+   9
+  ],
+  "ym_in_file": [
+   202010
+  ],
+  "secs": 5.0
+ },
+ {
+  "ym": "202010",
+  "hour": "10",
+  "rows": 5913419,
+  "expected": 5913419,
+  "masked": 1365415,
+  "bad_dow": 0,
+  "hours_in_file": [
+   10
+  ],
+  "ym_in_file": [
+   202010
+  ],
+  "secs": 4.9
+ },
+ {
+  "ym": "202010",
+  "hour": "11",
+  "rows": 6448432,
+  "expected": 6448432,
+  "masked": 1508859,
+  "bad_dow": 0,
+  "hours_in_file": [
+   11
+  ],
+  "ym_in_file": [
+   202010
+  ],
+  "secs": 5.3
+ },
+ {
+  "ym": "202010",
+  "hour": "12",
+  "rows": 7211926,
+  "expected": 7211926,
+  "masked": 1769833,
+  "bad_dow": 0,
+  "hours_in_file": [
+   12
+  ],
+  "ym_in_file": [
+   202010
+  ],
+  "secs": 6.0
+ },
+ {
+  "ym": "202010",
+  "hour": "13",
+  "rows": 7489604,
+  "expected": 7489604,
+  "masked": 1931676,
+  "bad_dow": 0,
+  "hours_in_file": [
+   13
+  ],
+  "ym_in_file": [
+   202010
+  ],
+  "secs": 6.2
+ },
+ {
+  "ym": "202010",
+  "hour": "14",
+  "rows": 7383991,
+  "expected": 7383991,
+  "masked": 1918287,
+  "bad_dow": 0,
+  "hours_in_file": [
+   14
+  ],
+  "ym_in_file": [
+   202010
+  ],
+  "secs": 6.1
+ },
+ {
+  "ym": "202010",
+  "hour": "15",
+  "rows": 7478277,
+  "expected": 7478277,
+  "masked": 1929461,
+  "bad_dow": 0,
+  "hours_in_file": [
+   15
+  ],
+  "ym_in_file": [
+   202010
+  ],
+  "secs": 6.2
+ },
+ {
+  "ym": "202010",
+  "hour": "16",
+  "rows": 7795349,
+  "expected": 7795349,
+  "masked": 1997503,
+  "bad_dow": 0,
+  "hours_in_file": [
+   16
+  ],
+  "ym_in_file": [
+   202010
+  ],
+  "secs": 6.4
+ },
+ {
+  "ym": "202010",
+  "hour": "17",
+  "rows": 8430217,
+  "expected": 8430217,
+  "masked": 2180795,
+  "bad_dow": 0,
+  "hours_in_file": [
+   17
+  ],
+  "ym_in_file": [
+   202010
+  ],
+  "secs": 6.9
+ },
+ {
+  "ym": "202010",
+  "hour": "18",
+  "rows": 9320256,
+  "expected": 9320256,
+  "masked": 2517446,
+  "bad_dow": 0,
+  "hours_in_file": [
+   18
+  ],
+  "ym_in_file": [
+   202010
+  ],
+  "secs": 7.7
+ },
+ {
+  "ym": "202010",
+  "hour": "19",
+  "rows": 8956358,
+  "expected": 8956358,
+  "masked": 2603050,
+  "bad_dow": 0,
+  "hours_in_file": [
+   19
+  ],
+  "ym_in_file": [
+   202010
+  ],
+  "secs": 7.5
+ },
+ {
+  "ym": "202010",
+  "hour": "20",
+  "rows": 7249463,
+  "expected": 7249463,
+  "masked": 2235362,
+  "bad_dow": 0,
+  "hours_in_file": [
+   20
+  ],
+  "ym_in_file": [
+   202010
+  ],
+  "secs": 6.1
+ },
+ {
+  "ym": "202010",
+  "hour": "21",
+  "rows": 6134527,
+  "expected": 6134527,
+  "masked": 1996110,
+  "bad_dow": 0,
+  "hours_in_file": [
+   21
+  ],
+  "ym_in_file": [
+   202010
+  ],
+  "secs": 5.2
+ },
+ {
+  "ym": "202010",
+  "hour": "22",
+  "rows": 5280591,
+  "expected": 5280591,
+  "masked": 1836195,
+  "bad_dow": 0,
+  "hours_in_file": [
+   22
+  ],
+  "ym_in_file": [
+   202010
+  ],
+  "secs": 4.5
+ },
+ {
+  "ym": "202010",
+  "hour": "23",
+  "rows": 3862445,
+  "expected": 3862445,
+  "masked": 1505908,
+  "bad_dow": 0,
+  "hours_in_file": [
+   23
+  ],
+  "ym_in_file": [
+   202010
+  ],
+  "secs": 3.3
+ },
+ {
+  "ym": "202011",
+  "hour": "00",
+  "rows": 2455452,
+  "expected": 2455452,
+  "masked": 1062041,
+  "bad_dow": 0,
+  "hours_in_file": [
+   0
+  ],
+  "ym_in_file": [
+   202011
+  ],
+  "secs": 2.1
+ },
+ {
+  "ym": "202011",
+  "hour": "01",
+  "rows": 1411113,
+  "expected": 1411113,
+  "masked": 614502,
+  "bad_dow": 0,
+  "hours_in_file": [
+   1
+  ],
+  "ym_in_file": [
+   202011
+  ],
+  "secs": 1.2
+ },
+ {
+  "ym": "202011",
+  "hour": "02",
+  "rows": 954649,
+  "expected": 954649,
+  "masked": 415519,
+  "bad_dow": 0,
+  "hours_in_file": [
+   2
+  ],
+  "ym_in_file": [
+   202011
+  ],
+  "secs": 0.8
+ },
+ {
+  "ym": "202011",
+  "hour": "03",
+  "rows": 709430,
+  "expected": 709430,
+  "masked": 298667,
+  "bad_dow": 0,
+  "hours_in_file": [
+   3
+  ],
+  "ym_in_file": [
+   202011
+  ],
+  "secs": 0.6
+ },
+ {
+  "ym": "202011",
+  "hour": "04",
+  "rows": 657775,
+  "expected": 657775,
+  "masked": 233345,
+  "bad_dow": 0,
+  "hours_in_file": [
+   4
+  ],
+  "ym_in_file": [
+   202011
+  ],
+  "secs": 0.6
+ },
+ {
+  "ym": "202011",
+  "hour": "05",
+  "rows": 951546,
+  "expected": 951546,
+  "masked": 235670,
+  "bad_dow": 0,
+  "hours_in_file": [
+   5
+  ],
+  "ym_in_file": [
+   202011
+  ],
+  "secs": 0.8
+ },
+ {
+  "ym": "202011",
+  "hour": "06",
+  "rows": 1891973,
+  "expected": 1891973,
+  "masked": 376168,
+  "bad_dow": 0,
+  "hours_in_file": [
+   6
+  ],
+  "ym_in_file": [
+   202011
+  ],
+  "secs": 1.6
+ },
+ {
+  "ym": "202011",
+  "hour": "07",
+  "rows": 3292364,
+  "expected": 3292364,
+  "masked": 649914,
+  "bad_dow": 0,
+  "hours_in_file": [
+   7
+  ],
+  "ym_in_file": [
+   202011
+  ],
+  "secs": 2.7
+ },
+ {
+  "ym": "202011",
+  "hour": "08",
+  "rows": 5505643,
+  "expected": 5505643,
+  "masked": 1046073,
+  "bad_dow": 0,
+  "hours_in_file": [
+   8
+  ],
+  "ym_in_file": [
+   202011
+  ],
+  "secs": 4.6
+ },
+ {
+  "ym": "202011",
+  "hour": "09",
+  "rows": 6017724,
+  "expected": 6017724,
+  "masked": 1318747,
+  "bad_dow": 0,
+  "hours_in_file": [
+   9
+  ],
+  "ym_in_file": [
+   202011
+  ],
+  "secs": 5.1
+ },
+ {
+  "ym": "202011",
+  "hour": "10",
+  "rows": 5754791,
+  "expected": 5754791,
+  "masked": 1326537,
+  "bad_dow": 0,
+  "hours_in_file": [
+   10
+  ],
+  "ym_in_file": [
+   202011
+  ],
+  "secs": 4.8
+ },
+ {
+  "ym": "202011",
+  "hour": "11",
+  "rows": 6148175,
+  "expected": 6148175,
+  "masked": 1446993,
+  "bad_dow": 0,
+  "hours_in_file": [
+   11
+  ],
+  "ym_in_file": [
+   202011
+  ],
+  "secs": 5.1
+ },
+ {
+  "ym": "202011",
+  "hour": "12",
+  "rows": 6786418,
+  "expected": 6786418,
+  "masked": 1664396,
+  "bad_dow": 0,
+  "hours_in_file": [
+   12
+  ],
+  "ym_in_file": [
+   202011
+  ],
+  "secs": 5.6
+ },
+ {
+  "ym": "202011",
+  "hour": "13",
+  "rows": 7072121,
+  "expected": 7072121,
+  "masked": 1815690,
+  "bad_dow": 0,
+  "hours_in_file": [
+   13
+  ],
+  "ym_in_file": [
+   202011
+  ],
+  "secs": 5.9
+ },
+ {
+  "ym": "202011",
+  "hour": "14",
+  "rows": 6937955,
+  "expected": 6937955,
+  "masked": 1790840,
+  "bad_dow": 0,
+  "hours_in_file": [
+   14
+  ],
+  "ym_in_file": [
+   202011
+  ],
+  "secs": 5.8
+ },
+ {
+  "ym": "202011",
+  "hour": "15",
+  "rows": 7032115,
+  "expected": 7032115,
+  "masked": 1798315,
+  "bad_dow": 0,
+  "hours_in_file": [
+   15
+  ],
+  "ym_in_file": [
+   202011
+  ],
+  "secs": 5.8
+ },
+ {
+  "ym": "202011",
+  "hour": "16",
+  "rows": 7346881,
+  "expected": 7346881,
+  "masked": 1871465,
+  "bad_dow": 0,
+  "hours_in_file": [
+   16
+  ],
+  "ym_in_file": [
+   202011
+  ],
+  "secs": 6.2
+ },
+ {
+  "ym": "202011",
+  "hour": "17",
+  "rows": 7981431,
+  "expected": 7981431,
+  "masked": 2056398,
+  "bad_dow": 0,
+  "hours_in_file": [
+   17
+  ],
+  "ym_in_file": [
+   202011
+  ],
+  "secs": 6.7
+ },
+ {
+  "ym": "202011",
+  "hour": "18",
+  "rows": 8943812,
+  "expected": 8943812,
+  "masked": 2421705,
+  "bad_dow": 0,
+  "hours_in_file": [
+   18
+  ],
+  "ym_in_file": [
+   202011
+  ],
+  "secs": 7.5
+ },
+ {
+  "ym": "202011",
+  "hour": "19",
+  "rows": 8547521,
+  "expected": 8547521,
+  "masked": 2487844,
+  "bad_dow": 0,
+  "hours_in_file": [
+   19
+  ],
+  "ym_in_file": [
+   202011
+  ],
+  "secs": 7.2
+ },
+ {
+  "ym": "202011",
+  "hour": "20",
+  "rows": 6809600,
+  "expected": 6809600,
+  "masked": 2102153,
+  "bad_dow": 0,
+  "hours_in_file": [
+   20
+  ],
+  "ym_in_file": [
+   202011
+  ],
+  "secs": 5.8
+ },
+ {
+  "ym": "202011",
+  "hour": "21",
+  "rows": 5883985,
+  "expected": 5883985,
+  "masked": 1920239,
+  "bad_dow": 0,
+  "hours_in_file": [
+   21
+  ],
+  "ym_in_file": [
+   202011
+  ],
+  "secs": 5.0
+ },
+ {
+  "ym": "202011",
+  "hour": "22",
+  "rows": 4974731,
+  "expected": 4974731,
+  "masked": 1750903,
+  "bad_dow": 0,
+  "hours_in_file": [
+   22
+  ],
+  "ym_in_file": [
+   202011
+  ],
+  "secs": 4.3
+ },
+ {
+  "ym": "202011",
+  "hour": "23",
+  "rows": 3538824,
+  "expected": 3538824,
+  "masked": 1396131,
+  "bad_dow": 0,
+  "hours_in_file": [
+   23
+  ],
+  "ym_in_file": [
+   202011
+  ],
+  "secs": 3.1
+ },
+ {
+  "ym": "202012",
+  "hour": "00",
+  "rows": 1393002,
+  "expected": 1393002,
+  "masked": 600161,
+  "bad_dow": 0,
+  "hours_in_file": [
+   0
+  ],
+  "ym_in_file": [
+   202012
+  ],
+  "secs": 1.2
+ },
+ {
+  "ym": "202012",
+  "hour": "01",
+  "rows": 802983,
+  "expected": 802983,
+  "masked": 346113,
+  "bad_dow": 0,
+  "hours_in_file": [
+   1
+  ],
+  "ym_in_file": [
+   202012
+  ],
+  "secs": 0.7
+ },
+ {
+  "ym": "202012",
+  "hour": "02",
+  "rows": 549921,
+  "expected": 549921,
+  "masked": 236743,
+  "bad_dow": 0,
+  "hours_in_file": [
+   2
+  ],
+  "ym_in_file": [
+   202012
+  ],
+  "secs": 0.5
+ },
+ {
+  "ym": "202012",
+  "hour": "03",
+  "rows": 418366,
+  "expected": 418366,
+  "masked": 170064,
+  "bad_dow": 0,
+  "hours_in_file": [
+   3
+  ],
+  "ym_in_file": [
+   202012
+  ],
+  "secs": 0.4
+ },
+ {
+  "ym": "202012",
+  "hour": "04",
+  "rows": 433323,
+  "expected": 433323,
+  "masked": 139309,
+  "bad_dow": 0,
+  "hours_in_file": [
+   4
+  ],
+  "ym_in_file": [
+   202012
+  ],
+  "secs": 0.4
+ },
+ {
+  "ym": "202012",
+  "hour": "05",
+  "rows": 727796,
+  "expected": 727796,
+  "masked": 159824,
+  "bad_dow": 0,
+  "hours_in_file": [
+   5
+  ],
+  "ym_in_file": [
+   202012
+  ],
+  "secs": 0.6
+ },
+ {
+  "ym": "202012",
+  "hour": "06",
+  "rows": 1574069,
+  "expected": 1574069,
+  "masked": 293213,
+  "bad_dow": 0,
+  "hours_in_file": [
+   6
+  ],
+  "ym_in_file": [
+   202012
+  ],
+  "secs": 1.3
+ },
+ {
+  "ym": "202012",
+  "hour": "07",
+  "rows": 2888299,
+  "expected": 2888299,
+  "masked": 573347,
+  "bad_dow": 0,
+  "hours_in_file": [
+   7
+  ],
+  "ym_in_file": [
+   202012
+  ],
+  "secs": 2.4
+ },
+ {
+  "ym": "202012",
+  "hour": "08",
+  "rows": 4879259,
+  "expected": 4879259,
+  "masked": 951924,
+  "bad_dow": 0,
+  "hours_in_file": [
+   8
+  ],
+  "ym_in_file": [
+   202012
+  ],
+  "secs": 4.0
+ },
+ {
+  "ym": "202012",
+  "hour": "09",
+  "rows": 5160714,
+  "expected": 5160714,
+  "masked": 1154723,
+  "bad_dow": 0,
+  "hours_in_file": [
+   9
+  ],
+  "ym_in_file": [
+   202012
+  ],
+  "secs": 4.3
+ },
+ {
+  "ym": "202012",
+  "hour": "10",
+  "rows": 5032534,
+  "expected": 5032534,
+  "masked": 1180733,
+  "bad_dow": 0,
+  "hours_in_file": [
+   10
+  ],
+  "ym_in_file": [
+   202012
+  ],
+  "secs": 4.2
+ },
+ {
+  "ym": "202012",
+  "hour": "11",
+  "rows": 5379239,
+  "expected": 5379239,
+  "masked": 1283605,
+  "bad_dow": 0,
+  "hours_in_file": [
+   11
+  ],
+  "ym_in_file": [
+   202012
+  ],
+  "secs": 4.4
+ },
+ {
+  "ym": "202012",
+  "hour": "12",
+  "rows": 6000014,
+  "expected": 6000014,
+  "masked": 1506057,
+  "bad_dow": 0,
+  "hours_in_file": [
+   12
+  ],
+  "ym_in_file": [
+   202012
+  ],
+  "secs": 5.0
+ },
+ {
+  "ym": "202012",
+  "hour": "13",
+  "rows": 6300431,
+  "expected": 6300431,
+  "masked": 1657108,
+  "bad_dow": 0,
+  "hours_in_file": [
+   13
+  ],
+  "ym_in_file": [
+   202012
+  ],
+  "secs": 5.3
+ },
+ {
+  "ym": "202012",
+  "hour": "14",
+  "rows": 6285632,
+  "expected": 6285632,
+  "masked": 1651781,
+  "bad_dow": 0,
+  "hours_in_file": [
+   14
+  ],
+  "ym_in_file": [
+   202012
+  ],
+  "secs": 5.2
+ },
+ {
+  "ym": "202012",
+  "hour": "15",
+  "rows": 6397809,
+  "expected": 6397809,
+  "masked": 1676448,
+  "bad_dow": 0,
+  "hours_in_file": [
+   15
+  ],
+  "ym_in_file": [
+   202012
+  ],
+  "secs": 5.4
+ },
+ {
+  "ym": "202012",
+  "hour": "16",
+  "rows": 6639088,
+  "expected": 6639088,
+  "masked": 1741341,
+  "bad_dow": 0,
+  "hours_in_file": [
+   16
+  ],
+  "ym_in_file": [
+   202012
+  ],
+  "secs": 5.6
+ },
+ {
+  "ym": "202012",
+  "hour": "17",
+  "rows": 7113417,
+  "expected": 7113417,
+  "masked": 1891496,
+  "bad_dow": 0,
+  "hours_in_file": [
+   17
+  ],
+  "ym_in_file": [
+   202012
+  ],
+  "secs": 5.9
+ },
+ {
+  "ym": "202012",
+  "hour": "18",
+  "rows": 7659170,
+  "expected": 7659170,
+  "masked": 2137097,
+  "bad_dow": 0,
+  "hours_in_file": [
+   18
+  ],
+  "ym_in_file": [
+   202012
+  ],
+  "secs": 6.4
+ },
+ {
+  "ym": "202012",
+  "hour": "19",
+  "rows": 7145087,
+  "expected": 7145087,
+  "masked": 2111501,
+  "bad_dow": 0,
+  "hours_in_file": [
+   19
+  ],
+  "ym_in_file": [
+   202012
+  ],
+  "secs": 6.0
+ },
+ {
+  "ym": "202012",
+  "hour": "20",
+  "rows": 5570952,
+  "expected": 5570952,
+  "masked": 1746438,
+  "bad_dow": 0,
+  "hours_in_file": [
+   20
+  ],
+  "ym_in_file": [
+   202012
+  ],
+  "secs": 4.6
+ },
+ {
+  "ym": "202012",
+  "hour": "21",
+  "rows": 5081206,
+  "expected": 5081206,
+  "masked": 1706345,
+  "bad_dow": 0,
+  "hours_in_file": [
+   21
+  ],
+  "ym_in_file": [
+   202012
+  ],
+  "secs": 4.3
+ },
+ {
+  "ym": "202012",
+  "hour": "22",
+  "rows": 3564532,
+  "expected": 3564532,
+  "masked": 1346308,
+  "bad_dow": 0,
+  "hours_in_file": [
+   22
+  ],
+  "ym_in_file": [
+   202012
+  ],
+  "secs": 3.1
+ },
+ {
+  "ym": "202012",
+  "hour": "23",
+  "rows": 2082962,
+  "expected": 2082962,
+  "masked": 855622,
+  "bad_dow": 0,
+  "hours_in_file": [
+   23
+  ],
+  "ym_in_file": [
+   202012
+  ],
+  "secs": 1.8
+ }
+]

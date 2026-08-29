@@ -1,0 +1,45 @@
+Licence for derived data in this archive
+=======================================
+
+The MIT licence in LICENSE covers the source code. It does not cover data.
+
+Derived data, when a version of this archive carries it, is released under
+Creative Commons Attribution 4.0 International (CC BY 4.0):
+
+    https://creativecommons.org/licenses/by/4.0/
+
+"Derived data" means aggregates computed by the code in this archive: age-by-age
+co-arrival matrices, the age-specific coverage profile, the measured per-cell
+masking fill, the administrative-dong crosswalk, and the calendar and policy
+panel.
+
+WHAT IS NOT COVERED, AND IS NOT HERE
+------------------------------------
+
+The Seoul Living Migration (생활이동) administrative-dong product itself is NOT
+redistributed in this archive, in any form, at any resolution. It is published
+by the Seoul Metropolitan Government through the Seoul Open Data Plaza under its
+own terms, which permit free use on attribution. Retrieve it with the download
+helpers under eda/ and verify it against the stored SHA-256 manifest.
+
+The Korean nationwide contact survey is not redistributed either. It is
+available from its own public release (doi:10.1038/s41597-026-06896-y) under its
+own licence and its own ethical approval.
+
+Resident registration, registered-foreigner and SGIS covariate files come from
+행정안전부, 법무부 and SGIS respectively. They are NOT covered by the Seoul
+terms and each carries its own conditions.
+
+ATTRIBUTION
+-----------
+
+Reuse of any derived aggregate must credit both this deposit and the upstream
+Seoul Metropolitan Government release it was computed from. Attribution to this
+deposit alone is not sufficient.
+
+RE-IDENTIFICATION
+-----------------
+
+The source product already suppresses cells below three at publication. What is
+released here is aggregation at the matrix level, coarser than the source cells,
+so it adds no re-identification risk beyond the published product.

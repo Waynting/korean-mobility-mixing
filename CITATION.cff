@@ -1,0 +1,35 @@
+cff-version: 1.2.0
+message: >-
+  If you use this software, please cite the archive by its concept DOI, which
+  always resolves to the latest version.
+title: >-
+  How much age-mixing structure survives in an aggregated mobility product:
+  analysis code and reproduction harness for a 79-month measurement of Seoul's
+  Living Migration release
+type: software
+authors:
+  - family-names: Liu
+    given-names: Wei-Ting
+    affiliation: National Taiwan University
+license:
+  - MIT
+  - CC-BY-4.0
+version: 1.0.0
+keywords:
+  - contact matrices
+  - human mobility
+  - age-structured models
+  - proportionate mixing
+  - measurement
+  - aggregation
+  - Seoul
+  - reproducibility
+# identifiers: filled in once the record is published. Record the CONCEPT DOI
+# first (the one to cite) and the version DOI second.
+# identifiers:
+#   - type: doi
+#     value: 10.5281/zenodo.XXXXXXX
+#     description: Concept DOI, always the latest version
+#   - type: doi
+#     value: 10.5281/zenodo.YYYYYYY
+#     description: This exact release

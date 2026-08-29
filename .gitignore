@@ -1,0 +1,40 @@
+# Bulk data. Lives on the external drive; point KOREAN_DATA_ROOT at it.
+# See eda/paths.py and .env.example.
+/parquet/
+/derived/
+/raw/
+/*.csv
+
+# Environments and caches
+.venv/
+__pycache__/
+*.pyc
+
+# Local machine config (paths differ per machine; .env.example is tracked)
+.env
+
+# Tooling / OS
+.gstack/
+.DS_Store
+
+# scratch artefacts from eda/determinism_check.sh
+eda/*.determinism-backup
+eda/*.determinism-failure.log
+eda/results_p*.partial.json
+
+# LaTeX build artefacts. main.tex is generated from paper/manuscript_*.md by
+# scripts/manuscript_to_latex.py and IS tracked; everything latexmk produces
+# beside it is not.
+paper/latex/**/main.aux
+paper/latex/**/main.log
+paper/latex/**/main.out
+paper/latex/**/main.fls
+paper/latex/**/main.fdb_latexmk
+paper/latex/**/main.pdf
+paper/latex/**/*.synctex.gz
+
+# Zenodo deposit builds. The zip is reproducible from a commit by
+# scripts/build_zenodo_deposit.sh, so it is an artefact, not a source.
+# release/zenodo_manifests/*.txt IS tracked: it is the per-version file list
+# the next build diffs against.
+/build/

@@ -1,0 +1,20 @@
+# Versions the 2020 results were produced under. Target journals (Epidemics,
+# PLoS CB) enforce code availability, so pin rather than float.
+duckdb==1.5.5
+pandas==3.0.5
+pyarrow==25.0.1
+numpy==2.5.2
+matplotlib==3.11.1
+openpyxl==3.1.5
+python-dateutil==2.9.0.post0
+
+# Source for the 2021-2026 public holidays in eda/calendar_kr.py. The table is
+# written into that file, so this is only needed to re-run
+# calendar_kr.verify_against_library().
+holidays==0.102
+
+# Not yet installed. Needed before Phase 1 (dong-level covariate regressions,
+# the boundary-change graph) and Phase 7 (bootstrap CIs). See archive/REVISION_PLAN.md.
+scipy==1.18.0
+# statsmodels
+# networkx
