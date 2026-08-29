@@ -25,7 +25,7 @@
 #   bash scripts/verify_zenodo_record.sh 1.0.0        # also assert the latest version
 set -uo pipefail
 
-CONCEPT_RECID=""                  # <- fill in after the first publish
+CONCEPT_RECID="22152089"          # concept DOI 10.5281/zenodo.22152089
 EXPECT_VERSION="${1:-}"
 API="https://zenodo.org/api/records"
 RDM_ACCEPT="Accept: application/vnd.inveniordm.v1+json"
@@ -63,7 +63,10 @@ else bad "concept DOI returned HTTP $code; the Data accessibility statement does
 note "resolves to $url"
 
 # --- 2. concept vs version DOI --------------------------------------------
-curl -s -H "$RDM_ACCEPT" "$API/$CONCEPT_RECID" > /tmp/zrec.$$
+# -L is load-bearing: the concept id 302s to the latest version's record, and
+# without it curl returns the redirect's HTML body and the parse below dies on
+# "Expecting value: line 1 column 1".
+curl -sL -H "$RDM_ACCEPT" "$API/$CONCEPT_RECID" > /tmp/zrec.$$
 python3 - /tmp/zrec.$$ "$CONCEPT_RECID" "$EXPECT_VERSION" <<'PY'
 import json, sys
 d = json.load(open(sys.argv[1])); concept_id, want = sys.argv[2], sys.argv[3]

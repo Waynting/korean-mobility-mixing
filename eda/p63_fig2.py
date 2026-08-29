@@ -70,6 +70,18 @@ from matplotlib.lines import Line2D
 from matplotlib.patches import Patch
 from paths import FIG, ROOT
 
+# JRSI wants figure text in Times at 9-11 pt and refuses anything under 7.5 pt,
+# so 7.5 is the floor for every explicit size below. STIXGeneral is the serif:
+# it is Times-metric AND it ships inside matplotlib, so the figure renders the
+# same on a machine with no Times installed. A figure that depends on a locally
+# installed font breaks on the typesetter's machine -- the same reason the
+# Korean here is romanised rather than set in a CJK font.
+plt.rcParams.update({"font.family": "serif",
+                     "font.serif": ["STIXGeneral", "Times New Roman",
+                                    "DejaVu Serif"],
+                     "mathtext.fontset": "stix"})
+
+
 TEAL, RED, BLUE, GOLD = "#0E7C86", "#A8434E", "#4C6E8A", "#BC8034"
 INK, GREY, PALE = "#1b1b1b", "#8a8a8a", "#c9c9c9"
 
@@ -259,8 +271,12 @@ def main():
     # JRSI is no wider, so the constraint holds through the target change.
     # ====================================================================
     fig = plt.figure(figsize=(7.00, 8.55))
+    # (d) takes a little more of the bottom row than it did at 6.4 pt: it is
+    # the one panel whose content is mostly prose, so it is the one the 7.5 pt
+    # floor costs the most. (e) carries four y ticks and a two-line legend and
+    # gives the width up without crowding.
     gs = fig.add_gridspec(4, 2, height_ratios=[1.30, 0.94, 0.94, 1.00],
-                          width_ratios=[1.16, 0.84], hspace=0.46, wspace=0.34,
+                          width_ratios=[1.24, 0.76], hspace=0.46, wspace=0.34,
                           left=0.132, right=0.985, top=0.960, bottom=0.058)
     ax_a = fig.add_subplot(gs[0, :])
     ax_b = fig.add_subplot(gs[1, :])
@@ -289,19 +305,22 @@ def main():
         xs = [POS[ym] for ym in YMS if YEAR[ym] == y_]
         a.plot([min(xs) - .5, max(xs) + .5], [YMED[y_]] * 2, "-", lw=1.6,
                color=BLUE, alpha=.75, zorder=2)
+    # White plate, like the labels in (b) and (c): at 7.5 pt the line reaches
+    # into 2023, where the series spikes through it.
     a.text(0.6, FLOOR * 1.035,
            f"floor: the national survey's own permutation median, "
-           f"{FLOOR:.5f} bits", fontsize=6.9, color=RED, va="bottom")
+           f"{FLOOR:.5f} bits", fontsize=7.5, color=RED, va="bottom",
+           bbox=dict(fc="white", ec="none", alpha=.88, pad=1.2))
     a.text(16.0, 0.00742,
            f"year medians (blue rules) rise {TREND:.2f}x from "
-           f"{min(YEARS)} to {max(YEARS)}", fontsize=6.9, color=BLUE,
+           f"{min(YEARS)} to {max(YEARS)}", fontsize=7.5, color=BLUE,
            ha="left", va="bottom")
     ticks = [POS[ym] for ym in YMS if ym % 100 == 1]
     a.set_xticks(ticks)
     a.set_xticklabels([str(YMS[t] // 100) for t in ticks], fontsize=7.6)
     a.set_xlim(-1.0, 79.0)
     a.set_ylim(0.0068, 0.0322)
-    a.tick_params(axis="y", labelsize=7.2)
+    a.tick_params(axis="y", labelsize=7.5)
     a.set_ylabel("departure from proportionate mixing\n"
                  "age-pair mutual information (bits)", fontsize=7.6)
     title(a, f"(a)  {len(YMS)} monthly matrices, {YMS[0] // 100}-"
@@ -314,7 +333,7 @@ def main():
         Line2D([], [], marker="o", ls="none", ms=5, color=RED,
                label=f"reaches the floor ({len(CLEAR)} of {len(YMS)})"),
         Line2D([], [], color=BLUE, lw=1.6, alpha=.75, label="year median")],
-        fontsize=6.6, frameon=True, framealpha=.92, edgecolor="none",
+        fontsize=7.5, frameon=True, framealpha=.92, edgecolor="none",
         loc="upper left", ncol=2, handlelength=1.5, columnspacing=1.1,
         borderpad=.4, labelspacing=.35)
     note("a", "months in the series", len(YMS))
@@ -348,21 +367,21 @@ def main():
     mean_sh = sh["n_term_over_shifts"]["mean"]
     b.axhline(mean_sh, color=GREY, lw=.9, ls="--", zorder=1)
     b.text(76.2, mean_sh + .45, f"mean over the {len(ks) - 1} shifts, "
-                                f"{mean_sh:.2f}", fontsize=6.5, color=GREY,
+                                f"{mean_sh:.2f}", fontsize=7.5, color=GREY,
            ha="right", va="bottom",
            bbox=dict(fc="white", ec="none", alpha=.88, pad=1.2))
     b.annotate("k = 0: the true calendar", xy=(0, NT[0]), xytext=(2.6, 21.0),
-               fontsize=7.0, color=TEAL, ha="left", va="center",
+               fontsize=7.5, color=TEAL, ha="left", va="center",
                arrowprops=dict(arrowstyle="->", lw=.85, color=TEAL))
     b.annotate(f"k = {', '.join(str(k) for k in GE)} also keep all "
                f"{len(CLEAR)} in term\n(every one a multiple of 6; "
                f"{len(ks)} = 6x12 + 7)",
-               xy=(GE[-1], NT[GE[-1]] + .4), xytext=(41.0, 20.4), fontsize=6.8,
+               xy=(GE[-1], NT[GE[-1]] + .4), xytext=(41.0, 20.4), fontsize=7.5,
                color="#8a5c1f", ha="left", va="center",
                arrowprops=dict(arrowstyle="->", lw=.85, color=GOLD))
     b.set_ylim(0, 24.6)
     b.set_yticks([0, 5, 10, 15, 17])
-    b.tick_params(axis="both", labelsize=7.2)
+    b.tick_params(axis="both", labelsize=7.5)
     b.tick_params(axis="x", labelbottom=False)
     b.set_ylabel("clearing months\nlabelled term", fontsize=7.6)
     title(b, f"(b)  the same {len(CLEAR)} months under every rotation of the "
@@ -401,11 +420,11 @@ def main():
     c.plot([0], [AGREE[0]], "o", ms=6.0, color=TEAL, zorder=5)
     c.axhline(CHANCE, color=BLUE, lw=1.05, ls="--", zorder=1)
     c.text(76.2, CHANCE - 2.5, f"chance agreement, {CHANCE:.1f} of {len(ks)}",
-           fontsize=6.6, color=BLUE, ha="right", va="top",
+           fontsize=7.5, color=BLUE, ha="right", va="top",
            bbox=dict(fc="white", ec="none", alpha=.88, pad=1.2))
     for k in GE:
         c.annotate(f"{AGREE[k]}", xy=(k, AGREE[k]), xytext=(0, 3.2),
-                   textcoords="offset points", fontsize=6.9, color="#8a5c1f",
+                   textcoords="offset points", fontsize=7.5, color="#8a5c1f",
                    ha="center", va="bottom")
     n_above = sum(1 for k in range(1, 79) if AGREE[k] > CHANCE)
     c.text(0.015, 0.985,
@@ -413,12 +432,12 @@ def main():
            f"agreement(k) = agreement(79 - k),\nlands the calendar nearly back "
            f"on itself: {n_above} of the {len(ks) - 1} shifts agree above "
            f"chance",
-           transform=c.transAxes, fontsize=6.6, color=INK, ha="left", va="top",
+           transform=c.transAxes, fontsize=7.5, color=INK, ha="left", va="top",
            linespacing=1.5)
     c.set_ylim(0, 112)
     c.set_yticks([0, 20, 40, 60, 79])
     c.set_xticks([0, 6, 12, 18, 24, 30, 36, 42, 48, 54, 60, 66, 72, 78])
-    c.tick_params(axis="both", labelsize=7.2)
+    c.tick_params(axis="both", labelsize=7.5)
     c.set_xlim(-1.0, 79.0)
     c.set_xlabel("circular shift k, in months, of the whole school calendar",
                  fontsize=7.6)
@@ -446,12 +465,15 @@ def main():
     # The floor binds the two ROTATION rows and nothing else: the within-year
     # null is a different test and is not bounded by 1/79, so the band stops
     # below its row rather than running the height of the panel.
-    d.fill_between([1.1e-6, floor_p], -0.62, 1.62, color=GREY, alpha=.16, lw=0,
+    # Top at 1.40, not 1.62: it has to sit above the rotation row it binds and
+    # below the within-year row's text, and that text is three lines tall, so
+    # at 7.5 pt its bottom line reaches down to y = 1.43.
+    d.fill_between([1.1e-6, floor_p], -0.62, 1.40, color=GREY, alpha=.16, lw=0,
                    zorder=0)
-    d.plot([floor_p, floor_p], [-0.62, 1.62], color=INK, lw=.9, zorder=2)
+    d.plot([floor_p, floor_p], [-0.62, 1.40], color=INK, lw=.9, zorder=2)
     d.text(1.6e-6, 0.55, f"1/{len(ks)} = {floor_p:.4f}\nno {len(ks)}-rotation "
                          f"test\ncan go below this",
-           fontsize=6.3, color=INK, ha="left", va="center", linespacing=1.45)
+           fontsize=7.5, color=INK, ha="left", va="center", linespacing=1.45)
     d.plot([P_WITHIN], [2], "D", ms=6.0, color=BLUE, zorder=4)
     d.plot([sh["p"]], [1], "o", ms=6.8, color=RED, zorder=4)
     d.plot([sb["p"]], [0], "o", ms=6.8, mfc="white", mec=GOLD, mew=1.7,
@@ -459,25 +481,30 @@ def main():
     d.text(P_WITHIN * 2.1, 2.0, f"{P_WITHIN:.2e} -- month labels\nexchangeable "
                                 f"inside a year, but\nsemesters are contiguous "
                                 f"blocks",
-           fontsize=6.4, color=BLUE, ha="left", va="center", linespacing=1.45)
+           fontsize=7.5, color=BLUE, ha="left", va="center", linespacing=1.45)
     d.text(sh["p"] * 1.7, 1.0, f"{sh['p']:.4f} = {sh['numerator']}/"
                                f"{sh['denominator']}\none alignment either\n"
                                f"way: {ladder[2]:.4f} / {ladder[4]:.4f}",
-           fontsize=6.4, color=RED, ha="left", va="center", linespacing=1.45)
+           fontsize=7.5, color=RED, ha="left", va="center", linespacing=1.45)
     d.text(sb["p"] * 1.7, 0.0, f"{sb['p']:.4f} = {sb['numerator']}/"
                                f"{sb['denominator']}, but rank 1\nis a tie: "
                                f"D(12) is bitwise D(0)",
-           fontsize=6.4, color="#8a5c1f", ha="left", va="center",
+           fontsize=7.5, color="#8a5c1f", ha="left", va="center",
            linespacing=1.45)
     d.set_xscale("log")
-    d.set_xlim(1.1e-6, 9.0)
+    # The right end is the width of the TEXT LANE, not a measurement: nothing
+    # is measured past 10^0 and there is no tick out there. It was 9.0 while
+    # the three labels were set at 6.4 pt; at the 7.5 pt JRSI floor the two
+    # right-hand blocks -- anchored in data coordinates beside their markers --
+    # ran over the right spine, so the lane is longer and they sit back inside.
+    d.set_xlim(1.1e-6, 60.0)
     d.set_xticks([1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1, 1e0])
     d.minorticks_off()      # nothing is measured past 10^0; that lane is text
     d.set_ylim(-0.85, 2.62)
     d.set_yticks([2, 1, 0])
     d.set_yticklabels(["within-year\nnull", "rotation,\ncount",
-                       "rotation,\ncontrast"], fontsize=6.9)
-    d.tick_params(axis="x", labelsize=6.8)
+                       "rotation,\ncontrast"], fontsize=7.5)
+    d.tick_params(axis="x", labelsize=7.5)
     d.set_xlabel("p under each null (log scale)", fontsize=7.6)
     title(d, "(d)  neither null dominates, and the\n      rotation has little "
              "resolution to spend")
@@ -506,20 +533,22 @@ def main():
     e.vlines(xs, lo, hi, color=GREY, lw=5.4, alpha=.45, zorder=1)
     e.plot(xs, idn, "s", ms=4.6, color=INK, zorder=3)
     e.set_xticks(xs)
-    e.set_xticklabels([f"'{str(y)[2:]}" for y in YEARS], fontsize=7.0)
+    e.set_xticklabels([f"'{str(y)[2:]}" for y in YEARS], fontsize=7.5)
     e.set_ylim(2.2, 9.6)
     e.set_yticks([3, 5, 7, 9])
-    e.tick_params(axis="y", labelsize=7.0)
-    e.set_ylabel("term months in that year", fontsize=7.4)
+    e.tick_params(axis="y", labelsize=7.5)
+    e.set_ylabel("term months in that year", fontsize=7.5)
     e.set_xlabel("year", fontsize=7.6)
     title(e, "(e)  the rotation moves the\n      per-year margins")
     e.grid(alpha=.16, lw=.55, axis="y")
     e.legend(handles=[
         Line2D([], [], marker="s", ls="none", ms=5, color=INK,
                label="true calendar"),
+        # "over 79" rather than "over the 79": at 7.5 pt in a panel this narrow
+        # the longer string reaches the 2026 bar.
         Line2D([], [], color=GREY, lw=5.4, alpha=.45,
-               label="range over the 79 rotations")],
-        fontsize=6.4, frameon=False, loc="lower left", handlelength=1.2,
+               label="range over 79 rotations")],
+        fontsize=7.5, frameon=False, loc="lower left", handlelength=1.2,
         borderpad=.2, labelspacing=.3, bbox_to_anchor=(-0.02, -0.02))
     note("e", "per-year term margins, true calendar",
          [pym["identity"][str(y)] for y in YEARS])

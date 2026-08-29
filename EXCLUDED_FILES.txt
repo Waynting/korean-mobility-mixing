@@ -1,6 +1,6 @@
 # Files present in the source repository and deliberately not deposited
 #
-# Built from commit 5b93e04 on 2026-08-29T02:44:01Z
+# Built from commit 72b3fee on 2026-08-29T14:45:45Z
 # Tier A payload: withheld
 #
 # Reasons, by prefix:
@@ -162,11 +162,19 @@ eda/results_p9.json
 meeting_note_20260827.md
 paper/editorial_constraints.md
 paper/latex/JRSI/.olcli.json
+paper/latex/JRSI/figures/p46_figure6.pdf
+paper/latex/JRSI/figures/p47_figure3.pdf
+paper/latex/JRSI/figures/p47_figure4.pdf
+paper/latex/JRSI/figures/p48_figure1.pdf
+paper/latex/JRSI/figures/p55_figure7.pdf
+paper/latex/JRSI/figures/p56_figure5.pdf
+paper/latex/JRSI/figures/p63_figure2.pdf
 paper/latex/JRSI/main.tex
 paper/latex/JRSI_SI/main.tex
 paper/latex/README.md
 paper/manuscript_JRSI.md
 paper/manuscript_JRSI_SI.md
+paper/media_summary.md
 paper/paper_structure.md
 paper/preprint_plan.md
 paper/related_work_positioning.md
@@ -177,5 +185,6 @@ release/deposit/EXCLUSIONS.md
 release/deposit/LICENSE
 release/deposit/LICENSE-DATA
 release/deposit/README.md
+release/tier_a_basis.md
 release/zenodo_manifests/v1.0.0.txt
 release/zenodo_metadata.json

@@ -71,6 +71,18 @@ import numpy as np
 from matplotlib.lines import Line2D
 from paths import FIG, ROOT
 
+# JRSI wants figure text in Times at 9-11 pt and refuses anything under 7.5 pt,
+# so 7.5 is the floor for every explicit size below. STIXGeneral is the serif:
+# it is Times-metric AND it ships inside matplotlib, so the figure renders the
+# same on a machine with no Times installed. A figure that depends on a locally
+# installed font breaks on the typesetter's machine -- the same reason the
+# Korean here is romanised rather than set in a CJK font. mathtext.fontset =
+# "stix" keeps the maths in the same face as the prose around it.
+plt.rcParams.update({"font.family": "serif",
+                     "font.serif": ["STIXGeneral", "Times New Roman",
+                                    "DejaVu Serif"],
+                     "mathtext.fontset": "stix"})
+
 TEAL, RED, BLUE, GOLD = "#0E7C86", "#A8434E", "#4C6E8A", "#BC8034"
 INK, GREY, VIOLET = "#1b1b1b", "#8a8a8a", "#5B4B8A"
 BETA_COLOUR = {0.0: TEAL, 0.5: BLUE, 0.8: GOLD, 0.95: RED, 0.99: "#5B4B8A"}
@@ -182,7 +194,37 @@ def main():
     assert len(_k15) == 1, f"expected one k = 1.5 reading, found {len(_k15)}"
     b_k15 = _k15[0]["beta"]
 
-    fig, ax = plt.subplots(1, 3, figsize=(15.0, 4.5))
+    # WAS 1x3 at 15.0 in, which reproduces at 0.44x on a 7 in page: the 7.5 pt
+    # floor this figure was raised to arrived as 3.3 pt of ink. 7.0 in is what
+    # p48 and p63 already build to and what JRSI prints a full-page figure at.
+    #
+    # The row becomes (a) across the top and (b) beside (c) below, in that
+    # order, so the panel letters still run a, b, c in reading order and each
+    # keeps exactly the content the caption describes. The widths follow the
+    # content rather than being equal: (a) draws five curves over three decades
+    # and (b) carries four leader-line annotations, while (c) is two bars.
+    #
+    # Rows are placed in INCHES rather than by height_ratios, because what has
+    # to be reserved between them is a text height -- a title, an axis label --
+    # and that does not scale with the panel. The bands sum to H.
+    H = 7.00
+    def fy(inches):
+        return inches / H
+    # (bc) 0.10 pad | 0.44 xlabel | 2.68 axes | 0.22 title
+    # (a)  0.35 gap | 0.32 xlabel | 2.60 axes | 0.22 title | 0.07 pad
+    # 0.44 and not 0.32 under (b): its x label carries a mathtext $\beta$ whose
+    # descender sits a line below the rest, and at 0.32 the tail of it printed
+    # off the bottom of the page.
+    R2_LO, R2_HI = fy(0.54), fy(3.22)
+    R1_LO, R1_HI = fy(4.11), fy(6.71)
+    LEFT, RIGHT = .115, .985
+
+    fig = plt.figure(figsize=(7.0, H))
+    gs1 = fig.add_gridspec(1, 1, left=LEFT, right=RIGHT, top=R1_HI, bottom=R1_LO)
+    gs2 = fig.add_gridspec(1, 2, left=LEFT, right=RIGHT, top=R2_HI, bottom=R2_LO,
+                           width_ratios=[1.95, 1.0], wspace=.22)
+    ax = [fig.add_subplot(gs1[0, 0]), fig.add_subplot(gs2[0, 0]),
+          fig.add_subplot(gs2[0, 1])]
 
     # -------------------------------------------- (a) the calibration surface
     a = ax[0]
@@ -202,7 +244,10 @@ def main():
     a.text(0.0055, r_corr * 1.13, f"what we read, {r_corr:.5f}",
            fontsize=7.5, color=INK)
     a.axvline(r_survey, color=RED, lw=1.0, ls=":")
-    a.text(r_survey * 0.93, 3.2e-3, f"the survey, {r_survey:.3f}", fontsize=7.5,
+    # Anchored near the floor, not at 3.2e-3: this panel is 2.6 in tall now
+    # instead of 3.4, so the same 0.9 in of rotated text spans a third more of
+    # the decade range and climbed through the two lowest beta curves.
+    a.text(r_survey * 0.93, 2.4e-4, f"the survey, {r_survey:.3f}", fontsize=7.5,
            color=RED, rotation=90, va="bottom", ha="right")
     a.set_xscale("log")
     a.set_yscale("log")
@@ -223,10 +268,18 @@ def main():
         b_.scatter([x], [y], s=64, zorder=4,
                    color=(INK if ex else "white"), edgecolors=INK, lw=1.4)
     b_.axhline(r_survey, color=RED, lw=1.3)
-    b_.text(0.02, r_survey * 1.10, f"the survey reads {r_survey:.3f}",
-            fontsize=7.8, color=RED)
+    # BELOW its own rule, not above it. Above the rule is where the two-entry
+    # legend lives, and at 3.4 in wide the legend reaches far enough right that
+    # "it is not" was printing straight through this line of text. Under the
+    # rule the whole left half of the panel is empty -- the bound does not
+    # reach 0.2 until beta is past 0.95.
+    b_.text(0.02, r_survey * 0.90, f"the survey reads {r_survey:.3f}",
+            fontsize=7.8, color=RED, va="top")
     b_.axhline(r_corr, color=GREY, lw=1.0, ls="--")
-    b_.text(0.02, r_corr * 1.10, f"we read {r_corr:.5f}", fontsize=7.5, color=GREY)
+    # Not x = 0.02: the bound leaves the dashed line at beta = 0 and climbs, so
+    # a label just above the line at the left edge is struck through by the
+    # curve. Further along the line the curve has cleared it.
+    b_.text(0.42, r_corr * 1.10, f"we read {r_corr:.5f}", fontsize=7.5, color=GREY)
     # the measured beta, from outside these data
     b_.axvspan(min(b_seoul, b_nat), max(b_seoul, b_nat), color=TEAL, alpha=.16,
                zorder=0)
@@ -311,16 +364,22 @@ def main():
     c.set_ylim(0, max(hi, max(vals)) * 1.42)
     # Both captions go in the headroom above everything, not over the bars.
     _top = c.get_ylim()[1]
-    c.text(0.5, _top * 0.985, f"p37, measured on real data over 79 months: "
+    # Both wrapped for the narrow panel. Same strings, one line break each.
+    c.text(0.5, _top * 0.990, f"measured on real data\nover 79 months: "
                               f"{100 * lo:.1f}–{100 * hi:.1f}%",
-           fontsize=7.8, color="#0b5a61", ha="center", va="top")
-    c.text(0.5, _top * 0.905, f"the real 2023-12 rung, "
+           fontsize=7.8, color="#0b5a61", ha="center", va="top",
+           linespacing=1.35)
+    c.text(0.5, _top * 0.815, f"the real 2023-12 rung, "
                               f"{100 * lad['real_rung']:.1f}%",
            fontsize=7.5, color=INK, ha="center", va="top")
     c.set_ylabel("share of dong-level excess kept at district")
-    c.set_title("(c)  a validation the experiment did not have to pass",
+    # Two lines because the panel is 1.9 in wide and a one-line title ran off
+    # the page. The title used to read "a validation the experiment did not
+    # have to pass", which named the intent rather than the check.
+    c.set_title("(c)  an out-of-sample\nvalidation",
                 fontsize=10, loc="left")
     c.grid(alpha=.18, lw=.6, axis="y")
+    c.tick_params(axis="x", labelsize=8.5)
     note("c", "p37 band, low", lo)
     note("c", "p37 band, high", hi)
     note("c", "p37 median", lad["p37_median"])
@@ -328,13 +387,26 @@ def main():
     note("c", "synthetic archetype field", lad["noiseless"]["archetype"])
     note("c", "the real 202312 rung", lad["real_rung"])
 
-    fig.tight_layout()
+    # No tight_layout and no bbox_inches="tight": the margins above ARE the
+    # layout, so the emitted page is 7.00 in wide rather than whatever the trim
+    # happens to leave. p46 and p63 save the same way.
     png = f"{FIG}/p56_figure5.png"
-    fig.savefig(png, dpi=300, bbox_inches="tight")
+    fig.savefig(png, dpi=300)
     if args.pdf:
-        fig.savefig(f"{FIG}/p56_figure5.pdf", bbox_inches="tight")
+        # CreationDate omitted on purpose: matplotlib stamps the wall clock
+        # into the PDF, so two runs of the same figure differ by bytes for a
+        # reason that has nothing to do with the figure. p46 and p63 have
+        # done this since they were written; these four had not, so their
+        # vector files showed up in every diff whether or not the figure
+        # had changed. The PNG beside them was always stable.
+        fig.savefig(f"{FIG}/p56_figure5.pdf",
+                    metadata={"CreationDate": None})
     plt.close(fig)
-    print(f"wrote {png}" + (" (+ .pdf)" if args.pdf else ""))
+    assert fig.get_size_inches()[0] <= 7.0, \
+        "figure 5 is wider than the 7-inch reproduction width"
+    print(f"wrote {png} ({fig.get_size_inches()[0]:.2f} x "
+          f"{fig.get_size_inches()[1]:.2f} in)"
+          + (" (+ .pdf)" if args.pdf else ""))
 
     print("\n=== the numbers this figure's caption may quote ===")
     for panel, what, value in sheet:

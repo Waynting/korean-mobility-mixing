@@ -101,7 +101,7 @@
 
 | 學年 | 三月起點 | 事件與限制 | 來源 | 類型 |
 |---|---|---|---|---|
-| 2021 | **3/2 正常開學** | 「2021학년 학사일정은 **개학연기 없이 3월 2일부터 정상적으로 개학**하고 법정기준 수업일수를 준수」。但**密度上限仍在**：幼·初1–2 在 2 階段前可免適用，其餘年級仍受限 | [교육부·전국시도교육감협의회, 정책브리핑 156434290](https://www.korea.kr/news/policyBriefingView.do?newsId=156434290)（2021-01-28） | official-secondary（政府簡報全文） |
+| 2021 | **3/2 正常開學** | 「2021학년 학사일정은 **개학연기 없이 3월 2일부터 정상적으로 개학**하고 법정기준 수업일수를 준수」。但**密度上限仍在**：幼·初1–2 在 2 階段前可免適用，其餘年級仍受限 | [교육부·전국시도교육감협의회, 정책브리핑 156434290](https://www.korea.kr/briefing/policyBriefingView.do?newsId=156434290)（2021-01-28） | official-secondary（政府簡報全文） |
 | 2021 年中 | — | 首都圈 4 階段 → **7/14 起到暑假前全面遠距**（七月在本文編碼裡屬假期月，影響有限） | [정책브리핑 148889944](https://www.korea.kr/news/policyNewsView.do?newsId=148889944)（2021-07-09） | official-secondary |
 | 2021 年末 | — | **11/22 起全面登校**（含首都圈）；**12/20 起首都圈密度回到 2/3** 至寒假 | [정책브리핑 148894953](https://www.korea.kr/news/policyNewsView.do?newsId=148894953)、[148896909](https://www.korea.kr/news/policyNewsView.do?newsId=148896909)（2021-12-16） | official-secondary |
 | 2022 | **3/2 開學** | 開學了，但**開學後兩週（3/2–3/11）定為「새 학기 적응주간」，學校可自行採取縮短授課、密度調整、遠距授課**（「수업시간 단축, 과밀학교(급)의 밀집도 조정 및 원격수업 등 탄력적으로 학사를 운영」）。同期為 Omicron 高峰 | [교육부 보도자료 90598](https://www.moe.go.kr/boardCnts/view.do?boardID=294&boardSeq=90598&lev=0&searchType=null&statusYN=W&page=1&s=moe&m=020402&opType=N)（2022-02-07）；[정책브리핑 148899172](https://www.korea.kr/news/policyNewsView.do?newsId=148899172)（2022-02-21） | primary（公告本身）＋ official-secondary（適應週細節） |
@@ -133,7 +133,7 @@
 12. 교육부. 추석 연휴 특별 방역기간(10.11.) 이후 학사운영 방안 발표 [Academic operation plan after the Chuseok special quarantine period]. Press release, 11 October 2020. https://www.moe.go.kr/boardCnts/view.do?boardID=294&boardSeq=82184&lev=0&m=020402&s=moe (accessed 22 August 2026).
 13. 교육부. 사회적 거리두기 단계 격상에 따른 학사 운영 조치사항 등 안내 [Guidance on academic operation following the raising of the social-distancing level]. Reference material, 7 December 2020. https://www.moe.go.kr/boardCnts/view.do?boardID=294&boardSeq=82885&lev=0&m=020402&s=moe (accessed 22 August 2026).
 14. 교육부. 교육분야 코로나19 대응 현황 자료(12.15.) [COVID-19 response status in the education sector, 15 December]. Reference material, 15 December 2020. https://www.moe.go.kr/boardCnts/view.do?boardID=294&boardSeq=83024&lev=0&m=020402&s=moe (accessed 22 August 2026).
-15. 교육부·전국시도교육감협의회. 2021학년도 학사 및 교육과정 운영 지원방안 [Support plan for academic and curriculum operation in the 2021 school year]. Briefing, 28 January 2021. https://www.korea.kr/news/policyBriefingView.do?newsId=156434290 (accessed 22 August 2026).
+15. 교육부·전국시도교육감협의회. 2021학년도 학사 및 교육과정 운영 지원방안 [Support plan for academic and curriculum operation in the 2021 school year]. Briefing, 28 January 2021. https://www.korea.kr/briefing/policyBriefingView.do?newsId=156434290 (accessed 22 August 2026).
 16. 교육부. 오미크론 대응 2022학년도 1학기 방역 및 학사 운영방안 발표 [Quarantine and academic operation plan for the first semester of 2022 in response to Omicron]. Press release, 7 February 2022. https://www.moe.go.kr/boardCnts/view.do?boardID=294&boardSeq=90598&lev=0&m=020402&s=moe (accessed 22 August 2026).
 17. 대한민국 정책브리핑. 5월부터 모든 학교 정상등교한다…교육활동 전면 재개 [All schools return to normal attendance from May]. 20 April 2022. https://www.korea.kr/news/policyNewsView.do?newsId=148900912 (accessed 22 August 2026).
 18. 대한민국 법제처 [Korea Ministry of Government Legislation]. 초·중등교육법 제24조 [Elementary and Secondary Education Act, Article 24]. https://www.law.go.kr/법령/초·중등교육법 (accessed 22 August 2026).

@@ -58,6 +58,18 @@ import numpy as np
 from matplotlib.lines import Line2D
 from paths import FIG, ROOT
 
+# JRSI wants figure text in Times at 9-11 pt and refuses anything under 7.5 pt,
+# so 7.5 is the floor for every explicit size below. STIXGeneral is the serif:
+# it is Times-metric AND it ships inside matplotlib, so the figure renders the
+# same on a machine with no Times installed. A figure that depends on a locally
+# installed font breaks on the typesetter's machine -- the same reason the
+# Korean here is romanised rather than set in a CJK font. mathtext.fontset =
+# "stix" keeps the maths in the same face as the prose around it.
+plt.rcParams.update({"font.family": "serif",
+                     "font.serif": ["STIXGeneral", "Times New Roman",
+                                    "DejaVu Serif"],
+                     "mathtext.fontset": "stix"})
+
 TEAL, RED, BLUE, GOLD = "#0E7C86", "#A8434E", "#4C6E8A", "#BC8034"
 INK = "#1b1b1b"
 STYLE = {
@@ -126,7 +138,13 @@ def main():
         f"p62 measured the rule's size at n_boot = " \
         f"{p62['alpha_rule']['n_boot']} and p52 ran at {d['n_boot']}"
 
-    fig, ax = plt.subplots(1, 2, figsize=(11.6, 4.6))
+    # 2 x 1, NOT 1 x 2. JRSI reproduces a figure at 180 mm, which is the 7.0 in
+    # p48 and p63 already build to; an 11.6 in row arrives on the page at 0.60x
+    # and the 7.5 pt floor set for this figure lands as 4.5 pt of ink. Stacking
+    # spends height, which the page has, instead of type size, which it does
+    # not. Neither panel loses width in the trade: both now get the full 7 in,
+    # where the old row gave each of them 5.4.
+    fig, ax = plt.subplots(2, 1, figsize=(7.0, 8.0))
 
     # ------------------------------------------------- (a) the whole curve
     a = ax[0]
@@ -146,7 +164,7 @@ def main():
              p52["point_summary"]["max_over_grid"][k])
         note("a", f"{lab}: R0 at that maximum", p52["point_summary"]["argmax"][k])
     a.axvline(2.5, color=INK, lw=1.0, ls=":", zorder=1)
-    a.annotate("the only $R_0$\np40 ever ran", xy=(2.5, 0.62),
+    a.annotate("the only $R_0$\npreviously run", xy=(2.5, 0.62),
                xytext=(3.15, 0.72), fontsize=8, color=INK,
                arrowprops=dict(arrowstyle="->", lw=0.9, color=INK))
     a.set_xscale("log")
@@ -259,7 +277,14 @@ def main():
     png = f"{FIG}/p55_figure7.png"
     fig.savefig(png, dpi=300, bbox_inches="tight")
     if args.pdf:
-        fig.savefig(f"{FIG}/p55_figure7.pdf", bbox_inches="tight")
+        # CreationDate omitted on purpose: matplotlib stamps the wall clock
+        # into the PDF, so two runs of the same figure differ by bytes for a
+        # reason that has nothing to do with the figure. p46 and p63 have
+        # done this since they were written; these four had not, so their
+        # vector files showed up in every diff whether or not the figure
+        # had changed. The PNG beside them was always stable.
+        fig.savefig(f"{FIG}/p55_figure7.pdf", bbox_inches="tight",
+                    metadata={"CreationDate": None})
     plt.close(fig)
     print(f"wrote {png}" + (" (+ .pdf)" if args.pdf else ""))
 

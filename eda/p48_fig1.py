@@ -54,6 +54,17 @@ from paths import FIG, ROOT
 INK, TEAL, RED, BLUE, GOLD = "#222222", "#0E7C86", "#A8434E", "#4C6E8A", "#BC8034"
 FACE, TRAP = "#F4F6F7", "#FBF1F2"
 
+# JRSI wants figure text in Times at 9-11 pt and refuses anything under 7.5 pt,
+# so 7.5 is the floor for every size below. STIXGeneral is the serif: it is
+# Times-metric AND it ships inside matplotlib, so this renders the same on a
+# machine with no Times installed. A figure that depends on a locally installed
+# font breaks on the typesetter's machine -- the same reason the Korean on this
+# schematic is romanised rather than set in a CJK font.
+plt.rcParams.update({"font.family": "serif",
+                     "font.serif": ["STIXGeneral", "Times New Roman",
+                                    "DejaVu Serif"],
+                     "mathtext.fontset": "stix"})
+
 
 def load(name):
     return json.load(open(f"{ROOT}/eda/results_{name}.json"))
@@ -70,7 +81,7 @@ def arrow(ax, x, y0, y1, color=INK):
                                  mutation_scale=11, lw=1.1, color=color, zorder=3))
 
 
-def txt(ax, x, y, s, size=7.4, weight="normal", color=INK, ha="left", va="top"):
+def txt(ax, x, y, s, size=7.5, weight="normal", color=INK, ha="left", va="top"):
     ax.text(x, y, s, fontsize=size, fontweight=weight, color=color,
             ha=ha, va=va, zorder=4, linespacing=1.5)
 
@@ -159,8 +170,9 @@ def main():
 
     gates_n = p36["n_checks"]
     assert p36["n_fail"] == 0, "p36: the independent recompute has failures"
-    # p31 is a pass/fail gate script and writes no results file, so it is named
-    # on the figure but contributes no number; p36 is the one with a tally.
+    # p31 is a pass/fail gate script and writes no results file, so the box
+    # carries it without a number; p36 is the one with a tally. Neither phase
+    # number is drawn: they are this repo's bookkeeping, not the reader's.
 
     n_dong = p38["adjacency"]["n_nodes"]
     assert p37["ladder"]["n_monotone"] == months, \
@@ -213,7 +225,7 @@ def main():
     LEAD = .0175          # line height in axes units at the body size
     PAD = .012
 
-    def block(x, y, lines, size=7.2, weight="normal", color=INK, lead=LEAD):
+    def block(x, y, lines, size=7.5, weight="normal", color=INK, lead=LEAD):
         for ln in lines:
             txt(ax, x, y, ln, size, weight, color)
             y -= lead
@@ -231,11 +243,11 @@ def main():
     y -= .004
     y = block(L + .015, y, [
         "Seoul Living Migration (Saenghwal Idong), administrative-dong product",
-        "dong x weekday x arrival hour x sex x age band x trip type x volume"], 7.3)
+        "dong x weekday x arrival hour x sex x age band x trip type x volume"], 7.5)
     y -= .004
     y = block(L + .015, y, [
         f"{span}   ·   {months} of {months} months complete   ·   {n_dong} dong",
-        f"{files:,} parquet files   ·   {rows:,} rows"], 7.3, "bold")
+        f"{files:,} parquet files   ·   {rows:,} rows"], 7.5, "bold")
     y -= PAD
     box(ax, L, y, R - L, top - y, FACE, BLUE, 1.2)
 
@@ -244,7 +256,9 @@ def main():
     # ---- 2 the traps ------------------------------------------------------
     top = y
     y -= PAD
-    y = block(L + .015, y, ["WHAT THE PRODUCT DOES NOT TELL YOU"], 8.0, "bold", RED)
+    # "does not record", not "does not tell you": the same wording as §2.1
+    # and the caption, and one less instrument with intentions.
+    y = block(L + .015, y, ["WHAT THE PRODUCT DOES NOT RECORD"], 8.0, "bold", RED)
     y -= .004
     traps = [
         "no date column: a month is one row per weekday, not per day",
@@ -260,8 +274,8 @@ def main():
     ]
     for t in traps:
         wrapped = wrap(t, 84)
-        txt(ax, L + .018, y, "\u2022", 7.2, color="#7A2E38")
-        y = block(L + .033, y, wrapped, 7.1, color="#7A2E38")
+        txt(ax, L + .018, y, "\u2022", 7.5, color="#7A2E38")
+        y = block(L + .033, y, wrapped, 7.5, color="#7A2E38")
     y -= PAD - .004
     box(ax, L, y, R - L, top - y, TRAP, RED, 1.2)
 
@@ -271,7 +285,8 @@ def main():
     # ---- 3 external anchors ----------------------------------------------
     top = y
     y -= PAD
-    y = block(L + .015, y, ["EXTERNAL ANCHORS — what closes each trap"],
+    # "gap", not "trap": §2.2 and the caption both say the anchors close gaps.
+    y = block(L + .015, y, ["EXTERNAL ANCHORS — what closes each gap"],
               8.0, "bold", GOLD)
     y -= .004
     anchors = [
@@ -287,8 +302,8 @@ def main():
     ends = []
     for i, (h, b) in enumerate(anchors):
         x = L + .015 + i * col_w
-        yy = block(x, y, wrap(h, 26), 7.3, "bold", "#7A5312")
-        yy = block(x, yy - .002, wrap(b, 30), 6.8, color="#7A5312")
+        yy = block(x, y, wrap(h, 26), 7.5, "bold", "#7A5312")
+        yy = block(x, yy - .002, wrap(b, 30), 7.5, color="#7A5312")
         ends.append(yy)
     y = min(ends) - PAD + .004
     box(ax, L, y, R - L, top - y, FACE, GOLD, 1.2)
@@ -306,13 +321,14 @@ def main():
         f"\u2192  age x age matrix A, at three spatial scales "
         f"(dong {n_dong} / district 25 / city 1)",
         "\u2192  excess over the proportionate-mixing null: assortativity, "
-        "normalised MI, rank"], 7.3)
+        "normalised MI, rank"], 7.5)
     y -= .006
-    y = block(L + .015, y, ["GATES, all green before any number is quoted"],
-              7.3, "bold")
+    y = block(L + .015, y,
+              ["THREE CHECKS, all green before any number is quoted"],
+              7.5, "bold")
     y = block(L + .015, y - .002, [
-        f"report audit (p31)   ·   independent second implementation "
-        f"{gates_n}/{gates_n} (p36)   ·   bit-for-bit determinism"], 6.9)
+        f"citation audit   ·   independent second implementation "
+        f"{gates_n}/{gates_n}   ·   bit-for-bit determinism"], 7.5)
     y -= PAD - .004
     box(ax, L, y, R - L, top - y, FACE, TEAL, 1.2)
 
@@ -357,9 +373,9 @@ def main():
                                     fc=INK, ec="none", zorder=4))
         txt(ax, x + .025, y - .0165, n, 8.0, "bold", "white",
             ha="center", va="center")
-        yy = block(x + .050, y - .008, heads[i], 7.4, "bold")
-        yy = block(x + .014, min(yy, y - .034) - .002, bodies[i], 6.8)
-        txt(ax, x + .014, y - h_box + .012, figs, 6.9, "bold", TEAL, va="bottom")
+        yy = block(x + .050, y - .008, heads[i], 7.5, "bold")
+        yy = block(x + .014, min(yy, y - .034) - .002, bodies[i], 7.5)
+        txt(ax, x + .014, y - h_box + .012, figs, 7.5, "bold", TEAL, va="bottom")
     y -= h_box
 
     # Crop to what the layout actually used rather than shrinking the canvas:
@@ -370,7 +386,14 @@ def main():
     out = f"{FIG}/p48_figure1.png"
     fig.savefig(out, dpi=300, bbox_inches=crop)
     if args.pdf:
-        fig.savefig(f"{FIG}/p48_figure1.pdf", bbox_inches=crop)
+        # CreationDate omitted on purpose: matplotlib stamps the wall clock
+        # into the PDF, so two runs of the same figure differ by bytes for a
+        # reason that has nothing to do with the figure. p46 and p63 have
+        # done this since they were written; these four had not, so their
+        # vector files showed up in every diff whether or not the figure
+        # had changed. The PNG beside them was always stable.
+        fig.savefig(f"{FIG}/p48_figure1.pdf", bbox_inches=crop,
+                    metadata={"CreationDate": None})
     plt.close(fig)
     print(f"  -> {out}   ({W:.2f} x {crop.height:.2f} in, "
           f"content bottom at y={y:.3f})")

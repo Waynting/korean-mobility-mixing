@@ -16,6 +16,19 @@ hidden share.
 survey is redistributed here. See `EXCLUSIONS.md`, which is an audit of what is held back and
 why, not a disclaimer.
 
+## Where this lives
+
+The archive of record is Zenodo, concept DOI
+[10.5281/zenodo.22152089](https://doi.org/10.5281/zenodo.22152089), which always resolves to
+the latest published version; the manuscript cites that DOI and names the version it
+corresponds to. This same tree is mirrored at <https://github.com/Waynting/korean-mobility-mixing>, where `main` is the working state and a
+tag marks each published version.
+
+Neither copy is assembled by hand. Both come out of `scripts/build_zenodo_deposit.sh`, which
+takes the source repository's tracked files, subtracts one exclusion list, and adds the front
+matter you are reading. `EXCLUDED_FILES.txt` lists every path that list withheld, so what is
+missing can be seen without asking for it.
+
 ## Quickstart
 
 ```bash

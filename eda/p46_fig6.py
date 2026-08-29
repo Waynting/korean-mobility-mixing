@@ -154,10 +154,29 @@ def main():
     print(f"  {len(CAPTION_CLAIMS)} caption claims, all reproduced.\n")
 
     # --------------------------------------------------------------------- draw
-    plt.rcParams.update({"font.size": 8.5, "axes.titlesize": 9,
+    # JRSI wants figure text in Times at 9-11 pt and refuses anything under
+    # 7.5 pt, so 7.5 is the floor everywhere below. STIXGeneral is the serif:
+    # it is Times-metric AND it ships inside matplotlib, so the figure renders
+    # the same on a machine with no Times installed. A figure that needs a
+    # locally installed font breaks on the typesetter's machine -- the same
+    # reason the Korean on these axes is romanised rather than set in a CJK
+    # font. mathtext.fontset = "stix" keeps $\theta$ and $R_0$ in the same face
+    # as the prose around them.
+    plt.rcParams.update({"font.family": "serif",
+                         "font.serif": ["STIXGeneral", "Times New Roman",
+                                        "DejaVu Serif"],
+                         "mathtext.fontset": "stix",
+                         "font.size": 8.5, "axes.titlesize": 9,
                          "axes.labelsize": 8.5, "legend.fontsize": 7.5,
                          "xtick.labelsize": 7.5, "ytick.labelsize": 7.5})
-    fig, ax = plt.subplots(2, 2, figsize=(9.0, 6.6))
+    # WAS 9.0 in wide, which reproduces at 0.72x on a 7 in page: the 7.5 pt
+    # floor this figure was raised to arrived as 5.4 pt of ink. 7.0 in is what
+    # p48 and p63 already build to and what JRSI prints a full-page figure at.
+    # The 2x2 survives the cut -- none of the four panels is a wide one -- so
+    # what the width buys back is spent on height instead: the panels keep
+    # roughly the area they had, in a taller box. Nothing is merged, dropped or
+    # re-lettered; (a)-(d) still carry what the caption describes.
+    fig, ax = plt.subplots(2, 2, figsize=(7.0, 7.2))
 
     # (a) the coverage family, with the masking band to scale
     a = ax[0, 0]
@@ -169,7 +188,7 @@ def main():
     a.axhspan(lo, hi, color="0.55", alpha=.35, lw=0, zorder=0)
     a.annotate(f"masking band,\n{mvc['202312']['ratio']:.1f}x narrower",
                xy=(-0.85, (lo + hi) / 2), xytext=(-0.95, hi + 0.0125),
-               fontsize=7, color="0.25", ha="left",
+               fontsize=7.5, color="0.25", ha="left",
                arrowprops=dict(arrowstyle="->", color="0.45", lw=.8))
     a.axvline(0, color="0.7", lw=.8, ls=":")
     a.set_xlabel(r"$\theta$   (device space $\leftarrow$  published  "
@@ -205,15 +224,29 @@ def main():
         b.plot([r["theta"] for r in fam[ym]],
                [r["kendall_tau_vs_theta0"] for r in fam[ym]], mk, ms=3.5, lw=1.3,
                color="#1f77b4" if ym == 202312 else "#ff7f0e", label=LAB[ym])
-    # One label per end per month, stacked so December and February do not
-    # collide: both months end on 0-9, and two labels on one point reads as a
-    # smudge rather than as a result.
-    for ym, dy in zip(MONTHS, (9, -13)):
-        col = "#1f77b4" if ym == 202312 else "#ff7f0e"
-        for r, ha, dx in ((fam[ym][0], "left", 3), (fam[ym][-1], "right", -3)):
+    # One label per end per month, pushed apart so December and February do not
+    # land on each other: both months end on 0-9, and two labels on one point
+    # reads as a smudge rather than as a result. WHICH month goes above is read
+    # from the file, not fixed. A fixed "December up, February down" works at
+    # theta = -1, where the two taus are equal, but at theta = +1 February sits
+    # 0.13 above December, so pushing December up and February down drove the
+    # two "0-9" labels into the same pixels -- which is what they had been doing.
+    # The labels now sit OUTSIDE the data range, not inside it: at 3.4 in a
+    # panel width the +/-3 pt inset put the theta = -1 label straight onto the
+    # rising segment beside it and the theta = +1 label onto the falling one --
+    # the offsets are in points and did not shrink with the panel. Past the end
+    # of the curve there is nothing to strike through, so the label reads and
+    # the data stays uncovered. set_xlim below opens the margin they need.
+    for end, ha, dx in ((0, "right", -4), (-1, "left", 4)):
+        taus = {ym: fam[ym][end]["kendall_tau_vs_theta0"] for ym in MONTHS}
+        above = MONTHS[0] if taus[MONTHS[0]] >= taus[MONTHS[1]] else MONTHS[1]
+        for ym in MONTHS:
+            r = fam[ym][end]
             b.annotate(r["top_band"], (r["theta"], r["kendall_tau_vs_theta0"]),
-                       textcoords="offset points", xytext=(dx, dy), ha=ha,
-                       fontsize=6.5, color=col)
+                       textcoords="offset points",
+                       xytext=(dx, 9 if ym == above else -14), ha=ha,
+                       fontsize=7.5,
+                       color="#1f77b4" if ym == 202312 else "#ff7f0e")
     # READ, NOT TYPED. This string said "40-44 (both months)" from the day the
     # figure was built until 2026-08-28. 40-44 is the leading band at
     # theta = -1, and at theta = 0 the months disagree -- so the label named the
@@ -224,15 +257,28 @@ def main():
                  f"{lead0[202402]} (Feb)")
     b.annotate(lead0_txt,
                (0.0, 1.0), textcoords="offset points", xytext=(0, 8),
-               ha="center", fontsize=6.5, color="0.3")
+               ha="center", fontsize=7.5, color="0.3")
     b.axhline(1.0, color="0.7", lw=.8, ls=":")
-    b.set_ylim(0, 1.15)
-    b.set_xlim(-1.15, 1.28)
+    # Headroom above the peak, so the legend gets a strip instead of a corner.
+    # Was 1.15, which left the legend nowhere to go: every corner of this panel
+    # is spoken for -- theta = +-1 by the band labels, the middle-left by the
+    # rising limb, the top-centre by the theta = 0 caption.
+    b.set_ylim(0, 1.34)
+    # Widened from (-1.15, 1.28) to make room for the end labels outside the
+    # data. The curves are unchanged; only the empty margin either side grew.
+    b.set_xlim(-1.40, 1.40)
     b.set_xlabel(r"$\theta$")
     b.set_ylabel(r"Kendall $\tau$ of the NGM dominant" "\n"
                  r"eigenvector against $\theta = 0$")
     b.set_title("(b)  the ordering does not (leading band annotated)", loc="left")
-    b.legend(frameon=False, loc="lower right")
+    # Not "lower right": that corner is where the theta = +1 labels live, and
+    # the legend was sitting on top of December's. Not "center left" either,
+    # which is where it went instead: that reads clear at 4.0 in and not at
+    # 3.4, where a 1.3 in legend box reaches as far right as the rising limb
+    # and "December 2023" ended underneath the theta = -0.25 marker. It goes in
+    # the headroom opened above, where nothing is drawn at all.
+    b.legend(frameon=False, loc="upper right", handlelength=1.6,
+             handletextpad=.5, borderaxespad=.5)
     b.grid(alpha=.25)
 
     for ym in MONTHS:
@@ -265,21 +311,33 @@ def main():
         c.plot(x, rank, mk, ms=4, lw=1.1, color=COL[tag], label=NAME[tag],
                alpha=.9)
     c.invert_yaxis()
+    # Empty ranks below the worst real one, so the three-entry legend has a
+    # strip of its own. At 9 in a 3-column legend took a third of the panel;
+    # at 3.4 in it takes all of it, and it was sitting on the survey curve's
+    # dive to rank 16 at 20-24 and on the y tick at 15. The alternative was
+    # stacking the legend into 3 rows, which walks into the same corner.
+    _rk_lo, _rk_hi = c.get_ylim()          # inverted, so _rk_lo is the largest
+    c.set_ylim(_rk_lo + 3.4, _rk_hi)
     c.set_yticks([1, 5, 10, 15])
     c.set_xticks(x)
-    c.set_xticklabels(bands, rotation=60, ha="right", fontsize=6.5)
-    c.set_ylabel("rank by reduction in $R_0$\nper person-day  (1 = buy first)")
+    c.set_xticklabels(bands, rotation=60, ha="right", fontsize=7.5)
+    c.set_ylabel("rank by reduction in $R_0$\nper person-day allocated  (1 = highest)")
     c.set_title("(c)  December 2023: the first choice agrees, the rest do not",
                 loc="left")
     c.legend(loc="lower right", framealpha=.92, edgecolor="0.8", ncol=3,
-             fontsize=6.8, handlelength=1.6, columnspacing=1.0)
+             fontsize=7.5, handlelength=1.4, columnspacing=0.8)
     c.grid(alpha=.25)
     first = {t: bands[int(np.argmax(p35["marginal"]["202312"][t]))]
              for t in ("survey", "passive_dong", "passive_gu")}
+    # Offset DOWNWARD into the panel. It used to be xytext=(10, 14), which put
+    # the string above the top of the axes and straight through the panel
+    # title; the y axis is inverted, so rank 1 is the ceiling and there is no
+    # room above it. Ranks 2-6 to the right of 15-19 are empty, so the label
+    # goes there.
     c.annotate(f"all three agree here: {first['survey']}",
                (x[bands.index(first["survey"])], 1),
-               textcoords="offset points", xytext=(10, 14), fontsize=6.8,
-               color="0.25", ha="left",
+               textcoords="offset points", xytext=(14, -16), fontsize=7.5,
+               color="0.25", ha="left", va="top",
                arrowprops=dict(arrowstyle="->", color="0.55", lw=.8))
 
     note("c", "the month panel (c) draws", str(MONTHS[0]))
@@ -309,7 +367,7 @@ def main():
               color="#1f77b4" if ym == 202312 else "#ff7f0e", alpha=.9)
         for j, v in enumerate(vals):
             d.annotate(f"{v:.1f}%", (xx[j] + (i - 0.5) * 0.34, v),
-                       ha="center", va="bottom", fontsize=6.5)
+                       ha="center", va="bottom", fontsize=7.5)
     d.set_xticks(xx)
     d.set_xticklabels([f"$R_0$ = {r}" for r in R0S])
     d.set_ylabel("benefit forgone by spending the\npassive plan in the survey world (%)")
@@ -330,6 +388,8 @@ def main():
     note("d", "largest bar on the panel", max(_reg_all))
 
     fig.tight_layout()
+    assert fig.get_size_inches()[0] <= 7.0, \
+        "figure 6 is wider than the 7-inch reproduction width"
     out_png = f"{FIG}/p46_figure6.png"
     fig.savefig(out_png, dpi=300)
     print(f"  figure -> {out_png}")

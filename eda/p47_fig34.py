@@ -86,6 +86,19 @@ from common import AGE_LABEL, AGES
 from p32_pmix import pm_null, symmetrise
 from paths import FIG, ROOT
 
+# JRSI wants figure text in Times at 9-11 pt and refuses anything under 7.5 pt,
+# so 7.5 is the floor for every explicit size below. STIXGeneral is the serif:
+# it is Times-metric AND it ships inside matplotlib, so both figures render the
+# same on a machine with no Times installed. A figure that depends on a locally
+# installed font breaks on the typesetter's machine -- the same reason the
+# Korean here is romanised rather than set in a CJK font. mathtext.fontset =
+# "stix" keeps $\sigma_k/\sigma_1$ in the same face as the prose around it.
+plt.rcParams.update({"font.family": "serif",
+                     "font.serif": ["STIXGeneral", "Times New Roman",
+                                    "DejaVu Serif"],
+                     "mathtext.fontset": "stix"})
+
+
 PUBLISHED_MONTHS = [202001, 202012, 202312, 202402, 202512, 202606]
 TERM = {3, 4, 5, 6, 9, 10, 11}
 PANEL = "WE"
@@ -225,29 +238,86 @@ def figure3(p26, p27, p32, p37, p61, pdf):
     for m, t in mats:
         note(3, "a", f"max |log10 excess|, {t}", round(float(np.nanmax(np.abs(m))), 4))
 
-    fig = plt.figure(figsize=(13.2, 8.4))
-    gs = fig.add_gridspec(2, 3, height_ratios=[1.0, 0.92], hspace=.42, wspace=.28)
+    # 7.00 in wide, which is what p48 and p63 already build to and what JRSI
+    # reproduces a full-page figure at (~180 mm). The old canvas was 13.2 in
+    # and arrived on the page at 0.56x, so the 7.5 pt floor this figure was
+    # raised to landed as 4.2 pt of ink -- the width defeated the type size.
+    # Height is not capped, so the row that used to hold (b) beside (c) is
+    # spent instead: (a) keeps its three-across row, and (b) and (c) each take
+    # a full-width row of their own. Nothing is merged and nothing is
+    # re-lettered; (a), (b), (c) still carry exactly the content the caption
+    # describes, now stacked in reading order.
+    #
+    # Saved WITHOUT bbox_inches="tight" (the p46/p63 rule), so the emitted page
+    # IS the figsize rather than whatever the trim happens to leave. That makes
+    # the margins below load-bearing: `left` has to hold the y tick labels AND
+    # the panel letter, `top` the row header.
+    # The three rows are placed in INCHES rather than by height_ratios, because
+    # what has to be reserved is a text height (a rotated tick label, a title)
+    # and that does not scale with the panel. Each row's band is written out so
+    # the arithmetic is checkable: the numbers below sum to H.
+    H = 8.90
+    def fy(inches):                       # inches from the bottom -> fraction
+        return inches / H
+    # (c) 0.10 pad | 0.55 rotated ym labels | 1.95 axes | 0.30 title
+    # (b) 0.28 gap | 0.30 xlabel | 2.10 axes | 0.30 title
+    # (a) 0.30 gap | 0.44 rotated band labels | 1.80 axes | 0.16 titles
+    #             | 0.30 header
+    C_LO, C_HI = fy(0.65), fy(2.60)
+    B_LO, B_HI = fy(3.48), fy(5.58)
+    A_LO, A_HI = fy(6.62), fy(8.42)
+    LEFT, RIGHT = .105, .985
+    # Row (a) stops short of the right margin so the colour bar and its tick
+    # labels have somewhere to be. At 13.2 in the bar hung off the third matrix
+    # and its labels rode the figure edge; at 7 in they fell off it.
+    A_LEFT, A_RIGHT = .070, .885
+
+    fig = plt.figure(figsize=(7.0, H))
+    gsA = fig.add_gridspec(1, 3, left=A_LEFT, right=A_RIGHT,
+                           top=A_HI, bottom=A_LO, wspace=.09)
+    gsB = fig.add_gridspec(1, 1, left=LEFT, right=RIGHT, top=B_HI, bottom=B_LO)
+    gsC = fig.add_gridspec(1, 1, left=LEFT, right=RIGHT, top=C_HI, bottom=C_LO)
+
+    def panel_letter(s, y_top):
+        """Panel letters flush at the left edge, on the row's title line.
+
+        They used to be offsets in AXES fractions, which is a fixed distance
+        only while the axes stays the same size; at half the width they walked
+        into the tick labels. Anchoring all three to the figure instead also
+        lines them up with each other, which the old placement never did.
+        """
+        fig.text(.010, y_top + 0.09 / H, s, fontsize=12, fontweight="bold",
+                 va="baseline", ha="left")
 
     # (a) three excess matrices on one colour scale
+    axes_a = []
     for j, (m, t) in enumerate(mats):
-        ax = fig.add_subplot(gs[0, j])
+        ax = fig.add_subplot(gsA[0, j])
+        axes_a.append(ax)
         im = ax.imshow(m, cmap="RdBu_r", vmin=-vmax, vmax=vmax)
-        ax.set_title(t, fontsize=9)
+        ax.set_title(t, fontsize=8.5, pad=3)
         ax.set_xticks(range(len(lbl)))
         ax.set_yticks(range(len(lbl)))
-        ax.set_xticklabels(lbl, rotation=90, fontsize=6)
-        ax.set_yticklabels(lbl, fontsize=6)
-        if j == 0:
-            ax.text(-0.34, 1.14, "(a)", transform=ax.transAxes,
-                    fontsize=13, fontweight="bold", va="top")
-            ax.text(0.0, 1.075, "log$_{10}$ excess over proportionate mixing, "
-                                "2023-12, shared colour limits",
-                    transform=ax.transAxes, fontsize=9.5)
-        if j == 2:
-            fig.colorbar(im, ax=ax, fraction=.046)
+        ax.set_xticklabels(lbl, rotation=90, fontsize=7.5)
+        # The three matrices are on the same 15 age bands, so the bands are
+        # labelled once. Repeating them would cost 0.6 in of the 7 that exist,
+        # and the width is the whole constraint here.
+        ax.set_yticklabels(lbl if j == 0 else [], fontsize=7.5)
+        ax.tick_params(length=2, pad=1.5)
+    panel_letter("(a)", A_HI + 0.16 / H)
+    fig.text(A_LEFT, A_HI + 0.25 / H,
+             "log$_{10}$ excess over proportionate mixing, 2023-12, "
+             "shared colour limits", fontsize=8.5, va="baseline", ha="left")
+    # One colour bar for the row, in its own axes rather than carved out of the
+    # third matrix: carving made that matrix smaller than the two beside it,
+    # which reads as a difference in the data.
+    cax = fig.add_axes([A_RIGHT + .016, A_LO + .10 * (A_HI - A_LO),
+                        .016, .80 * (A_HI - A_LO)])
+    cb = fig.colorbar(im, cax=cax)
+    cb.ax.tick_params(labelsize=7.5, length=2, pad=1.5)
 
     # (b) the rank test, with the survey's own null drawn behind it
-    ax = fig.add_subplot(gs[1, 0])
+    ax = fig.add_subplot(gsB[0, 0])
     c61 = p61["cells"][str(REF_MONTH)]
     perm = c61["permutation"]["sigma2_over_sigma1"]
     boot = c61["bootstrap"]["sigma2_over_sigma1"]
@@ -284,8 +354,11 @@ def figure3(p26, p27, p32, p37, p61, pdf):
     # Floor set below the smallest singular value (district, k = 15) so the
     # seven-entry legend has a strip of its own. Without it the legend lands on
     # the district curve, and a legend that covers a curve is worse than a
-    # smaller panel.
-    ax.set_ylim(2e-6, 2.0)
+    # smaller panel. 2e-6 was that floor while the legend was set at 6.1 pt;
+    # at the 7.5 pt JRSI floor the seven entries are half an inch taller and
+    # the box climbed back over the district curve at k = 8, so the strip is a
+    # decade and a bit deeper.
+    ax.set_ylim(1e-7, 2.0)
     handles = [Line2D([], [], color=TEAL, marker="o", ms=4, lw=1.2,
                       label="passive, dong"),
                Line2D([], [], color=BLUE, marker="s", ms=4, lw=1.2,
@@ -298,14 +371,14 @@ def figure3(p26, p27, p32, p37, p61, pdf):
                       label="null p95 (escape threshold)"),
                Line2D([], [], color=RED, lw=7, alpha=.32,
                       label="survey bootstrap, 95% CI")]
-    ax.legend(handles=handles, fontsize=6.1, loc="lower left", framealpha=.92,
+    ax.legend(handles=handles, fontsize=7.5, loc="lower left", framealpha=.92,
               handlelength=1.8, handletextpad=.6, labelspacing=.35,
               borderpad=.4)
     ax.grid(alpha=.3, which="both")
-    ax.text(-0.20, 1.13, "(b)", transform=ax.transAxes,
-            fontsize=13, fontweight="bold", va="top")
-    ax.set_title("how close to rank one? (2023-12)\n"
-                 "grey = the survey's own null at $k=2$", fontsize=9.5)
+    panel_letter("(b)", B_HI)
+    ax.set_title("how close to rank one? (2023-12)   "
+                 "grey = the survey's own null at $k=2$",
+                 fontsize=8.5, loc="left", pad=5)
 
     v2 = c61["verdict_sigma2_over_sigma1"]
     # Every edge this panel draws is on the sheet, so a caption can name the
@@ -342,7 +415,7 @@ def figure3(p26, p27, p32, p37, p61, pdf):
     note(3, "b", "null median empty cells", float(emp["null_zero_cells_median"]))
 
     # (c) the same estimator on 79 months
-    ax = fig.add_subplot(gs[1, 1:])
+    ax = fig.add_subplot(gsC[0, 0])
     rows = p37["rows"]
     months = p37["months"]
 
@@ -365,16 +438,23 @@ def figure3(p26, p27, p32, p37, p61, pdf):
             label="the six published months")
     ax.annotate("2020: schools shut,\nthe cycle is absent",
                 xy=((min(idx) + max(idx)) / 2, dong.max()),
-                ha="center", va="top", fontsize=7, color=RED)
+                ha="center", va="top", fontsize=7.5, color=RED)
     ax.set_xticks(range(0, len(months), 6))
-    ax.set_xticklabels([str(m) for m in months][::6], rotation=90, fontsize=7)
+    ax.set_xticklabels([str(m) for m in months][::6], rotation=90, fontsize=7.5)
     ax.set_ylabel("assortativity")
-    ax.legend(fontsize=7.5, ncol=2)
+    # A four-entry legend needs a strip of its own, and at 7 in it can only get
+    # one across the top. Headroom is added rather than the legend being moved
+    # down: the dong series is the top curve for all 79 months, so every other
+    # corner of this panel is either on a curve or on the 2020 annotation.
+    _lo, _hi = ax.get_ylim()
+    ax.set_ylim(_lo, _hi + .26 * (_hi - _lo))
+    ax.legend(fontsize=7.5, ncol=4, loc="upper right", framealpha=.92,
+              handlelength=1.6, handletextpad=.5, columnspacing=1.0,
+              borderpad=.35)
     ax.grid(alpha=.3)
-    ax.text(-0.085, 1.13, "(c)", transform=ax.transAxes,
-            fontsize=13, fontweight="bold", va="top")
+    panel_letter("(c)", C_HI)
     ax.set_title(f"the ladder holds in all {len(months)} months; "
-                 "shading = school term", fontsize=9.5)
+                 "shading = school term", fontsize=8.5, loc="left", pad=5)
 
     s = p37["summary_dong"]
     for k in ("assort_min", "assort_max", "assort_median",
@@ -384,23 +464,79 @@ def figure3(p26, p27, p32, p37, p61, pdf):
     note(3, "c", "months where the ladder holds", int(p37["ladder"]["n_monotone"]))
 
     out = f"{FIG}/p47_figure3.png"
-    fig.savefig(out, dpi=300, bbox_inches="tight")
+    fig.savefig(out, dpi=300)
     if pdf:
-        fig.savefig(f"{FIG}/p47_figure3.pdf", bbox_inches="tight")
+        # CreationDate omitted on purpose: matplotlib stamps the wall clock
+        # into the PDF, so two runs of the same figure differ by bytes for a
+        # reason that has nothing to do with the figure. p46 and p63 have
+        # done this since they were written; these four had not, so their
+        # vector files showed up in every diff whether or not the figure
+        # had changed. The PNG beside them was always stable.
+        fig.savefig(f"{FIG}/p47_figure3.pdf",
+                    metadata={"CreationDate": None})
     plt.close(fig)
-    print(f"  -> {out}")
+    print(f"  -> {out}   ({fig.get_size_inches()[0]:.2f} x "
+          f"{fig.get_size_inches()[1]:.2f} in)")
+    assert fig.get_size_inches()[0] <= 7.0, \
+        "figure 3 is wider than the 7-inch reproduction width"
 
 
 # --------------------------------------------------------------------------
 # figure 4
 # --------------------------------------------------------------------------
 def figure4(p18b, p19, p38, p60, pdf):
-    # 1x3, and deliberately NOT 2x2 with the March-vs-December panel spanning
-    # the bottom row: a full-width bottom row reads as a promotion, and that
-    # panel is being demoted. It keeps the widest of the three ratios only
-    # because it carries 16 labelled bars and eight legend entries.
-    fig, axes = plt.subplots(1, 3, figsize=(17.6, 5.0),
-                             gridspec_kw={"width_ratios": [1.0, 1.0, 1.3]})
+    # WAS 1x3 at 17.6 in, which reproduces at 0.44x on a 7 in page: the 7.5 pt
+    # floor this figure was raised to arrived as 3.3 pt of ink. 7.0 in is the
+    # width p48 and p63 build to and the width JRSI prints a full-page figure
+    # at, so the row has to become two.
+    #
+    # The old comment here refused a spanning bottom row on the grounds that
+    # "a full-width bottom row reads as a promotion, and that panel is being
+    # demoted". The width cap overrules it, and the trade is honest: at 7 in a
+    # three-across row gives (c) 2.6 in for 16 labelled bars and an eight-entry
+    # legend, which is not a panel, it is a smudge. (c) is still demoted by
+    # being third and by carrying the smallest claim; what it gets back is the
+    # 6.4 in its content needs. (a) and (b) share the top row because they are
+    # the matched pair -- the same estimator on two axes, answering in opposite
+    # directions -- and reading them side by side is the point of the figure.
+    # No panel is merged, dropped or re-lettered.
+    #
+    # Rows are placed in INCHES, not by height_ratios: what has to be reserved
+    # is a text height (a rotated tick label, a two-line title), and that does
+    # not scale with the panel.
+    H = 7.50
+    def fy(inches):
+        return inches / H
+    # (c) 0.10 pad | 0.45 rotated band labels | 3.20 axes | 0.32 title
+    # (ab) 0.30 gap | 0.28 xlabel | 2.50 axes | 0.30 two-line titles | 0.05 pad
+    C_LO, C_HI = fy(0.55), fy(3.75)
+    R_LO, R_HI = fy(4.65), fy(7.15)
+    RIGHT = .985
+    # The top row starts further in than the bottom one. Both (a) and (b) are
+    # log axes whose minor labels read "2 x 10^-2", which is half an inch of
+    # tick label before the rotated "assortativity" even starts; at left=.105
+    # that word ran off the left edge of the page. wspace has to clear the same
+    # stack twice, because (b) carries its own copy of it.
+    R_LEFT, R_WSPACE = .130, .30
+
+    fig = plt.figure(figsize=(7.0, H))
+    gsR = fig.add_gridspec(1, 2, left=R_LEFT, right=RIGHT,
+                           top=R_HI, bottom=R_LO, wspace=R_WSPACE)
+    gsC = fig.add_gridspec(1, 1, left=.075, right=RIGHT,
+                           top=C_HI, bottom=C_LO)
+    axes = [fig.add_subplot(gsR[0, 0]), fig.add_subplot(gsR[0, 1]),
+            fig.add_subplot(gsC[0, 0])]
+
+    def panel_letter(ax, s, dy_in=.22):
+        """Letter to the LEFT of the axes, on the title's first line.
+
+        Placed off the axes' own box rather than in axes fractions: a fraction
+        offset is a fixed distance only while the axes stays the same size, and
+        these are now half the width they were.
+        """
+        p = ax.get_position()
+        fig.text(p.x0 - .34 / 7.0, p.y1 + dy_in / H, s,
+                 fontsize=12, fontweight="bold", va="baseline", ha="left")
 
     # (a) spatial scale
     ax = axes[0]
@@ -416,8 +552,11 @@ def figure4(p18b, p19, p38, p60, pdf):
     ax.set_yscale("log")
     ax.axvspan(424, 1e7, color="0.85", zorder=0)
     ax.set_xlim(0.8, 1e4)
-    ax.text(700, ax.get_ylim()[1] * .4, "unsupported by these data",
-            fontsize=7, rotation=90)
+    # Anchored low in the band for the same reason as (b)'s "one bin" string:
+    # the panel is 2.5 in tall now, and a 0.9 in rotated label starting at 0.4
+    # of the top ran out through the axes frame.
+    ax.text(700, ax.get_ylim()[1] * .16, "unsupported by these data",
+            fontsize=7.5, rotation=90)
     ax.set_xlabel("number of locations")
     ax.set_ylabel("assortativity")
     ax.grid(alpha=.3, which="both")
@@ -427,10 +566,10 @@ def figure4(p18b, p19, p38, p60, pdf):
     ax.text(.03, .96, "coarsening geography\nlowers r", transform=ax.transAxes,
             va="top", ha="left", fontsize=8.5, color="#33475B", linespacing=1.3,
             bbox=dict(fc="white", ec="none", alpha=.85, pad=2.0))
-    ax.text(-0.17, 1.10, "(a)", transform=ax.transAxes,
-            fontsize=13, fontweight="bold", va="top")
-    ax.set_title(f"spatial scale: {len(p38['months'])} monthly curves, "
-                 "adjacency arm\n(red = the six published months)", fontsize=9.5)
+    panel_letter(ax, "(a)")
+    ax.set_title(f"spatial scale: {len(p38['months'])} monthly curves,\n"
+                 "adjacency arm (red = the six published months)",
+                 fontsize=8.5, loc="left", pad=4)
     ex = p38["extrapolation_support"]
     note(4, "a", "curves", len(p38["months"]))
     note(4, "a", "log10 span the curve supports", round(float(ex["log10_span"]), 3))
@@ -473,8 +612,11 @@ def figure4(p18b, p19, p38, p60, pdf):
     ax.set_xticks(sorted(NESTED_K + (3,)))
     ax.set_xticks([], minor=True)
     ax.get_xaxis().set_major_formatter(ScalarFormatter())
-    ax.text(1.26, ax.get_ylim()[1] * .30, "one bin: r is 0/0, undefined",
-            fontsize=7, rotation=90, ha="center", va="bottom")
+    # Anchored low in the band, not at 0.30 of the top: the panel is 2.5 in
+    # tall now instead of 5, and a 0.95 in string starting at 0.30 of a log
+    # axis ran up into the second line of the title.
+    ax.text(1.26, ax.get_ylim()[1] * .13, "one bin: r is 0/0, undefined",
+            fontsize=7.5, rotation=90, ha="center", va="bottom")
     ax.text(.97, .96, "coarsening age\nraises r", transform=ax.transAxes,
             va="top", ha="right", fontsize=8.5, color="#33475B", linespacing=1.3,
             bbox=dict(fc="white", ec="none", alpha=.85, pad=2.0))
@@ -487,12 +629,12 @@ def figure4(p18b, p19, p38, p60, pdf):
                         label="the six published months"),
                  Line2D([], [], color=GOLD, marker="o", ms=3.2, ls="--", lw=1.0,
                         label="Lim et al., 3 bands")]
-    ax.legend(handles=handles_b, fontsize=7.0, loc="lower right",
+    ax.legend(handles=handles_b, fontsize=7.5, loc="lower right",
               framealpha=.92, handlelength=1.9, handletextpad=.6)
-    ax.text(-0.17, 1.10, "(b)", transform=ax.transAxes,
-            fontsize=13, fontweight="bold", va="top")
-    ax.set_title(f"age scale: the same {len(p60['months'])} matrices, nested "
-                 "ladder\n(red = the six published months)", fontsize=9.5)
+    panel_letter(ax, "(b)")
+    ax.set_title(f"age scale: the same {len(p60['months'])} matrices,\n"
+                 "nested ladder (red = the six published months)",
+                 fontsize=8.5, loc="left", pad=4)
 
     aa = p60["axis_asymmetry"]
     note(4, "b", "curves", len(p60["months"]))
@@ -576,7 +718,7 @@ def figure4(p18b, p19, p38, p60, pdf):
                   zorder=6)
         ax.annotate(f"{vo:+.2f}", (end - .55, vo), xytext=(4, -10),
                     textcoords="offset points", ha="left", va="top",
-                    fontsize=7, color=BLUE, zorder=7,
+                    fontsize=7.5, color=BLUE, zorder=7,
                     bbox=dict(fc="white", ec="none", alpha=.85, pad=.8))
         ax.text((start + end - 1) / 2, top - .28, band, ha="center", va="top",
                 fontsize=9, color="#8A5A18", weight="bold")
@@ -596,19 +738,19 @@ def figure4(p18b, p19, p38, p60, pdf):
                Line2D([], [], color="#333", lw=1.1,
                       label="masking range, 0 to 3 per cell"),
                Line2D([], [], color=BLUE, marker="D", ms=3.4, ls="none",
-                      label="both endpoints in Seoul (p18b)"),
+                      label="both endpoints in Seoul"),
                Line2D([], [], color=BLUE, marker="D", ms=5.0, mfc="white",
-                      mew=1.2, ls="none", label="origin in Seoul only (p18b)"),
+                      mew=1.2, ls="none", label="origin in Seoul only"),
                Line2D([], [], color=BLUE, lw=1.5,
                       label="3 bands, both endpoints"),
                Line2D([], [], color=BLUE, lw=1.9, ls=(0, (3, 2)),
                       label="3 bands, origin in Seoul")]
-    ax.legend(handles=handles, fontsize=7.0, loc="lower left", framealpha=.92,
+    ax.legend(handles=handles, fontsize=7.5, loc="lower left", framealpha=.92,
               ncol=2, columnspacing=1.0, handletextpad=.6)
-    ax.text(-0.12, 1.10, "(c)", transform=ax.transAxes,
-            fontsize=13, fontweight="bold", va="top")
+    panel_letter(ax, "(c)", dy_in=.24)
     ax.set_title("age scale: Dec vs Mar 2020, within-age share\n"
-                 "bars = measured masking fill, whiskers = 0..3", fontsize=9.5)
+                 "bars = measured masking fill, whiskers = 0..3",
+                 fontsize=8.5, loc="left", pad=4)
     # The stamp used to read NOT SETTLED, and before that it was clipped to
     # "...ope:" by the legend -- a warning that is present but unreadable is
     # worse than none, because it still looks discharged. The question is
@@ -619,7 +761,7 @@ def figure4(p18b, p19, p38, p60, pdf):
             "endpoint filter, settled: co-occurrence -> both endpoints;\n"
             "composition -> origin only. Both shown; the conclusion\n"
             "holds under either, and is stronger under origin-only.",
-            transform=ax.transAxes, ha="right", va="top", fontsize=6.9,
+            transform=ax.transAxes, ha="right", va="top", fontsize=7.5,
             color="#33475B", linespacing=1.35,
             bbox=dict(fc="white", ec=BLUE, lw=.8, alpha=.95, pad=3.0))
 
@@ -661,11 +803,16 @@ def figure4(p18b, p19, p38, p60, pdf):
          round(float(max(abs(mid[i] - both[i]) for i in range(len(labs)))), 4))
 
     out = f"{FIG}/p47_figure4.png"
-    fig.savefig(out, dpi=300, bbox_inches="tight")
+    fig.savefig(out, dpi=300)
     if pdf:
-        fig.savefig(f"{FIG}/p47_figure4.pdf", bbox_inches="tight")
+        # CreationDate omitted, for the reason figure 3 gives above.
+        fig.savefig(f"{FIG}/p47_figure4.pdf",
+                    metadata={"CreationDate": None})
     plt.close(fig)
-    print(f"  -> {out}")
+    print(f"  -> {out}   ({fig.get_size_inches()[0]:.2f} x "
+          f"{fig.get_size_inches()[1]:.2f} in)")
+    assert fig.get_size_inches()[0] <= 7.0, \
+        "figure 4 is wider than the 7-inch reproduction width"
 
 
 def main():

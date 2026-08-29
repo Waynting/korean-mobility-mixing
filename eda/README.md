@@ -202,7 +202,7 @@ python3 -m venv .venv && .venv/bin/pip install duckdb pandas pyarrow matplotlib
 .venv/bin/python eda/p46_fig6.py --pdf   # Phase 46 圖 6 的四面板合成(數秒)
 #   讀 results_p33/p35,不重算任何東西;寫 results_p46.json(圖說數字清單 caption
 #   sheet + source + 11 道閘門各自比了什麼)。--pdf 另外寫向量檔,PDF 不蓋
-#   CreationDate,所以向量檔也逐位可重現(同 p63)。
+#   CreationDate,所以向量檔也逐位可重現(2026-08-29 起六支圖階段都這樣存)。
 #   畫圖之前先把 coverage draft 圖說引用的 11 個數字逐一對回 results 檔,對不上
 #   就中止——圖說與圖不會各說各話。
 #   ✅ 2026-08-28 補上 results_p46.json。在此之前它是**唯一**不寫 results 檔的圖
@@ -222,6 +222,10 @@ python3 -m venv .venv && .venv/bin/pip install duckdb pandas pyarrow matplotlib
 #   20-44 以外相等,20-24 差 0.4757 pp。拿 p18b 的一端配 p19 的長條,會把補值
 #   當成 scope 賣掉;gates() 把「20-44 以外相差 <= 0.005 pp」asserted 起來。
 #   沒有草稿圖說,所以改成印出編號的數字清單。
+#   ✅ 2026-08-29:p47/p48/p55/p56 存 PDF 時補上 metadata={"CreationDate": None}。
+#   在此之前只有 p46/p63 蓋掉那個時間戳,所以這四張的向量檔每跑一次 hash 就變,
+#   圖沒動也會進 diff——p47_figure3.pdf 是徵狀最明顯的一張(PNG 逐位相同、PDF 不同)。
+#   determinism_check.sh 比的是 results 檔而不是圖檔,所以這件事它抓不到。
 .venv/bin/python eda/p48_fig1.py --pdf   # Phase 48 圖 1 研究設計/管線五層示意(數秒)
 #   讀 results_inventory/p16/p29/p36/p37/p38;7.0 x 9.4 吋直式,配合 AJE 的 7 吋上限。
 .venv/bin/python eda/p49_dongwor.py      # Phase 49 洞級取後放回 vs 取後不放回(約 3 分)
@@ -331,9 +335,10 @@ python3 -m venv .venv && .venv/bin/pip install duckdb pandas pyarrow matplotlib
 .venv/bin/python eda/p31_report_audit.py --table   # 引用閘門(只讀 JSON,數秒),並生成數字列表
 #   --table 寫 eda/memo/numbers-20260820.md —— 那份檔案是生成的,是內部清單、不隨信寄出,
 #   內容就是閘門比對的 (項目, 引用值, 重算值) 本身,所以不會與閘門不一致。手改沒有意義。
-#   守四輪文件:08-18、08-19/08-20、08-21+附件、08-24+圖說,以及還在寫的 08-27。
+#   守五輪信件:08-18、08-19/08-20、08-21+附件、08-24+圖說,還在寫的 08-27,
+#   以及**要投稿的那份論文**(`paper/manuscript_JRSI.md` 與 `paper/manuscript_JRSI_SI.md`)。
 #   反方向檢查是各輪只比對自己那封信,不把幾封併在一起比。
-#   閘門守自己的項數,而這三個總數就寫在這裡:1203 項 / 500 項 / 467 項,對不上就報紅。
+#   閘門守自己的項數,而這三個總數就寫在這裡:1782 項 / 906 項 / 873 項,對不上就報紅。
 #   以前這三個數是從 08-19 那封已寄出的信裡讀的,而總數每一輪都會動——結果就是
 #   為了讓閘門轉綠去改一封已經寄出去的信。會動的數字要放在還在寫的文件裡。
 #   08-21 那封信只守自己那一輪的 178 項檢查(已結案的一輪不會再動);它也過期過(寫 59,實際 101)。
@@ -350,6 +355,21 @@ python3 -m venv .venv && .venv/bin/pip install duckdb pandas pyarrow matplotlib
 #   ⚠️ 圖說檔(p47/p48/p55/p56/p63 的 caption sheet)在 08-27 之前**一份都沒有被閘門讀過**——
 #   圖說是照著 sheet 寫的,而沒有任何東西比對過 sheet 與它讀來的結果檔。
 #   那就是一張圖可以連著好幾天跟自己的圖說互相矛盾而沒人知道的結構原因,現在補上了。
+#   ⚠️ 論文本身在這之前也**一份都沒有被閘門讀過**——這個檔守的每一份文件都是寄給老師的信,
+#   而真正要離開這個 repo 去期刊的那一份,是唯一沒有任何閘門在看數字的。現在補上:
+#   正文與 SI 是**一對**,579 項檢查、406 個登記值,全部對 LIVE。
+#   一對而不是兩份:兩者是同一個投稿信封,正文寫結論、SI 放它的算術,
+#   只出現在 SI 裡的數字是有引用而不是漏引;拆開比就會重蹈 08-22 只讀信不讀附件的錯。
+#   讀 LIVE 而不是快照,是因為這份還沒投出去,數字還會動、文件要跟著動;
+#   投出去那一天要在同一個 commit 裡凍進 `eda/archive/`,並把那一節每一個 `load()` 指過去。
+#   ⚠️ 論文用 U+2009 THIN SPACE 當千分位(`10 186 891 962`,不是 `10,186,891,962`),
+#   那是 Royal Society 的體例。`_forms()` 兩種寫法都生成,和 U+2212 那條規則同一個道理:
+#   比對器要認得一個數字,不該對排版有意見。**不要把逗號改回去。**
+#   閘門蓋不到的(沒有結果檔可對):兩個 Zenodo DOI、授權名稱、開放資料廣場第 11 條、
+#   參考文獻的編號與計數、2020 停課年表的每一個日期、調查的 14 天日誌與 424/424 對應、
+#   手冊的結構性零與它解釋的 99.03% 空網格、docomo 的十歲距、以及 SI 7 那四個偵測器偏差
+#   (6.66e-16、1.49e-15、2.2e-4、250 個細胞展開成 5,714 個場館)——那四個 p39 只寫進 memo,
+#   沒寫進結果檔。這些在 `--table` 跑完的 NOT COVERED 那一段逐條列出,不替它們發明來源。
 eda/determinism_check.sh                 # 預設集各跑兩次,比 sha256(約 10 分)
 #   預設集:p33/p35/p36/p41/p42/p44/p49/p50/p53/p54/p55/p56/p47/p48/p57/p58/p60/p61/p62/p63/p46。
 #   ⚠️ p46 是最後一支進來的圖階段,而且在 2026-08-28 之前**進不來**:它不寫
