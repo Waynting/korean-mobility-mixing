@@ -5369,7 +5369,8 @@ def main():
           "facts, and every date. Those are checked in their own memos. "
           "Section 8's disk counts USED to be on this list; they are now gated "
           "against eda/results_inventory.json.")
-    print("  In the manuscript specifically: the two Zenodo DOIs and the MIT "
+    print("  In the manuscript specifically: the two Zenodo DOIs, the GitHub "
+          "mirror's URL and the MIT "
           "and CC BY 4.0 licence names; the Open Data Plaza's article 11; the "
           "count and numbering of the reference lists; the 2020 closure "
           "chronology's dates; the survey's 14-day diary window and its "
