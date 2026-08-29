@@ -8,6 +8,21 @@
 #   2. concept and version DOIs are not reversed
 #   3. the licences match the paper   (MIT for code, CC BY 4.0 for derived data)
 #   4. the version the paper names is the version that is actually published
+#   5. the record points at the public mirror the paper also names
+#
+# EDITING A PUBLISHED RECORD'S METADATA: use the InvenioRDM API, never the
+# legacy deposit API. `GET /api/deposit/depositions/<id>` reports
+# `license: "cc-by-4.0"` for a record that carries BOTH cc-by-4.0 and mit,
+# because the legacy schema has room for one; PUT that back and the record
+# silently loses MIT, and with it check 3 and the manuscript's sentence about
+# the code licence. The working sequence, all with Accept and Content-Type
+# application/json against /api/records/<id>/draft:
+#   POST   /api/records/<id>/draft                     create the edit draft
+#   GET    /api/records/<id>/draft   Accept: application/vnd.inveniordm.v1+json
+#   PUT    /api/records/<id>/draft   {"metadata": {...}}  rights as [{"id":..}]
+#   GET    the draft again, diff it against the live record, expect ONE field
+#   POST   /api/records/<id>/draft/actions/publish
+# Files are immutable on a published record; metadata is not.
 #
 # IMPORTANT, and the reason this is not a one-line curl: Zenodo's legacy API
 # (`GET /api/records/<id>`, the default response) serialises only the FIRST
@@ -26,6 +41,7 @@
 set -uo pipefail
 
 CONCEPT_RECID="22152089"          # concept DOI 10.5281/zenodo.22152089
+MIRROR_URL="https://github.com/Waynting/korean-mobility-mixing"
 EXPECT_VERSION="${1:-}"
 API="https://zenodo.org/api/records"
 RDM_ACCEPT="Accept: application/vnd.inveniordm.v1+json"
@@ -67,7 +83,7 @@ note "resolves to $url"
 # without it curl returns the redirect's HTML body and the parse below dies on
 # "Expecting value: line 1 column 1".
 curl -sL -H "$RDM_ACCEPT" "$API/$CONCEPT_RECID" > /tmp/zrec.$$
-python3 - /tmp/zrec.$$ "$CONCEPT_RECID" "$EXPECT_VERSION" <<'PY'
+python3 - /tmp/zrec.$$ "$CONCEPT_RECID" "$EXPECT_VERSION" "$MIRROR_URL" <<'PY'
 import json, sys
 d = json.load(open(sys.argv[1])); concept_id, want = sys.argv[2], sys.argv[3]
 G, R = '\033[32mok\033[0m   ', '\033[31mFAIL\033[0m '
@@ -97,6 +113,23 @@ if want:
     print(f"        record says: {got!r}")
 else:
     print(f"        latest published version: {got!r}")
+
+# 5. the mirror. The paper's Data accessibility names a GitHub URL as well as
+# the DOI, so the record has to point back at it or the two halves of that
+# sentence are unconnected for anyone arriving from Zenodo. The relation is
+# checked too: isSupplementTo plus a tree/<tag> URL is what Zenodo's own GitHub
+# integration writes, and a bare repository URL would point at a moving target
+# from a fixed version DOI.
+mirror = sys.argv[4] if len(sys.argv) > 4 else ''
+rels = d.get('metadata', {}).get('related_identifiers') or []
+hit = [r for r in rels if mirror and mirror in str(r.get('identifier', ''))]
+supp = [r for r in hit if (r.get('relation_type') or {}).get('id') == 'issupplementto']
+print(f"  {G if supp else R} the public mirror is a related identifier "
+      f"(isSupplementTo)")
+for r in hit:
+    print(f"        {(r.get('relation_type') or {}).get('id')}: {r.get('identifier')}")
+if not hit:
+    print(f"        no related identifier mentions {mirror or '(no URL given)'}")
 
 files = (d.get('files') or {}).get('entries') or {}
 print(f"        files on the record: {len(files)}")

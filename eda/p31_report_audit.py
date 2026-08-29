@@ -3523,10 +3523,16 @@ cms("1: beta's low end, the Seoul arm, is 0.9217", 0.9217,
     p53_ms["asymmetry"]["beta_seoul"], _dp(0.9217, 4))
 cms("1: beta's high end, the national arm, is 0.9347", 0.9347,
     p53_ms["asymmetry"]["beta_national"], _dp(0.9347, 4))
-# "with every reading we obtain below 0.95" is the sentence §1 needs in order
-# not to contradict §3.5's eleventh reading of 0.9387, so it is checked as the
-# inequality it states rather than left to the prose.
-check("MS", "1: every one of the eleven readings lies below 0.95", 1.0,
+# "with all eleven readings below 0.95" is the sentence §1 needs in order not to
+# contradict §3.5's eleventh reading of 0.9387, so it is checked as the two
+# things it asserts rather than left to the prose. It says ELEVEN and not "every
+# reading we obtain", because §3.5 also names an archived twelfth -- venue
+# pairing with replacement, 0.9616 -- which sits above 0.95 and was rejected on
+# evidence that predates this comparison. A universal over "readings" would have
+# been false on that one.
+check("MS", "1: there are eleven measured readings", 11.0,
+      float(len(_cl59["measured_betas"])), 1e-9)
+check("MS", "1: all eleven of them lie below 0.95", 1.0,
       1.0 if _cl59["largest_measured_beta"] < 0.95 else 0.0, 1e-9)
 
 
