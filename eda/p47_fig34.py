@@ -739,9 +739,12 @@ def figure4(p18b, p19, p38, p60, pdf):
     ax.legend(handles=handles, fontsize=7.5, loc="lower right", framealpha=.92,
               ncol=2, columnspacing=1.0, handletextpad=.6)
     panel_letter(ax, "(c)", dy_in=.24)
+    # "Mar to Dec", not "Dec vs Mar": the quantity is still Dec - Mar, but the
+    # caption narrates it as "between March and December 2020" and a panel that
+    # names the two months in the other order reads as the opposite difference.
     ax.set_title("age scale: the 16 published bands against the three of "
                  "Lim et al.,\n"
-                 "change in E (discretionary) arrival share, Dec vs Mar 2020",
+                 "change in E (discretionary) arrival share, Mar to Dec 2020",
                  fontsize=8.5, loc="left", pad=4)
     # What (a) and (b) each carry in one short line, (c) now carries too, and
     # it reads out of p19 at draw time like every other number on the sheet.

@@ -2943,7 +2943,10 @@ check("27", "p47 4(b) draws one curve per month", 0.0,
 # would not, and Figure 4 would silently go back to two panels measuring
 # different objects -- which is the defect p60 was written to repair. So the
 # partition is read out of p19's source the way p60 reads it (ast, never import:
-# p19_bandwidth.py has no __main__ guard and importing it re-runs phase 19),
+# the literal is the thing the two panels must share, and reading it keeps this
+# check independent of whether p19 imports at all -- p19 has had its __main__
+# guard since 2026-08-28, so an import would no longer re-run the phase, but it
+# would still pull duckdb and matplotlib in for one dict),
 # checked against p60's anchor, and checked against every band name panel (c)
 # prints.
 _p19src = open(f"{ROOT}/eda/p19_bandwidth.py").read()

@@ -304,8 +304,10 @@ python3 -m venv .venv && .venv/bin/pip install duckdb pandas pyarrow matplotlib
 #   機制拆成兩個都大於 1 的因子:吸收超額 2.2708 × 邊際集中 1.7100,逐月恆等。
 #   比例混合虛無在每一級都是 4.94e-16,所以那個上升是真的超額被重新標籤,不是算子的假影。
 #   空間軸與年齡軸**不對稱**(空間粗化壓低 r,年齡粗化抬高 r),圖 4 不能畫成鏡像。
-#   A5 用 ast 從 p19 的原始碼讀 LIM_BANDS——不 import,因為 p19 沒有 __main__ 守衛,
-#   import 它等於重跑 phase 19。results_p37.json 一個位元都不動。
+#   A5 用 ast 從 p19 的原始碼讀 LIM_BANDS——不 import。p19 從 2026-08-28 起有 __main__
+#   守衛,import 它已經不會重跑 phase 19;仍然讀原始碼,是因為要綁的是那個字面值本身,
+#   不是「p19 還 import 得動」,也不必為了一個 dict 把 duckdb 與 matplotlib 拉進來。
+#   results_p37.json 一個位元都不動。
 .venv/bin/python eda/p61_survspec.py     # Phase 61 調查矩陣離秩一的距離扛不扛得住自己的虛無(約 6 秒)
 #   老師 8/27 第 3 點:圖 3(b) 是整張圖唯一沒有虛無的面板,而它最需要。
 #   跑的是 p32 32.4b 自己的兩個迴圈(500 次 ego-band 置換 + 500 次受訪者拔靴),

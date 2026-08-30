@@ -31,14 +31,15 @@ at max |delta| = 0.0. That assertion is what ties this file's estimator to the
 one in the paper rather than merely making it consistent with it.
 
 WHY p19 IS PARSED AND NOT IMPORTED. Anchor A5 requires the three-band map to be
-p19's and to fire if p19's edges ever move. `p19_bandwidth.py` has no
-`if __name__ == "__main__"` guard -- the whole phase is at module level -- so
-`from p19_bandwidth import LIM_BANDS` RUNS PHASE 19: it opens
-`derived/gu_level.parquet`, needs the external drive, redraws the figure and
-rewrites `results_p19.json`. This file therefore reads `LIM_BANDS` out of p19's
-source with `ast`, which keeps the coupling A5 asks for (a changed literal in
-p19 fails here) without executing anything and without touching a results file
-this phase does not own.
+p19's and to fire if p19's edges ever move. This file reads `LIM_BANDS` out of
+p19's source with `ast`, which keeps exactly that coupling -- a changed literal
+in p19 fails here -- and depends on nothing except the literal itself.
+`p19_bandwidth.py` is import-safe: since 2026-08-28 its whole phase sits behind
+`if __name__ == "__main__"`, so `from p19_bandwidth import LIM_BANDS` executes
+nothing and touches no results file. The parse is kept anyway, because it is the
+narrower dependency. Importing would load duckdb, matplotlib and pandas for one
+dict, and would tie A5 to p19 remaining importable rather than to the partition
+p19 publishes.
 
     python eda/p60_agescale.py
 
@@ -290,8 +291,9 @@ def main():
                 max_abs_diff=a4, n=len(PUBLISHED_MONTHS), passed=True),
         A5=dict(what="band map equals p19_bandwidth.py LIM_BANDS",
                 bands=lim, read_by="ast.literal_eval on p19's source; p19 is NOT "
-                                   "imported because it has no __main__ guard and "
-                                   "importing it re-runs phase 19",
+                                   "imported, so this anchor rests on p19's "
+                                   "LIM_BANDS literal alone and not on p19 "
+                                   "being importable",
                 passed=True),
         A6=dict(what="month set equals p37's, keyed by ym label",
                 n_months=len(months), first=months[0], last=months[-1],
