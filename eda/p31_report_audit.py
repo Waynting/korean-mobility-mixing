@@ -3738,19 +3738,19 @@ cms("3.2: the national span ends at 45.5x", 45.5,
     max(p51_ms["national_span"][_m]["hi"] for _m in ("202312", "202402")),
     _dp(45.5, 1))
 # The 79-month context.
-cms("3.2: the 79-month dong series runs from 0.01311", 0.01311,
+cms("SI 3: the 79-month dong series runs from 0.01311", 0.01311,
     p37["summary_dong"]["assort_min"], _dp(0.01311, 5))
-cms("3.2: ...to 0.02589", 0.02589, p37["summary_dong"]["assort_max"],
+cms("SI 3: ...to 0.02589", 0.02589, p37["summary_dong"]["assort_max"],
     _dp(0.02589, 5))
-cms("3.2: with a median of 0.01938", 0.01938,
+cms("SI 3: with a median of 0.01938", 0.01938,
     p37["summary_dong"]["assort_median"], _dp(0.01938, 5))
 _WE_MS = sorted([r for r in p37["rows"]
                  if r["panel"] == "WE" and r["level"] == "dong"],
                 key=lambda r: r["assortativity"])
 _RANK_MS = {r["ym"]: i + 1 for i, r in enumerate(_WE_MS)}
-check("MS", "3.2: December 2023 sits at rank 50 of 79", 50.0,
+check("MS", "SI 3: December 2023 sits at rank 50 of 79", 50.0,
       float(_RANK_MS[202312]), 1e-9)
-check("MS", "3.2: February 2024 sits at rank 24 of 79", 24.0,
+check("MS", "SI 3: February 2024 sits at rank 24 of 79", 24.0,
       float(_RANK_MS[202402]), 1e-9)
 # The two-sided floor, and the agreement between its two unrelated routes.
 cms("3.2: the zero-structure world reads 0.00455", 0.00455,
@@ -4268,8 +4268,8 @@ check("MS", "SI 6: the zero crossing moves one bin under filtering", 1.0,
               == "65-69/70-74"
               and _cap(_c47, 4, "c", "zero crossing, origin only")
               == "70-74/75-79") else 0.0, 1e-9)
-cms("SI 6: the bar-vs-marker gap is at most 0.48 pp", 0.48,
-    _cap(_c47, 4, "c", "largest bar-vs-marker gap"), _dp(0.48, 2))
+cms("SI 6: the two series differ by at most 0.48 pp", 0.48,
+    _cap(_c47, 4, "c", "largest gap between p19's bars"), _dp(0.48, 2))
 
 cms("Fig 5(b): the bound is 0.2065 at beta = 0.96", 0.2065,
     _cap(_c56, None, "b", "bound at beta = 0.96"), _dp(0.2065, 4))
@@ -4918,6 +4918,122 @@ cms("SI 9: the 97.5th covers 94.3%", 94.3, 100 * _ef62["high_level_ci"][0],
 cms("SI 9: to 98.9%", 98.9, 100 * _ef62["high_level_ci"][1], _dp(98.9, 1))
 
 
+# ======================================================================
+# Priority claims -- the one class of sentence this gate cannot recompute
+# ======================================================================
+# Every other row here is (where it is quoted, what it should equal, where that
+# comes from). "This has not previously been quantified" has no right-hand side:
+# no results file holds the literature. So the gate was silent about that class
+# of sentence, and silence read as coverage -- §4.1 carried such a clause with a
+# green gate over it, because the 3.96 sitting beside it WAS a row and the
+# priority clause simply was not one.
+#
+# What is checkable is not the fact but the diligence: a priority claim must
+# have a dated search record, and the record must still describe a sentence the
+# manuscript actually makes. Both directions, exactly as for the numbers:
+#
+#   registered -> prose   a registered claim whose sentence was rewritten or cut
+#                         is a stale row, and its record now documents a search
+#                         for a claim nobody makes.
+#   prose -> registered   a sentence that reads like a priority claim and is in
+#                         neither register is a claim nobody has searched.
+#
+# The second direction is the one that earns the mechanism, and it is why the
+# patterns below are deliberately loose. A false positive costs one line in a
+# register; a false negative is a reviewer holding a counter-example.
+PRIORITY_DIR = f"{ROOT}/paper/priority_searches"
+
+PRIORITY_PATTERNS = [
+    r"ha(?:s|ve|d)? ?not (?:previously |yet )?been (?:quantified|measured|"
+    r"reported|documented|shown|established|attempted|resolved|obtained)",
+    r"(?:has|have) not previously",
+    r"not previously been",
+    r"never been",
+    r"(?:we|this paper|this study|ours) (?:are|is) the first",
+    r"the first (?:study|paper|work|measurement|time)",
+    r"for the first time",
+    r"no (?:previous|prior|earlier|other) (?:study|work|measurement|paper)",
+    r"no (?:study|work|paper|measurement|analysis) has",
+    r"unquantified",
+    r"unmeasured",
+    r"nobody has",
+    r"no one has",
+    r"what is new",
+    r"\bare new\b",
+    r"novelty",
+    r"first to ",
+]
+
+# Claim -> the dated record under PRIORITY_DIR that backs it. The key is a
+# lowercased fragment of the sentence, long enough to be unique and short enough
+# to survive copy-editing that does not change the claim. A fragment that stops
+# matching is the point: the sentence moved, so the search must be re-read
+# against what it now says.
+PRIORITY = {
+    "the direction and the size of that distortion on a passive product are new":
+        "2026-08-30-age-coarsening.md",
+    "no study has asked how much":
+        "2026-08-30-proportionate-mixing.md",
+}
+
+# Hits that carry the wording without making the claim. These need a reason, not
+# a search record -- but they are registered rather than pattern-excluded, so
+# that the exemption is visible and has to be re-argued if the sentence changes.
+PRIORITY_NOT_A_CLAIM = {
+    "we do not claim novelty for the level discrepancy itself":
+        "disclaims priority rather than asserting it -- this is the sentence "
+        "that narrows the novelty to the concentration result",
+}
+
+
+def _sentence_at(text, start, end):
+    """The sentence around a match, whitespace-normalised."""
+    a = text.rfind(".", 0, start)
+    a = 0 if a < 0 else a + 1
+    b = text.find(".", end)
+    b = len(text) if b < 0 else b + 1
+    return " ".join(text[a:b].split())
+
+
+def _priority_audit(docs):
+    """[(kind, detail)] -- empty when every priority claim is accounted for."""
+    problems = []
+    hits = {}
+    for d in docs:
+        text = open(d).read()
+        for pat in PRIORITY_PATTERNS:
+            for m in re.finditer(pat, text, re.I):
+                s = _sentence_at(text, m.start(), m.end())
+                hits[(os.path.relpath(d, ROOT), s)] = text[:m.start()].count("\n") + 1
+
+    corpus = " ".join(" ".join(open(d).read().split()) for d in docs).lower()
+    known = set(PRIORITY) | set(PRIORITY_NOT_A_CLAIM)
+
+    # prose -> registered
+    for (rel, sentence), line in sorted(hits.items()):
+        if not any(k in sentence.lower() for k in known):
+            problems.append(("unregistered",
+                             f"{rel}:{line} reads as a priority claim and is in "
+                             f"neither register: \"{sentence[:120]}\""))
+
+    # registered -> prose, and the record has to exist
+    for frag, rec in sorted(PRIORITY.items()):
+        if frag not in corpus:
+            problems.append(("stale",
+                             f"{rec} is registered for a sentence the "
+                             f"manuscript no longer contains: \"{frag}\""))
+        if not os.path.exists(f"{PRIORITY_DIR}/{rec}"):
+            problems.append(("no record",
+                             f"paper/priority_searches/{rec} does not exist, "
+                             f"but a claim is registered against it"))
+    for frag in sorted(PRIORITY_NOT_A_CLAIM):
+        if frag not in corpus:
+            problems.append(("stale",
+                             f"an exemption is registered for a sentence the "
+                             f"manuscript no longer contains: \"{frag}\""))
+    return problems
+
+
 def _forms(q):
     """Every string form a number might plausibly be written as in prose."""
     forms = set()
@@ -5237,6 +5353,13 @@ def main():
             f"yet: {[d for d in (REPORT_0827, ANNEX_0827) if not os.path.exists(d)]}"
             f" -- write the letter, or unregister the values")
 
+    # Priority claims. One row, not one per sentence: what is being checked is
+    # the register, and a register is either complete or it is not. The detail
+    # prints below the table with the other findings.
+    _pri = [] if _corpus_ms is None else _priority_audit(_corpus_ms)
+    check("19", "every priority claim has a dated search record",
+          0.0, float(len(_pri)), 1e-9)
+
     bad = []
     print(f"{'§':>6}  {'claim':<44} {'quoted':>10} {'recomputed':>12}  status")
     for sec, label, quoted, actual, tol in CHECKS:
@@ -5254,6 +5377,11 @@ def main():
               "says the second:")
         for sec, label, q, a in bad:
             print(f"  §{sec} {label}: report {q}, source {a}")
+    if _pri:
+        print("\nPRIORITY CLAIMS THE REGISTER DOES NOT ACCOUNT FOR — "
+              "see paper/priority_searches/README.md:")
+        for _kind, _detail in _pri:
+            print(f"  [{_kind}] {_detail}")
     # The other direction: numbers this gate verifies that do not appear anywhere
     # in the document. Either the claim was dropped from the prose (so the check
     # is dead weight) or it was transcribed in a form this matcher does not see.

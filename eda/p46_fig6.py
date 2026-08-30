@@ -167,7 +167,14 @@ def main():
                                         "DejaVu Serif"],
                          "mathtext.fontset": "stix",
                          "font.size": 8.5, "axes.titlesize": 9,
-                         "axes.labelsize": 8.5, "legend.fontsize": 7.5,
+                         # WAS 8.5, which is under the 9 pt JRSI asks for and
+                         # was the smallest type on the figure that a reader
+                         # has to turn their head to read. The axis labels
+                         # below were shortened to pay for the point: every one
+                         # of them now breaks between phrases instead of
+                         # mid-parenthesis, and (a)'s x label lost a word it
+                         # did not need so it still fits the panel at 9 pt.
+                         "axes.labelsize": 9.0, "legend.fontsize": 7.5,
                          "xtick.labelsize": 7.5, "ytick.labelsize": 7.5})
     # WAS 9.0 in wide, which reproduces at 0.72x on a 7 in page: the 7.5 pt
     # floor this figure was raised to arrived as 5.4 pt of ink. 7.0 in is what
@@ -192,8 +199,8 @@ def main():
                arrowprops=dict(arrowstyle="->", color="0.45", lw=.8))
     a.axvline(0, color="0.7", lw=.8, ls=":")
     a.set_xlabel(r"$\theta$   (device space $\leftarrow$  published  "
-                 r"$\rightarrow$ expansion applied twice)")
-    a.set_ylabel("assortativity (excess over\nproportionate mixing)")
+                 r"$\rightarrow$ expansion twice)")
+    a.set_ylabel("assortativity\n(excess over proportionate mixing)")
     a.set_title("(a)  the sign and the magnitude survive the family", loc="left")
     a.legend(frameon=False)
     a.grid(alpha=.25)
@@ -268,7 +275,7 @@ def main():
     # data. The curves are unchanged; only the empty margin either side grew.
     b.set_xlim(-1.40, 1.40)
     b.set_xlabel(r"$\theta$")
-    b.set_ylabel(r"Kendall $\tau$ of the NGM dominant" "\n"
+    b.set_ylabel(r"Kendall $\tau$ of the dominant NGM" "\n"
                  r"eigenvector against $\theta = 0$")
     b.set_title("(b)  the ordering does not (leading band annotated)", loc="left")
     # Not "lower right": that corner is where the theta = +1 labels live, and
@@ -317,14 +324,26 @@ def main():
     # dive to rank 16 at 20-24 and on the y tick at 15. The alternative was
     # stacking the legend into 3 rows, which walks into the same corner.
     _rk_lo, _rk_hi = c.get_ylim()          # inverted, so _rk_lo is the largest
-    c.set_ylim(_rk_lo + 3.4, _rk_hi)
+    c.set_ylim(_rk_lo + 5.2, _rk_hi)
     c.set_yticks([1, 5, 10, 15])
     c.set_xticks(x)
     c.set_xticklabels(bands, rotation=60, ha="right", fontsize=7.5)
-    c.set_ylabel("rank by reduction in $R_0$\nper person-day allocated  (1 = highest)")
-    c.set_title("(c)  December 2023: the first choice agrees, the rest do not",
+    c.set_ylabel("rank by reduction in $R_0$\nper person-day  (1 = highest)")
+    # WAS "the first choice agrees, the rest do not", which overran the panel
+    # to the right AND was not what the sheet says. Two of the fifteen bands
+    # carry the same rank in all three matrices, not one: 15-19 at rank 1 and
+    # 35-39 at rank 10. What the sheet actually asserts is that the first
+    # choice agrees (the arrow inside the panel says so) and that the three
+    # second choices are distinct, which is also what the manuscript caption
+    # claims. The title now says the half the arrow does not.
+    c.set_title("(c)  December 2023: the second choice already differs",
                 loc="left")
-    c.legend(loc="lower right", framealpha=.92, edgecolor="0.8", ncol=3,
+    # ncol WAS 3. Three entries totalling 44 characters plus three handles
+    # is about 3.3 in of legend at 7.5 pt, and the panel is 2.6 in wide, so the
+    # box hung off the left edge of the axes and into (c)'s y label. Two
+    # columns is the widest that fits; the strip reserved below the worst rank
+    # grew from 3.4 to 5.2 rank units to hold the second row.
+    c.legend(loc="lower right", framealpha=.92, edgecolor="0.8", ncol=2,
              fontsize=7.5, handlelength=1.4, columnspacing=0.8)
     c.grid(alpha=.25)
     first = {t: bands[int(np.argmax(p35["marginal"]["202312"][t]))]
@@ -370,7 +389,7 @@ def main():
                        ha="center", va="bottom", fontsize=7.5)
     d.set_xticks(xx)
     d.set_xticklabels([f"$R_0$ = {r}" for r in R0S])
-    d.set_ylabel("benefit forgone by spending the\npassive plan in the survey world (%)")
+    d.set_ylabel("benefit forgone by the passive plan\nin the survey world (%)")
     d.set_title("(d)  and what the disagreement costs", loc="left")
     d.legend(frameon=False)
     d.grid(alpha=.25, axis="y")

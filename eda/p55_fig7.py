@@ -192,6 +192,14 @@ def main():
     _flip_r0 = sorted({r for v in a2["flips"].values() for r in v})
     r0_lo_top = max(r for r in _flip_r0 if r != out_r0)
     out_xy = None
+    # One alternating band per R0 group. Four cells and four null rules sit
+    # inside each group, and the gap between groups is barely wider than the
+    # gap inside one, so without the band the eye groups across the boundary
+    # and reads a cell's interval against its neighbour's null rule.
+    for j in range(len(boot_grid)):
+        if j % 2:
+            b.axvspan(j - 0.5, j + 0.5, color=INK, alpha=0.04, lw=0, zorder=0)
+    b.set_xlim(-0.5, len(boot_grid) - 0.5)
     for i, k in enumerate(ORDER):
         col, _, mk, lab = STYLE[k]
         rows = {r["r0"]: r for r in p52["verdict"][k]}
@@ -233,12 +241,24 @@ def main():
     b.set_title("(b)  against the cost of simply re-running the survey",
                 fontsize=10, loc="left")
     b.grid(alpha=0.18, lw=0.6, axis="y")
-    handles = [Line2D([], [], color="#999999", lw=1.4,
-                      label="null 97.5th pct (the bar to clear)"),
-               Line2D([], [], marker="o", ls="none", ms=9,
-                      markerfacecolor="none", markeredgecolor=INK,
-                      label="exceeds the null")]
-    b.legend(handles=handles, fontsize=8, frameon=False, loc="upper right")
+    # (b) draws the same four cells as (a), so it carries the same key. It used
+    # to carry only the null rule and the circle, which left the cell identity
+    # of every bar to be recalled from the panel above: four colour-marker
+    # pairs, held across a panel break, against five groups of four bars. The
+    # handles are built from STYLE rather than harvested off the axes, so the
+    # legend is in ORDER whatever order the loop ran in.
+    handles = [Line2D([], [], color=STYLE[k][0], marker=STYLE[k][2], ls="none",
+                      ms=5, label=STYLE[k][3]) for k in ORDER]
+    handles += [Line2D([], [], color="#999999", lw=1.4,
+                       label="null 97.5th pct (the bar to clear)"),
+                Line2D([], [], marker="o", ls="none", ms=9,
+                       markerfacecolor="none", markeredgecolor=INK,
+                       label="exceeds the null")]
+    # Headroom before the legend, not over the data: the 1.2 group reaches 0.78
+    # at the default limits and a six-entry legend placed there lands on it.
+    b.set_ylim(top=b.get_ylim()[1] * 1.25)
+    b.legend(handles=handles, fontsize=8, frameon=False, loc="upper center",
+             ncol=3, columnspacing=1.6, handletextpad=0.6)
 
     ans = p52["answer"]
     note("b", "verdicts that exceed the null, corrected", ans["n_flips"])

@@ -664,61 +664,56 @@ def figure4(p18b, p19, p38, p60, pdf):
          round(float(aa["spatial"]["city_over_dong"]["median"]), 4))
 
     # (c) age scale, the March-vs-December composition. Demoted from (b) when
-    # the ladder above took that slot; every word of the endpoint ruling, and
-    # every number it prints, travels with it unchanged.
+    # the ladder above took that slot.
+    #
+    # 2026-08-30: the endpoint-filter overlay came off the panel. It was four
+    # more series (two marker sets, and two more rules inside each of the three
+    # bands), a three-line box, and half of an eight-entry legend whose opaque
+    # frame sat on top of the 20-24 whisker -- all of it drawn over the single
+    # comparison this panel exists to make, sixteen bands against three. The
+    # filter is a robustness check ON that comparison, not the comparison, and
+    # SI 6 prints every number it moves: +0.84 against +0.55 at 80+, -3.96
+    # against -3.13 at 20-24, the crossing at 70-74/75-79, -0.16 for the 60+
+    # block, and the 0.48 pp gap that is the masking fill rather than the
+    # filter. NOTHING below the drawing changes: the caption sheet still
+    # records all twelve p18b values, because what a panel draws and what its
+    # sheet is allowed to quote are two different lists, and p31 checks the
+    # second one.
     ax = axes[2]
     d16 = {r["age"]: r for r in p19["e_share_change_16band"]}
     d3 = {r["band"]: r for r in p19["e_share_change_3band"]}
+    span = {r["resolution"]: r for r in p19["resolution_span"]}
+    # p18b is read for the notes only, and it is measured BEFORE the masking
+    # fill -- which is why none of its values may be paired with a p19 bar in
+    # prose either. gates() still asserts the agreement outside 20-44.
+    b18 = {r["band"]: r for r in p18b["by_age"]}
     labs = [AGE_LABEL[a] for a in AGES]
     x = np.arange(len(labs))
     mid = np.array([d16[l]["meas"] for l in labs], float)
     lo = np.array([d16[l]["lo"] for l in labs], float)
     hi = np.array([d16[l]["hi"] for l in labs], float)
-    # The endpoint filter, settled 2026-08-24. Both markers are p18b's, because
-    # p18b is measured before the masking fill: pairing one of its values with a
-    # p19 bar would charge the fill to the scope. Outside 20-44 the filled
-    # marker lands on its bar (gates() asserts it); inside 20-44 the offset the
-    # reader sees between bar and filled marker IS the fill, not the filter.
-    b18 = {r["band"]: r for r in p18b["by_age"]}
-    both = np.array([b18[l]["both_ends_pp"] for l in labs], float)
-    orig = np.array([b18[l]["origin_only_pp"] for l in labs], float)
 
     ax.bar(x, mid, width=.68, color=[RED if v > 0 else TEAL for v in mid])
     ax.vlines(x, lo, hi, color="#333", lw=1.1)
     ax.axhline(0, color="k", lw=.8)
-    ax.vlines(x, np.minimum(both, orig), np.maximum(both, orig),
-              color=BLUE, lw=.9, alpha=.9, zorder=8)
-    ax.plot(x, both, "D", ms=3.4, color=BLUE, mec=BLUE, ls="none", zorder=9)
-    ax.plot(x, orig, "D", ms=5.0, mfc="white", mec=BLUE, mew=1.2, ls="none",
-            zorder=9)
-    floor = min(lo.min(), both.min(), orig.min())
-    ceil = max(hi.max(), both.max(), orig.max())
-    ax.set_ylim(floor - .5, ceil + 1.6)
+    ax.set_ylim(min(lo.min(), mid.min()) - .45,
+                max(hi.max(), mid.max()) + 1.55)
     top = ax.get_ylim()[1]
     start = 0
     for band, n in LIM_SPAN:
         end = start + n
         v = d3[band]["meas"]
         ax.hlines(v, start - .45, end - .55, color=GOLD, lw=3.4, zorder=6)
-        ax.annotate(f"{v:+.2f}", (end - .55, v), xytext=(4, 8),
+        # Each rule is labelled off whichever end has room. The first two have
+        # it on the right; the last does not -- 60+ ends half a bar from the
+        # frame, and its label used to be typeset half on top of the spine.
+        # Above its LEFT end is the one place in that band with nothing in it,
+        # because 60-64 and 65-69 are the two bars still below zero.
+        at_left = band == LIM_SPAN[-1][0]
+        ax.annotate(f"{v:+.2f}",
+                    (start - .45 if at_left else end - .55, v), xytext=(4, 8),
                     textcoords="offset points", ha="left", va="bottom",
                     fontsize=8, color="#8A5A18", zorder=7,
-                    bbox=dict(fc="white", ec="none", alpha=.85, pad=.8))
-        # The same three bands under both filters, and BOTH from p18b -- the
-        # same rule the markers follow. Pairing the gold rule (p19, after the
-        # fill) against the origin-only rule (p18b, before it) would have made
-        # the 20-59 gap read as scope when most of it is fill: gold -1.42,
-        # p18b both-ends -1.47, p18b origin-only -1.18. So the scope is read
-        # solid-blue against dashed-blue, and the fill is read gold against
-        # solid-blue, exactly as bar against filled marker reads it above.
-        vi = p18b["three_band_int"]["band_pp"][band]
-        vo = p18b["three_band_out"]["band_pp"][band]
-        ax.hlines(vi, start - .45, end - .55, color=BLUE, lw=1.5, zorder=6)
-        ax.hlines(vo, start - .45, end - .55, color=BLUE, lw=1.9, ls=(0, (3, 2)),
-                  zorder=6)
-        ax.annotate(f"{vo:+.2f}", (end - .55, vo), xytext=(4, -10),
-                    textcoords="offset points", ha="left", va="top",
-                    fontsize=7.5, color=BLUE, zorder=7,
                     bbox=dict(fc="white", ec="none", alpha=.85, pad=.8))
         ax.text((start + end - 1) / 2, top - .28, band, ha="center", va="top",
                 fontsize=9, color="#8A5A18", weight="bold")
@@ -728,7 +723,7 @@ def figure4(p18b, p19, p38, p60, pdf):
     ax.axhspan(top - .95, top, color=GOLD, alpha=.07)
     ax.set_xticks(x)
     ax.set_xticklabels(labs, rotation=45, ha="right", fontsize=8)
-    ax.set_ylabel("change in E (discretionary) arrival share, pp")
+    ax.set_ylabel("change in arrival share, pp")
     ax.grid(axis="y", alpha=.3)
     # The bars are sign-coded, so the legend has to name both colours or it
     # implies the 16-band series is one colour and the reader mistrusts the rest.
@@ -736,36 +731,31 @@ def figure4(p18b, p19, p38, p60, pdf):
                Patch(fc=TEAL, label="16 bands, share falls"),
                Line2D([], [], color=GOLD, lw=3.4, label="3 bands (Lim et al.)"),
                Line2D([], [], color="#333", lw=1.1,
-                      label="masking range, 0 to 3 per cell"),
-               Line2D([], [], color=BLUE, marker="D", ms=3.4, ls="none",
-                      label="both endpoints in Seoul"),
-               Line2D([], [], color=BLUE, marker="D", ms=5.0, mfc="white",
-                      mew=1.2, ls="none", label="origin in Seoul only"),
-               Line2D([], [], color=BLUE, lw=1.5,
-                      label="3 bands, both endpoints"),
-               Line2D([], [], color=BLUE, lw=1.9, ls=(0, (3, 2)),
-                      label="3 bands, origin in Seoul")]
-    ax.legend(handles=handles, fontsize=7.5, loc="lower left", framealpha=.92,
+                      label="masking range, 0 to 3 per cell")]
+    # Bottom RIGHT, not bottom left. The deep whiskers are all in 20-34 and the
+    # axis has to reach -5.59 to hold them, so the empty quarter of this panel
+    # is under the small right-hand bars -- which is where the old legend was
+    # not, and it covered the 20-24 whisker it was there to explain.
+    ax.legend(handles=handles, fontsize=7.5, loc="lower right", framealpha=.92,
               ncol=2, columnspacing=1.0, handletextpad=.6)
     panel_letter(ax, "(c)", dy_in=.24)
-    ax.set_title("age scale: Dec vs Mar 2020, within-age share\n"
-                 "bars = measured masking fill, whiskers = 0..3",
+    ax.set_title("age scale: the 16 published bands against the three of "
+                 "Lim et al.,\n"
+                 "change in E (discretionary) arrival share, Dec vs Mar 2020",
                  fontsize=8.5, loc="left", pad=4)
-    # The stamp used to read NOT SETTLED, and before that it was clipped to
-    # "...ope:" by the legend -- a warning that is present but unreadable is
-    # worse than none, because it still looks discharged. The question is
-    # settled now (phase1c-scope.md §3), so what the panel has to carry is no
-    # longer a warning but the rule: which filter answers which question. It
-    # keeps the same empty band above the small right-hand bars.
-    ax.text(.985, .885,
-            "endpoint filter, settled: co-occurrence -> both endpoints;\n"
-            "composition -> origin only. Both shown; the conclusion\n"
-            "holds under either, and is stronger under origin-only.",
-            transform=ax.transAxes, ha="right", va="top", fontsize=7.5,
+    # What (a) and (b) each carry in one short line, (c) now carries too, and
+    # it reads out of p19 at draw time like every other number on the sheet.
+    # It replaces the endpoint-filter box, which answered a question the reader
+    # of this panel was not asking.
+    ax.text(.985, .90,
+            f"three bands keep {100 * p19['range_retained_frac']:.1f}% of the "
+            f"{span['16 bands']['range_pp']:.2f} pp spread:\n"
+            f"60+ reads {d3['60+']['meas']:+.2f} pp where its 80+ constituent "
+            f"reads {d16['80+']['meas']:+.2f} pp",
+            transform=ax.transAxes, ha="right", va="top", fontsize=8,
             color="#33475B", linespacing=1.35,
-            bbox=dict(fc="white", ec=BLUE, lw=.8, alpha=.95, pad=3.0))
+            bbox=dict(fc="white", ec="none", alpha=.85, pad=2.0))
 
-    span = {r["resolution"]: r for r in p19["resolution_span"]}
     note(4, "c", "16-band range, pp", span["16 bands"]["range_pp"])
     note(4, "c", "3-band range, pp", span["3 bands (Lim)"]["range_pp"])
     note(4, "c", "fraction of the range three bands retain",
@@ -799,8 +789,13 @@ def figure4(p18b, p19, p38, p60, pdf):
          round(p18b["three_band_int"]["range_kept"], 4))
     note(4, "c", "range three bands retain, origin only",
          round(p18b["three_band_out"]["range_kept"], 4))
-    note(4, "c", "largest bar-vs-marker gap, pp (the masking fill, not the scope)",
-         round(float(max(abs(mid[i] - both[i]) for i in range(len(labs)))), 4))
+    # Renamed with the markers that used to carry it: the two series are still
+    # measured, still compared here, and still reported in SI 6 -- the panel
+    # just no longer draws the second one, so "marker" would name nothing.
+    note(4, "c", "largest gap between p19's bars and p18b's both-endpoints "
+                 "series, pp (the masking fill, not the scope)",
+         round(float(max(abs(mid[i] - b18[l]["both_ends_pp"])
+                         for i, l in enumerate(labs))), 4))
 
     out = f"{FIG}/p47_figure4.png"
     fig.savefig(out, dpi=300)

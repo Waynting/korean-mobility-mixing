@@ -25,7 +25,13 @@ What is excluded, and why:
                       cuts, and including them hides which section is over
   the abstract        counted separately, against its own limit
   references          counted separately everywhere
-  figure captions     submitted as separate files, never in the body count
+  figure captions     submitted as separate display items, never in the body
+                      count. The WHOLE caption paragraph is dropped, not just
+                      the line that opens it: the captions used to live in a
+                      `## Figure captions` section that SKIP_HEADS threw away
+                      whole, and when they moved next to the sections they
+                      belong to, matching only the `**Figure N.` line left
+                      2 000-odd words of caption prose in the body total
   tables              submitted separately and counted as display items
   images, code        not prose
   working sections    "Editorial constraints carried in this draft (not for
@@ -85,7 +91,10 @@ ABSTRACT_HEADS = ("## Abstract",)
 # Scaffolding the author deletes before submitting; counted by nobody.
 WORKING_HEADS = ("## Editorial constraints", "## Supplementary")
 
-# A caption paragraph, with or without a blockquote marker in front of it.
+# The FIRST LINE of a caption paragraph, with or without a blockquote marker.
+# A caption runs from this line to the next blank line or rule; both counters
+# below carry an `in_caption` flag rather than testing every line against this,
+# because a caption is a paragraph and only its opening line looks like one.
 CAPTION_RE = re.compile(r"^>?\s*\*\*(Table|Figure|Fig\.)\s")
 # A thin space (U+2009) between two digits is the thousands separator Royal
 # Society style asks for, not a gap between two words.
@@ -150,6 +159,7 @@ def submission_count(path, limit):
         return "body (sections and headings)"
 
     parts, cur, in_code = {}, "front matter (title, byline, keywords)", False
+    in_caption = False
     for ln in src.split("\n"):
         if ln.startswith("```"):
             in_code = not in_code
@@ -157,15 +167,27 @@ def submission_count(path, limit):
         if in_code:
             continue
         if ln.startswith("## ") or ln.startswith("# "):
+            in_caption = False
             if ln.startswith("## "):
                 cur = part_of(ln)
             if cur is None:
                 continue
             parts.setdefault(cur, []).append(ln.lstrip("# "))
             continue
-        if cur is None or not ln.strip() or ln.startswith("---"):
+        if not ln.strip() or ln.startswith("---"):
+            in_caption = False
             continue
-        parts.setdefault(cur, []).append(ln)
+        if cur is None:
+            continue
+        if CAPTION_RE.match(ln):
+            in_caption = True
+        # A figure and its caption are one display item wherever they sit. They
+        # were once a section of their own and CAPTION_HEADS classified them by
+        # heading; they now sit inside the section they illustrate, so the line
+        # decides, not the heading above it. Without this the two totals this
+        # function exists to print apart become the same number.
+        dest = "figure captions" if in_caption or ln.startswith("![") else cur
+        parts.setdefault(dest, []).append(ln)
 
     order = ["front matter (title, byline, keywords)", "abstract",
              "body (sections and headings)",
@@ -213,7 +235,7 @@ def main():
 
     sections, dropped = {}, {"heading": 0, "table": 0, "caption": 0,
                              "image": 0, "code": 0, "skipped section": 0}
-    cur, in_code, in_skipped = None, False, False
+    cur, in_code, in_skipped, in_caption = None, False, False, False
 
     for ln in src.split("\n"):
         if ln.startswith("```"):
@@ -225,6 +247,7 @@ def main():
 
         if ln.startswith("## ") or ln.startswith("# "):
             dropped["heading"] += 1
+            in_caption = False
             if any(ln.startswith(h) for h in SKIP_HEADS):
                 cur, in_skipped = None, True
                 continue
@@ -238,6 +261,7 @@ def main():
             continue
         if ln.startswith("### ") or ln.startswith("#### "):
             dropped["heading"] += 1
+            in_caption = False
             continue
         if ln.startswith("|"):
             dropped["table"] += 1
@@ -245,10 +269,13 @@ def main():
         if ln.startswith("!["):
             dropped["image"] += 1
             continue
-        if CAPTION_RE.match(ln):
-            dropped["caption"] += 1
-            continue
         if ln.startswith("---") or not ln.strip():
+            in_caption = False
+            continue
+        if CAPTION_RE.match(ln):
+            in_caption = True
+        if in_caption:
+            dropped["caption"] += 1
             continue
         sections.setdefault(cur, []).append(ln)
 

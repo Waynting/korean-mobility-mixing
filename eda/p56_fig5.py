@@ -318,7 +318,7 @@ def main():
     b_.set_xlim(-0.03, 1.03)
     b_.set_xlabel(r"$\beta$: the share of the truth sitting below the cell")
     b_.set_ylabel(r"largest $r_{\rm true}$ not rejected (one-sided 5%)")
-    b_.set_title(r"(b)  the survey is excluded at every $\beta$ we can measure",
+    b_.set_title(r"(b)  the survey is excluded at every measured $\beta$",
                  fontsize=10, loc="left")
     b_.grid(alpha=.18, lw=.6, which="both")
     b_.legend(handles=[
@@ -373,11 +373,13 @@ def main():
                               f"{100 * lad['real_rung']:.1f}%",
            fontsize=7.5, color=INK, ha="center", va="top")
     c.set_ylabel("share of dong-level excess kept at district")
-    # Two lines because the panel is 1.9 in wide and a one-line title ran off
-    # the page. The title used to read "a validation the experiment did not
-    # have to pass", which named the intent rather than the check.
-    c.set_title("(c)  an out-of-sample\nvalidation",
-                fontsize=10, loc="left")
+    # One line. The break dated from the title "a validation the experiment did
+    # not have to pass", which named the intent rather than the check and did
+    # run off a 1.86 in panel; the wording that replaced it does not, and the
+    # break was left behind. It cost more than it looked: a two-line title is
+    # set from its bottom up, so (c)'s first line rode above (b)'s title and
+    # the two panels no longer shared a baseline.
+    c.set_title("(c)  an out-of-sample check", fontsize=10, loc="left")
     c.grid(alpha=.18, lw=.6, axis="y")
     c.tick_params(axis="x", labelsize=8.5)
     note("c", "p37 band, low", lo)

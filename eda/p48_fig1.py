@@ -264,9 +264,12 @@ def main():
         "no date column: a month is one row per weekday, not per day",
         "the volume column is the within-month sum over like weekdays "
         "(hap), not a daily mean",
-        f"cells below 3 are masked, {mask_rate:.0%} of cells overall, and the "
+        # One decimal, not zero: 2.1 of the main text reads "26.1%" and the
+        # caption reads "10.9% and 69.5%", so a rounded figure label puts two
+        # different numbers for the same quantity on one page.
+        f"cells below 3 are masked, {mask_rate:.1%} of cells overall, and the "
         f"loss is not spread evenly: {material[0]} to {material[-1]} lose "
-        f"{mat_lo:.0%}-{mat_hi:.0%} of their cells, {run_label(trace)} lose "
+        f"{mat_lo:.1%}-{mat_hi:.1%} of their cells, {run_label(trace)} lose "
         f"under {trace_cap:g}%, and {run_label(none_low)} and {run_label(none_high)} "
         f"lose exactly none",
         "expansion weights vary with age and are not recorded in the data",

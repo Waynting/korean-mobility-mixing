@@ -500,7 +500,25 @@ def process_images(md: str, src_dir: Path, out_dir: Path) -> str:
         return f'![{alt}]({dst_rel})'
 
     out = IMAGE_RE.sub(repl, md)
-    print(f'copied {len(claimed)} image(s) into {FIGURE_SUBDIR}/')
+
+    # Anything left in figures/ that this run did not write is a figure the
+    # manuscript no longer references. It is deleted rather than left alone
+    # because this directory IS the upload set: when the manuscript moved from
+    # .pdf figures to the .jpg the journal accepts, the seven superseded PDFs
+    # stayed behind, and an upload that carries two copies of every figure in
+    # two formats is one a copy-editor has to ask about. The copies above have
+    # already happened, so a file that is both claimed and on disk is the one
+    # just written.
+    fig_dir = out_dir / FIGURE_SUBDIR
+    stale = sorted(f for f in fig_dir.iterdir()
+                   if f.is_file() and f'{FIGURE_SUBDIR}/{f.name}' not in claimed
+                   ) if fig_dir.is_dir() else []
+    for f in stale:
+        f.unlink()
+
+    print(f'copied {len(claimed)} image(s) into {FIGURE_SUBDIR}/'
+          + (f'; removed {len(stale)} no longer referenced '
+             f'({", ".join(f.name for f in stale)})' if stale else ''))
     return out
 
 

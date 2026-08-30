@@ -506,8 +506,14 @@ def main():
                        "rotation,\ncontrast"], fontsize=7.5)
     d.tick_params(axis="x", labelsize=7.5)
     d.set_xlabel("p under each null (log scale)", fontsize=7.6)
-    title(d, "(d)  neither null dominates, and the\n      rotation has little "
-             "resolution to spend")
+    # One line, not two. A two-line title here is 0.29 in tall above the axes
+    # and the 0.46 hspace leaves 0.66 in below (c)'s tick labels and x-label,
+    # so the second line pushed the first up onto (c)'s "circular shift k"
+    # baseline -- (d) and (e) then read as if they belonged to (c). Dropping
+    # "to spend" from (d) and "per-" from (e) fits each on one line inside its
+    # own axes, which drops the title back into the gap it has room for.
+    title(d, "(d)  neither null dominates, and the rotation has little "
+             "resolution")
     d.grid(alpha=.16, lw=.55, axis="x")
     note("d", "within-year hypergeometric p (superseded as the primary)",
          P_WITHIN)
@@ -539,7 +545,7 @@ def main():
     e.tick_params(axis="y", labelsize=7.5)
     e.set_ylabel("term months in that year", fontsize=7.5)
     e.set_xlabel("year", fontsize=7.6)
-    title(e, "(e)  the rotation moves the\n      per-year margins")
+    title(e, "(e)  the rotation moves the year margins")
     e.grid(alpha=.16, lw=.55, axis="y")
     e.legend(handles=[
         Line2D([], [], marker="s", ls="none", ms=5, color=INK,
