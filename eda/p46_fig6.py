@@ -59,6 +59,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
+from figstyle import WIDTH, finish, plabel
 from paths import FIG, ROOT
 
 MONTHS = [202312, 202402]
@@ -110,6 +111,59 @@ def main():
 
     p33 = json.load(open(f"{ROOT}/eda/results_p33.json"))
     p35 = json.load(open(f"{ROOT}/eda/results_p35.json"))
+    # p52 is read for TWO things this figure could not say on its own.
+    #
+    # (i) THE SCOPE. Every panel here is Seoul, and until now no panel said so
+    #     -- a reader who put (d) beside Figure S1(a), which draws Seoul AND
+    #     national, saw two figures that looked as though they disagreed
+    #     (December 2023 at R0 = 2.5 is 7.5% at Seoul scope and 1.3% at
+    #     national). So the label goes on all four panels, and the one panel
+    #     that shares a quantity with Figure S1 has that shared quantity
+    #     ASSERTED bit for bit against p52 rather than described in a comment.
+    # (ii) THE GRID SIZE. (d) draws three values of R0; Figure S1 draws twelve,
+    #     and (d)'s three are a subset of them. "three of the twelve" is a
+    #     number on the figure, so it is read from p52's declaration like every
+    #     other number here, never typed.
+    p52 = json.load(open(f"{ROOT}/eda/results_p52.json"))
+    R0_GRID = list(p52["declaration"]["r0_point"])
+    assert set(R0S) <= set(R0_GRID), \
+        f"(d)'s R0 values {R0S} are not a subset of Figure S1's grid {R0_GRID}"
+    #     THE ANCHOR FIRED THE FIRST TIME IT WAS WRITTEN, and what it found is
+    #     reported rather than tuned away. Four of the six bars are bit-equal
+    #     to p52's Seoul cell -- including the 0.074688 the scope claim rests
+    #     on. The two R0 = 1.3 bars are not: they differ by a relative 4.6e-12
+    #     (December) and 5.4e-13 (February). R0 = 1.3 is where the regret curve
+    #     peaks and the optimum is flattest, and p35 and p52 reach it by
+    #     different routes -- p52 replays p45's seeded optimiser, which exists
+    #     because p40/p35's unseeded one returned NEGATIVE regret in 9 of 48
+    #     cells. Two equivalent optima on a flat ridge, not two scopes. So the
+    #     bit-exact half is asserted as bit-exact and the rest to machine
+    #     precision, which is p49's rule: report the precision you have, do not
+    #     claim the one you do not.
+    _BITEXACT_R0 = (1.8, 2.5)
+    _p52_seoul = {ym: {r["r0"]: r["regret"] for r in p52["point"][f"{ym}|seoul"]}
+                  for ym in MONTHS}
+    _scope_worst, _scope_exact = 0.0, 0
+    for _ym in MONTHS:
+        for _r0 in R0S:
+            _here = p35["allocation"][f"{_ym}|R0={_r0}"]["cross_application"][
+                "regret_share_of_benefit"]
+            _there = _p52_seoul[_ym][_r0]
+            _rel = abs(_here - _there) / abs(_there)
+            _scope_worst = max(_scope_worst, _rel)
+            _scope_exact += _here == _there
+            if _r0 in _BITEXACT_R0:
+                assert _here == _there, \
+                    f"(d)'s {_ym} bar at R0 = {_r0} is {_here!r} but p52's " \
+                    f"SEOUL cell reads {_there!r}; this one used to be " \
+                    f"bit-equal, so the scope label is no longer safe"
+            assert _rel < 1e-10, \
+                f"(d)'s {_ym} bar at R0 = {_r0} is {_rel:.2e} from p52's " \
+                f"SEOUL cell, past the optimiser's own precision; the panel " \
+                f"may not be labelled Seoul on that"
+    print(f"  ok  (d) is Seoul scope: {_scope_exact} of "
+          f"{len(MONTHS) * len(R0S)} bars bit-equal to p52's seoul cell, "
+          f"worst relative deviation {_scope_worst:.1e} (both at R0 = 1.3)")
     bands = p35["bands"]
     fam = {ym: sorted(p33["R2_theta_family"][str(ym)], key=lambda r: r["theta"])
            for ym in MONTHS}
@@ -176,14 +230,15 @@ def main():
                          # did not need so it still fits the panel at 9 pt.
                          "axes.labelsize": 9.0, "legend.fontsize": 7.5,
                          "xtick.labelsize": 7.5, "ytick.labelsize": 7.5})
-    # WAS 9.0 in wide, which reproduces at 0.72x on a 7 in page: the 7.5 pt
-    # floor this figure was raised to arrived as 5.4 pt of ink. 7.0 in is what
-    # p48 and p63 already build to and what JRSI prints a full-page figure at.
+    # WAS 9.0 in wide, which reproduces at 0.72x: the 7.5 pt floor this figure
+    # was raised to arrived as 5.4 pt of ink. WIDTH is JRSI's own measure, so
+    # the page copy is not rescaled at all (figstyle.py); at the 7.00 in this
+    # script built to until today, every 7.5 pt label printed at 6.96 pt.
     # The 2x2 survives the cut -- none of the four panels is a wide one -- so
     # what the width buys back is spent on height instead: the panels keep
     # roughly the area they had, in a taller box. Nothing is merged, dropped or
     # re-lettered; (a)-(d) still carry what the caption describes.
-    fig, ax = plt.subplots(2, 2, figsize=(7.0, 7.2))
+    fig, ax = plt.subplots(2, 2, figsize=(WIDTH, 7.4))
 
     # (a) the coverage family, with the masking band to scale
     a = ax[0, 0]
@@ -193,7 +248,7 @@ def main():
                color="#1f77b4" if ym == 202312 else "#ff7f0e", label=LAB[ym])
     lo, hi = mvc["202312"]["mask_band"]
     a.axhspan(lo, hi, color="0.55", alpha=.35, lw=0, zorder=0)
-    a.annotate(f"masking band,\n{mvc['202312']['ratio']:.1f}x narrower",
+    a.annotate(f"masking band,\n{mvc['202312']['ratio']:.1f}\u00d7 narrower",
                xy=(-0.85, (lo + hi) / 2), xytext=(-0.95, hi + 0.0125),
                fontsize=7.5, color="0.25", ha="left",
                arrowprops=dict(arrowstyle="->", color="0.45", lw=.8))
@@ -201,7 +256,8 @@ def main():
     a.set_xlabel(r"$\theta$   (device space $\leftarrow$  published  "
                  r"$\rightarrow$ expansion twice)")
     a.set_ylabel("assortativity\n(excess over proportionate mixing)")
-    a.set_title("(a)  the sign and the magnitude survive the family", loc="left")
+    a.set_title(plabel("a", "Seoul: sign and magnitude survive the family"),
+                loc="left")
     a.legend(frameon=False)
     a.grid(alpha=.25)
 
@@ -249,7 +305,12 @@ def main():
         above = MONTHS[0] if taus[MONTHS[0]] >= taus[MONTHS[1]] else MONTHS[1]
         for ym in MONTHS:
             r = fam[ym][end]
-            b.annotate(r["top_band"], (r["theta"], r["kendall_tau_vs_theta0"]),
+            # The month goes IN the label. The two end labels were separated
+            # by colour alone, so in the black-and-white printing JRSI does by
+            # default a reader could not tell which band belonged to which
+            # month -- the one place this figure lost information in grey.
+            b.annotate(f"{r['top_band']} ({LAB[ym][:3]})",
+                       (r["theta"], r["kendall_tau_vs_theta0"]),
                        textcoords="offset points",
                        xytext=(dx, 9 if ym == above else -14), ha=ha,
                        fontsize=7.5,
@@ -272,12 +333,13 @@ def main():
     # rising limb, the top-centre by the theta = 0 caption.
     b.set_ylim(0, 1.34)
     # Widened from (-1.15, 1.28) to make room for the end labels outside the
-    # data. The curves are unchanged; only the empty margin either side grew.
-    b.set_xlim(-1.40, 1.40)
+    # data, and again to (-1.66, 1.66) when those labels took the month with
+    # them. The curves are unchanged; only the empty margin either side grew.
+    b.set_xlim(-1.66, 1.66)
     b.set_xlabel(r"$\theta$")
     b.set_ylabel(r"Kendall $\tau$ of the dominant NGM" "\n"
                  r"eigenvector against $\theta = 0$")
-    b.set_title("(b)  the ordering does not (leading band annotated)", loc="left")
+    b.set_title(plabel("b", "Seoul: the ordering does not"), loc="left")
     # Not "lower right": that corner is where the theta = +1 labels live, and
     # the legend was sitting on top of December's. Not "center left" either,
     # which is where it went instead: that reads clear at 4.0 in and not at
@@ -328,6 +390,7 @@ def main():
     c.set_yticks([1, 5, 10, 15])
     c.set_xticks(x)
     c.set_xticklabels(bands, rotation=60, ha="right", fontsize=7.5)
+    c.set_xlabel("age band")
     c.set_ylabel("rank by reduction in $R_0$\nper person-day  (1 = highest)")
     # WAS "the first choice agrees, the rest do not", which overran the panel
     # to the right AND was not what the sheet says. Two of the fifteen bands
@@ -336,7 +399,7 @@ def main():
     # choice agrees (the arrow inside the panel says so) and that the three
     # second choices are distinct, which is also what the manuscript caption
     # claims. The title now says the half the arrow does not.
-    c.set_title("(c)  December 2023: the second choice already differs",
+    c.set_title(plabel("c", "Seoul, Dec 2023: the second choice differs"),
                 loc="left")
     # ncol WAS 3. Three entries totalling 44 characters plus three handles
     # is about 3.3 in of legend at 7.5 pt, and the panel is 2.6 in wide, so the
@@ -379,22 +442,50 @@ def main():
     # (d) what the disagreement costs
     d = ax[1, 1]
     xx = np.arange(len(R0S))
+    _all_bars = []
     for i, ym in enumerate(MONTHS):
         vals = [100 * p35["allocation"][f"{ym}|R0={r0}"]["cross_application"]
                 ["regret_share_of_benefit"] for r0 in R0S]
+        _all_bars += vals
         d.bar(xx + (i - 0.5) * 0.34, vals, 0.34, label=LAB[ym],
               color="#1f77b4" if ym == 202312 else "#ff7f0e", alpha=.9)
         for j, v in enumerate(vals):
             d.annotate(f"{v:.1f}%", (xx[j] + (i - 0.5) * 0.34, v),
                        ha="center", va="bottom", fontsize=7.5)
+    # The sentence that stops (d) and Figure S1(a) reading as a contradiction.
+    # Both are drawn from the same sweep; (d) shows three of Figure S1's twelve
+    # R0 and only the Seoul scope, while Figure S1 also carries the national
+    # arm, where the same December cell reads 1.3% rather than 7.5%.
+    # Headroom first: at the default limits the tallest bar and its own label
+    # reach the top of the axes, so both the note and the legend had nowhere
+    # to go that was not on top of a bar. Taken from the bars, not typed.
+    d.set_ylim(top=max(_all_bars) * 1.46)
+    d.text(.015, .985, f"Seoul scope. These are {len(R0S)} of the "
+                       f"{len(R0_GRID)} $R_0$\non Figure S1(a), which also "
+                       f"draws the national arm",
+           transform=d.transAxes, fontsize=7.5, color="0.25", va="top",
+           ha="left", linespacing=1.4)
     d.set_xticks(xx)
-    d.set_xticklabels([f"$R_0$ = {r}" for r in R0S])
+    d.set_xticklabels([f"{r}" for r in R0S])
+    d.set_xlabel("basic reproduction number $R_0$")
     d.set_ylabel("benefit forgone by the passive plan\nin the survey world (%)")
-    d.set_title("(d)  and what the disagreement costs", loc="left")
-    d.legend(frameon=False)
+    # Upper right, under the note: every other corner is a bar. February's
+    # R0 = 2.5 bar is the tallest thing on the panel and it is on the right,
+    # so the legend needs the headroom opened above rather than a corner.
+    d.set_title(plabel("d", "Seoul: what the disagreement costs"),
+                loc="left")
+    d.legend(frameon=False, loc="upper center", bbox_to_anchor=(.5, .84),
+             fontsize=7.5, handlelength=1.4, ncol=2, columnspacing=1.2)
     d.grid(alpha=.25, axis="y")
 
     note("d", "R0 values drawn", "/".join(f"{r:g}" for r in R0S))
+    note("d", "scope of every panel on this figure", "seoul")
+    note("d", "R0 values on Figure S1's grid, of which (d) draws three",
+         len(R0_GRID))
+    note("d", "bars bit-equal to p52's seoul cells, of six",
+         f"{_scope_exact} of {len(MONTHS) * len(R0S)}")
+    note("d", "worst relative deviation from p52's seoul cells (R0 = 1.3, "
+              "where the optimum is flattest)", _scope_worst)
     for ym in MONTHS:
         for r0 in R0S:
             note("d", f"{LAB[ym]}: benefit forgone at R0 = {r0:g} (the bar is "
@@ -407,16 +498,10 @@ def main():
     note("d", "largest bar on the panel", max(_reg_all))
 
     fig.tight_layout()
-    assert fig.get_size_inches()[0] <= 7.0, \
-        "figure 6 is wider than the 7-inch reproduction width"
     out_png = f"{FIG}/p46_figure6.png"
-    fig.savefig(out_png, dpi=300)
-    print(f"  figure -> {out_png}")
+    mode = finish(fig, out_png, pdf=args.pdf)
+    print(f"  figure -> {out_png} ({mode})")
     if args.pdf:
-        # CreationDate omitted on purpose: matplotlib stamps the wall clock into
-        # the PDF, so two runs of the same figure differ by bytes for a reason
-        # that has nothing to do with the figure. p63 does the same.
-        fig.savefig(f"{FIG}/p46_figure6.pdf", metadata={"CreationDate": None})
         print(f"  figure -> {FIG}/p46_figure6.pdf")
     plt.close(fig)
 

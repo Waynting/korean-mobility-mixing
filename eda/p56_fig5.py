@@ -69,6 +69,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.lines import Line2D
+from figstyle import WIDTH, finish, plabel
 from paths import FIG, ROOT
 
 # JRSI wants figure text in Times at 9-11 pt and refuses anything under 7.5 pt,
@@ -86,6 +87,15 @@ plt.rcParams.update({"font.family": "serif",
 TEAL, RED, BLUE, GOLD = "#0E7C86", "#A8434E", "#4C6E8A", "#BC8034"
 INK, GREY, VIOLET = "#1b1b1b", "#8a8a8a", "#5B4B8A"
 BETA_COLOUR = {0.0: TEAL, 0.5: BLUE, 0.8: GOLD, 0.95: RED, 0.99: "#5B4B8A"}
+# JRSI prints in black and white by default, and (a)'s five curves were
+# separated by COLOUR ALONE -- same marker, same dash, same width. Converted to
+# greyscale, beta = 0, 0.5, 0.95 and 0.99 collapse onto near-identical greys and
+# the legend's five swatches with them, which loses the one thing the panel is
+# for: that the surface falls with beta. Dash and marker are a redundant
+# encoding that survives the conversion, and they cost nothing in colour.
+BETA_STYLE = {0.0: ("-", "o"), 0.5: ((0, (5, 1.4)), "s"),
+              0.8: ((0, (1, 1.2)), "^"), 0.95: ((0, (6, 1.4, 1, 1.4)), "D"),
+              0.99: ((0, (3, 1.2, 1, 1.2, 1, 1.2)), "v")}
 
 sheet = []
 
@@ -104,6 +114,7 @@ def main():
     p44 = json.load(open(f"{ROOT}/eda/results_p44.json"))
     p53 = json.load(open(f"{ROOT}/eda/results_p53.json"))
     p59 = json.load(open(f"{ROOT}/eda/results_p59.json"))
+    p66 = json.load(open(f"{ROOT}/eda/results_p66.json"))
 
     # ------------------------------------------------------------------ gates
     # p39's own invariants, re-asserted from the file before anything is drawn.
@@ -122,8 +133,22 @@ def main():
         assert inv["monotone"], f"the inversion is not monotone at beta={b}"
     # The observation the bound is inverted against must be p33's, not a copy
     # that has drifted -- p44 reads the same constant and is checked against it.
-    assert pub["r_obs_corrected"] == p44["beta"]["betas"][
-        "venue-level, without replacement"]["r_true"] * 0.0 + pub["r_obs_corrected"]
+    # THIS LINE CHECKED NOTHING FROM 2026-08-24 TO 2026-09-02. It was written as
+    # `X == <a p44 value> * 0.0 + X`, which is true for every finite Y, so the
+    # anchor passed whatever p44 held -- and the value it reached for was
+    # `p44.beta.betas["venue-level, without replacement"].r_true` = 0.2487,
+    # p44's venue-level TRUE r, not the corrected observation at all. The
+    # constant p44 actually carries alongside p39's is
+    # `anchors.constants.r_obs_corrected`, and the two are bit-equal because
+    # both are p33's 0.01676780356461909. Bit equality is the right test here,
+    # not a tolerance: neither file computes this number, both read it.
+    assert pub["r_obs_corrected"] == \
+        p44["anchors"]["constants"]["r_obs_corrected"], \
+        f"p39 and p44 disagree on the corrected observation the bound is " \
+        f"inverted against: p39 holds {pub['r_obs_corrected']!r}, p44 holds " \
+        f"{p44['anchors']['constants']['r_obs_corrected']!r}. One of the two " \
+        f"has drifted from p33's constant, and this panel's bound would be " \
+        f"drawn against an observation p44's inverter never saw"
     assert abs(pub["survey"] - 0.22270993081818996) < 1e-15, "p39's survey value moved"
 
     # p59's own invariants. The refined slices are a second Monte Carlo, and the
@@ -164,6 +189,18 @@ def main():
                    for b, v in p59["inversion_refined"].items()})
     betas = sorted(merged)
     bounds = [merged[b] for b in betas]
+    # DESIGN IS NOT REALISED, AND PANEL (b) IS DRAWN IN THE REALISED UNIT.
+    # p39/p59 index the bound by the beta REQUESTED of the generator; the
+    # survey's beta is an attenuation actually observed. p66 measures the map
+    # between them from the two quantities every grid point already records.
+    # Plotting the measured band against the requested axis, which is what this
+    # panel used to do, puts the calibration and the measurement on two
+    # different rulers.
+    conv = {r["design"]: r["realised_A"] for r in p66["conversion"]}
+    for b in betas:
+        assert b in conv, \
+            f"p66 carries no realised beta for the design grid point {b}"
+    real = [conv[b] for b in betas]
     r_obs, r_corr = pub["r_obs_pub"], pub["r_obs_corrected"]
     r_survey = pub["survey"]
     excludes = [v < r_survey for v in bounds]
@@ -180,6 +217,8 @@ def main():
     # comparison is between grids and not between rule sets.
     bs = p59["beta_star"]
     b_star = bs["primary_value"]
+    # the crossing on the axis this panel is drawn in
+    b_star_real = p66["beta_star"]["primary_value"]
     b_star_spread = bs["spread"]
     _rules = list(bs["estimates"])
     _old = [bs["on_p39_grid"][r] for r in _rules]
@@ -194,9 +233,11 @@ def main():
     assert len(_k15) == 1, f"expected one k = 1.5 reading, found {len(_k15)}"
     b_k15 = _k15[0]["beta"]
 
-    # WAS 1x3 at 15.0 in, which reproduces at 0.44x on a 7 in page: the 7.5 pt
-    # floor this figure was raised to arrived as 3.3 pt of ink. 7.0 in is what
-    # p48 and p63 already build to and what JRSI prints a full-page figure at.
+    # WAS 1x3 at 15.0 in, which reproduces at 0.44x on a 6.5 in page: the
+    # 7.5 pt floor this figure was raised to arrived as 3.3 pt of ink. WIDTH is
+    # what JRSI's measure actually is, so the page copy is not rescaled at all
+    # (figstyle.py); at the 7.00 in this script used to build to, every 7.5 pt
+    # label below printed at 6.96 pt.
     #
     # The row becomes (a) across the top and (b) beside (c) below, in that
     # order, so the panel letters still run a, b, c in reading order and each
@@ -217,9 +258,12 @@ def main():
     # off the bottom of the page.
     R2_LO, R2_HI = fy(0.54), fy(3.22)
     R1_LO, R1_HI = fy(4.11), fy(6.71)
-    LEFT, RIGHT = .115, .985
+    # LEFT is a FRACTION, so it shrank with the page: at 6.50 in wide the old
+    # .115 left 0.75 in for a rotated y label plus a "10^-3" tick stack, which
+    # is 0.06 in less than the label needs. Widened to hold the same ink.
+    LEFT, RIGHT = .124, .985
 
-    fig = plt.figure(figsize=(7.0, H))
+    fig = plt.figure(figsize=(WIDTH, H))
     gs1 = fig.add_gridspec(1, 1, left=LEFT, right=RIGHT, top=R1_HI, bottom=R1_LO)
     gs2 = fig.add_gridspec(1, 2, left=LEFT, right=RIGHT, top=R2_HI, bottom=R2_LO,
                            width_ratios=[1.95, 1.0], wspace=.22)
@@ -238,8 +282,10 @@ def main():
                 ys.append(v["med_corr"])
         o = np.argsort(xs)
         xs, ys = np.array(xs)[o], np.array(ys)[o]
-        a.plot(xs, ys, "o-", ms=3.4, lw=1.5, color=BETA_COLOUR[b],
-               label=fr"$\beta$ = {b:g}")
+        ls, mk = BETA_STYLE[b]
+        a.plot(xs, ys, ls=ls, marker=mk, ms=3.4, lw=1.5,
+               color=BETA_COLOUR[b],
+               label=fr"$\beta$ = {conv[b]:.3f} ({b:g})")
     a.axhline(r_corr, color=INK, lw=1.2)
     a.text(0.0055, r_corr * 1.13, f"what we read, {r_corr:.5f}",
            fontsize=7.5, color=INK)
@@ -253,7 +299,8 @@ def main():
     a.set_yscale("log")
     a.set_xlabel(r"true assortativity $r_{\rm true}$ given to the synthetic world")
     a.set_ylabel(r"$\hat{r}$ read back at dong level")
-    a.set_title("(a)  what the estimator recovers", fontsize=10, loc="left")
+    a.set_title(plabel("a", "what the estimator recovers"), fontsize=10,
+                loc="left")
     a.legend(fontsize=7.6, frameon=False, loc="lower right")
     a.grid(alpha=.18, lw=.6, which="both")
     note("a", "reading, noise-corrected", r_corr)
@@ -263,8 +310,8 @@ def main():
 
     # ------------------------------------------------ (b) the bound over beta
     b_ = ax[1]
-    b_.plot(betas, bounds, "o-", ms=5, lw=1.8, color=INK, zorder=3)
-    for x, y, ex in zip(betas, bounds, excludes):
+    b_.plot(real, bounds, "o-", ms=5, lw=1.8, color=INK, zorder=3)
+    for x, y, ex in zip(real, bounds, excludes):
         b_.scatter([x], [y], s=64, zorder=4,
                    color=(INK if ex else "white"), edgecolors=INK, lw=1.4)
     b_.axhline(r_survey, color=RED, lw=1.3)
@@ -289,8 +336,8 @@ def main():
     _xy = b_.get_xaxis_transform()
     b_.annotate(f"measured $\\beta$: {min(b_seoul, b_nat):.4f}–"
                 f"{max(b_seoul, b_nat):.4f}",
-                xy=((b_seoul + b_nat) / 2, 0.30), xycoords=_xy,
-                xytext=(0.46, 0.13), textcoords=_xy,
+                xy=((b_seoul + b_nat) / 2, 0.46), xycoords=_xy,
+                xytext=(0.46, 0.29), textcoords=_xy,
                 fontsize=7.8, color="#0b5a61", ha="center",
                 arrowprops=dict(arrowstyle="->", lw=.9, color="#0b5a61"))
     # beta*, where the refined curve meets the survey rule. It is p59's declared
@@ -299,27 +346,39 @@ def main():
     # The label goes in the headroom with a leader rather than rotated along the
     # line: 0.95 and beta* are 0.016 apart on an axis that runs 0 to 1, so any
     # text sitting on either line lands on the other one.
-    b_.axvline(b_star, color=VIOLET, lw=1.2, zorder=2)
-    b_.annotate(fr"$\beta^*$ = {b_star:.4f}",
-                xy=(b_star, r_survey), xycoords="data",
+    b_.axvline(b_star_real, color=VIOLET, lw=1.2, zorder=2)
+    b_.annotate(fr"$\beta^*$ = {b_star_real:.4f}",
+                xy=(b_star_real, r_survey), xycoords="data",
                 xytext=(0.72, 0.955), textcoords="axes fraction",
                 fontsize=7.8, color=VIOLET, ha="center", va="center",
                 arrowprops=dict(arrowstyle="->", lw=.9, color=VIOLET,
                                 shrinkB=3))
     # and the grid point the claim actually rests on: 0.95 is measured, sits
     # above every measured beta, and the bound there is below the survey.
-    b_.axvline(0.95, color=INK, lw=1.0, ls=":", zorder=2)
-    b_.annotate(f"at $\\beta$ = 0.95 the bound is {bound_95:.4f}",
-                xy=(0.95, bound_95), xycoords="data",
+    b_.axvline(conv[0.95], color=INK, lw=1.0, ls=":", zorder=2)
+    b_.annotate(f"at $\\beta$ = {conv[0.95]:.3f} the bound is {bound_95:.4f}",
+                xy=(conv[0.95], bound_95), xycoords="data",
                 xytext=(0.30, 0.62), textcoords="axes fraction",
                 fontsize=7.8, color=INK, ha="center", va="center",
                 arrowprops=dict(arrowstyle="->", lw=.9, color=INK, shrinkB=9))
     b_.set_yscale("log")
+    # A strip below the lowest bound, so the conditionality note has somewhere
+    # to sit that is not on the curve, the survey rule or the measured-beta
+    # band. 0.55x the smallest bound is a quarter of a decade on a panel that
+    # spans one and a half, and it is taken FROM the bound rather than typed.
+    b_.set_ylim(bottom=min(bounds) * 0.55)
     b_.set_xlim(-0.03, 1.03)
-    b_.set_xlabel(r"$\beta$: the share of the truth sitting below the cell")
-    b_.set_ylabel(r"largest $r_{\rm true}$ not rejected (one-sided 5%)")
-    b_.set_title(r"(b)  the survey is excluded at every measured $\beta$",
-                 fontsize=10, loc="left")
+    b_.set_xlabel(r"$\beta$ realised: the share of the truth sitting below the cell")
+    # "at that beta" is on the AXIS, not only in the caption. This is the panel
+    # most likely to be lifted out of the paper on its own, and read alone the
+    # old label -- "largest r_true not rejected (one-sided 5%)" -- reads as an
+    # unconditional upper limit on true assortativity. It is not: every point
+    # is the bound AT one beta. Two lines did not fit the left margin at WIDTH,
+    # so the four words go inline and the panel note below carries the rest.
+    b_.set_ylabel(r"largest $r_{\rm true}$ not rejected at that $\beta$"
+                  "  (one-sided 5%)")
+    b_.set_title(plabel("b", r"the survey is excluded at every measured "
+                             r"$\beta$"), fontsize=10, loc="left")
     b_.grid(alpha=.18, lw=.6, which="both")
     b_.legend(handles=[
         Line2D([], [], marker="o", ls="none", ms=8, color=INK,
@@ -327,9 +386,24 @@ def main():
         Line2D([], [], marker="o", ls="none", ms=8, markerfacecolor="white",
                markeredgecolor=INK, label="it is not")],
         fontsize=7.6, frameon=False, loc="upper left")
-    for b, v, ex in zip(betas, bounds, excludes):
+    # And again in the panel, because an axis label is read after the picture.
+    # It sits in the strip opened below the lowest bound, where nothing else is
+    # drawn, and it says the one thing a reader who screenshots this panel on
+    # its own would otherwise not be told.
+    b_.text(0.5, 0.022, r"every point is conditional on $\beta$, which is "
+                        r"pinned from outside these data",
+            transform=b_.transAxes, fontsize=7.5, color=INK, ha="center",
+            va="bottom")
+    # THE NOTE KEY IS THE REQUESTED BETA, THE PANEL IS DRAWN IN THE REALISED
+    # ONE. A grid point's stable name is the value it was asked for -- that is
+    # what p39/p59 key their own files by, and what the gate addresses. The
+    # realised value is what the axis shows, so it is recorded beside it rather
+    # than in place of it; keying the notes by the realised value silently
+    # renamed five rows the gate looks up by name.
+    for b, r_, v, ex in zip(betas, real, bounds, excludes):
         note("b", f"bound at beta = {b:g}", v)
         note("b", f"survey excluded at beta = {b:g}", ex)
+        note("b", f"realised beta at requested {b:g}", r_)
     note("b", "measured beta, Seoul arm", b_seoul)
     note("b", "measured beta, national arm on Korea's vector", b_nat)
     # What replaced the grid-step count. "The lowest beta on the grid at which
@@ -372,6 +446,7 @@ def main():
     c.text(0.5, _top * 0.815, f"the real 2023-12 rung, "
                               f"{100 * lad['real_rung']:.1f}%",
            fontsize=7.5, color=INK, ha="center", va="top")
+    c.set_xlabel("synthetic field")
     c.set_ylabel("share of dong-level excess kept at district")
     # One line. The break dated from the title "a validation the experiment did
     # not have to pass", which named the intent rather than the check and did
@@ -379,7 +454,8 @@ def main():
     # break was left behind. It cost more than it looked: a two-line title is
     # set from its bottom up, so (c)'s first line rode above (b)'s title and
     # the two panels no longer shared a baseline.
-    c.set_title("(c)  an out-of-sample check", fontsize=10, loc="left")
+    c.set_title(plabel("c", "an out-of-sample check"), fontsize=10,
+                loc="left")
     c.grid(alpha=.18, lw=.6, axis="y")
     c.tick_params(axis="x", labelsize=8.5)
     note("c", "p37 band, low", lo)
@@ -390,24 +466,13 @@ def main():
     note("c", "the real 202312 rung", lad["real_rung"])
 
     # No tight_layout and no bbox_inches="tight": the margins above ARE the
-    # layout, so the emitted page is 7.00 in wide rather than whatever the trim
-    # happens to leave. p46 and p63 save the same way.
+    # layout, so the emitted page is the figsize rather than whatever the trim
+    # happens to leave. finish() asserts that width and flattens the alpha.
     png = f"{FIG}/p56_figure5.png"
-    fig.savefig(png, dpi=300)
-    if args.pdf:
-        # CreationDate omitted on purpose: matplotlib stamps the wall clock
-        # into the PDF, so two runs of the same figure differ by bytes for a
-        # reason that has nothing to do with the figure. p46 and p63 have
-        # done this since they were written; these four had not, so their
-        # vector files showed up in every diff whether or not the figure
-        # had changed. The PNG beside them was always stable.
-        fig.savefig(f"{FIG}/p56_figure5.pdf",
-                    metadata={"CreationDate": None})
+    mode = finish(fig, png, pdf=args.pdf)
     plt.close(fig)
-    assert fig.get_size_inches()[0] <= 7.0, \
-        "figure 5 is wider than the 7-inch reproduction width"
     print(f"wrote {png} ({fig.get_size_inches()[0]:.2f} x "
-          f"{fig.get_size_inches()[1]:.2f} in)"
+          f"{fig.get_size_inches()[1]:.2f} in, {mode})"
           + (" (+ .pdf)" if args.pdf else ""))
 
     print("\n=== the numbers this figure's caption may quote ===")

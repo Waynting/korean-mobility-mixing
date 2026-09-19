@@ -503,7 +503,7 @@ def main():
     vmax = max(np.nanmax(np.abs(m)) for m, _ in mats)
     for ax, (m, t) in zip(axes, mats):
         im = ax.imshow(m, cmap="RdBu_r", vmin=-vmax, vmax=vmax)
-        ax.set_title(f"{t}\nlog10 excess over proportionate mixing", fontsize=9)
+        ax.set_title(f"{t}\nlog10 ratio to proportionate mixing", fontsize=9)
         ax.set_xticks(range(len(lbl)))
         ax.set_yticks(range(len(lbl)))
         ax.set_xticklabels(lbl, rotation=90, fontsize=6)

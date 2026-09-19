@@ -285,13 +285,37 @@ def main():
                          symmetric_k_and_n_minus_k=sym_ok,
                          agreement_0=agreement[0], agreement_12=agreement[12],
                          chance_agreement=chance)
+
+    # The primary statistic is computed here rather than in 58.2 because the
+    # degeneracy note below quotes it: the claim that a shift is "the true
+    # calendar displaced by the seam" is a claim about which shifts KEEP the
+    # clearing months in term, and it cannot be written from the agreement
+    # profile alone. 58.2 re-asserts the identity and uses this same list.
+    n_term = [sum(1 for ym in clearing if LAB[k][ym] == "term") for k in range(N)]
+    mult6 = list(range(6, N, 6))
+    mult12 = list(range(12, N, 12))
+    odd6 = [k for k in mult6 if k % 12 != 0]
     out["degeneracy"] = dict(
         agreement_by_k=agreement, chance_agreement=chance,
         top_14_shifts_by_agreement={str(k): agreement[k] for k in top},
-        mod6_zero_shifts={str(k): agreement[k] for k in range(6, N, 6)},
-        note="79 = 6*12 + 7, so a shift that is a multiple of 6 lands the calendar "
-             "nearly back on itself; those shifts are the alternative displaced by "
-             "the seam, not draws from the null")
+        mod6_zero_shifts={str(k): agreement[k] for k in mult6},
+        mod12_zero_shifts={str(k): agreement[k] for k in mult12},
+        n_term_at_multiples_of_six={str(k): n_term[k] for k in mult6},
+        n_term_at_multiples_of_twelve={str(k): n_term[k] for k in mult12},
+        n_term_at_odd_multiples_of_six={str(k): n_term[k] for k in odd6},
+        note="a month's label is a function of its month-of-year, so a shift by a "
+             "multiple of TWELVE restores the original labelling on every month "
+             f"that does not wrap: 79 = 6*12 + 7, and agreement(k) at k = "
+             f"{mult12[0]}, {mult12[1]}, {mult12[2]} is {agreement[mult12[0]]}, "
+             f"{agreement[mult12[1]]}, {agreement[mult12[2]]} of {N} against a "
+             f"chance level of {chance:.2f}. Those shifts are the true calendar "
+             "displaced by the seam, not draws from the null. SIX IS NOT THE "
+             "MECHANISM: an odd multiple of six exchanges term with vacation, and "
+             f"at k = {odd6} the clearing count reads "
+             f"{[n_term[k] for k in odd6]}, never the observed {n_term[0]}, while "
+             f"k = {mult12} reads {[n_term[k] for k in mult12]}. See "
+             "results_p64.json letter_verdict.iii_mechanism_is_the_six_month_"
+             "symmetry, which records the six-month reading as refuted.")
 
     # the block structure the advisor's premise turns on
     runs, cur = [], [clearing[0]]
@@ -333,9 +357,20 @@ def main():
 
     # ==================================================================== 58.2
     say("\n=== 58.2 PRIMARY: the circular-shift p, all 78 shifts ===")
-    n_term = [sum(1 for ym in clearing if LAB[k][ym] == "term") for k in range(N)]
+    # n_term was built in 58.1, where the degeneracy note has to quote it. It is
+    # not rebuilt here -- one definition, one object -- and the identity assert
+    # below is the check that it is still the list this section means.
     assert n_term[0] == N_OBS, "the rotation at k=0 is not the identity"
     ge = [k for k in range(1, N) if n_term[k] >= N_OBS]
+    # The corrected framing in 58.1 and 58.3 says the matching shifts are the
+    # multiples of twelve. That is a statement about data, so it is asserted
+    # rather than trusted: if a shift outside 12Z ever reached the observed
+    # count, the prose in those two blocks would be wrong and this run should
+    # stop rather than write it.
+    assert all(k % 12 == 0 for k in ge), (
+        f"a shift that is not a multiple of twelve reaches {N_OBS}: {ge}. The "
+        f"degeneracy note and secondary_a's rationale both say the matching "
+        f"shifts are the multiples of twelve; that is now false.")
     p_shift = (1 + len(ge)) / N
     resolution_floor = 1.0 / N
     branch = ("p_shift <= 0.05" if p_shift <= 0.05 else
@@ -353,6 +388,17 @@ def main():
         shifts_at_or_above_observed=ge, n_shifts_at_or_above=len(ge),
         shift_set="all k in 1..78, no exclusions",
         resolution_floor=resolution_floor,
+        resolution_floor_note=(
+            f"1/{N} is the GRANULARITY of an enumeration of {N} rotations, "
+            "declared in advance as such, and it is the smallest value the "
+            "arithmetic (1 + hits)/79 can take. It is NOT the number of "
+            "distinct calendars this test offers as alternatives: a month's "
+            "label is a function of its month-of-year, so many rotations are "
+            "the same calendar displaced by the seam rather than a different "
+            "calendar. results_p64.json (effective_alignments, deduplicated) "
+            "counts how many are distinct and states the resolution that "
+            "follows; that file, not this number, is what a claim about what "
+            "the test can resolve must cite."),
         at_resolution_floor=bool(p_shift == resolution_floor),
         n_term_by_k=n_term,
         n_term_over_shifts=dict(min=min(n_term[1:]), max=max(n_term[1:]),
@@ -375,9 +421,23 @@ def main():
             f"p = (1+{len(hits)})/(1+{len(keep)}) = {sec_a[tag]['p']:.7f}")
     out["secondary_a"] = dict(
         readings=sec_a,
-        rationale="the shifts that are multiples of 6 agree with the true "
-                  "labelling far above chance, so they are the alternative "
-                  "displaced by the 79 = 6*12+7 seam rather than null draws",
+        rationale=(
+            f"the shifts that reach the observed {N_OBS} are {ge}, the small "
+            "multiples of TWELVE. A month's label is a function of its "
+            "month-of-year and 79 = 6*12 + 7, so a twelve-month shift restores "
+            "the original month-of-year labelling on every month that does not "
+            "wrap; those shifts are the true calendar displaced by the seam "
+            "rather than null draws. The declared exclusion rule names k mod 6, "
+            "and six is NOT the mechanism: an odd multiple of six exchanges "
+            f"term with vacation, and at k = {odd6} the clearing count reads "
+            f"{[n_term[k] for k in odd6]} and never {N_OBS} (results_p64.json "
+            "letter_verdict.iii_mechanism_is_the_six_month_symmetry records "
+            "this reading as refuted). The rule is therefore computed exactly "
+            "as declared and reported whichever way it lands; it drops more "
+            "than the seam shifts, and NO mod-12 exclusion is added here, "
+            "because an exclusion chosen after seeing that it removes precisely "
+            "the three matching shifts is the shopping the declaration exists "
+            "to prevent."),
         status="SECONDARY. The all-78 version stays primary because it is the "
                "conservative one and excluding shifts after seeing them is "
                "shopping.")
@@ -420,8 +480,9 @@ def main():
     say("  Shifting the calendar forward by k and backward by k enumerate the same")
     say("  78 rotations, relabelled k <-> 79-k, so the PRIMARY p cannot depend on")
     say("  the convention. Secondary (a)'s exclusion rule can, because it names k")
-    say("  rather than measuring agreement, and the seam shifts sit at k = 0 mod 6")
-    say("  under one convention and k = 1 mod 6 under the other.")
+    say("  rather than measuring agreement: the seam shifts are the multiples of")
+    say("  twelve forward, and their mirrors 79-k backward, which the declared")
+    say("  'k mod 6 != 0' catches forward and misses backward.")
 
 
     def rotate_back(k):
@@ -459,11 +520,14 @@ def main():
         f"{N_OBS}, p = {sec_a['a_mirror_symmetric']['p']:.7f}")
     out["secondary_a"]["readings"] = sec_a
     out["secondary_a"]["convention_defect"] = (
-        "the exclusion rule names k, and the seam shifts are k = 0 mod 6 under the "
-        "forward convention and k = 1 mod 6 under the backward one, so 'k mod 6 != "
-        "0' is not invariant to the rotation direction: forward it drops all "
-        f"{len(ge)} shifts that reach {N_OBS}, backward it drops none of them. The "
-        "mirror-symmetric reading is reported for that reason.")
+        f"the exclusion rule names k. The seam shifts are the multiples of twelve, "
+        f"{ge} forward, and the same rotations are {ge_b} backward -- k = "
+        f"{sorted({k % 12 for k in ge_b})} mod 12, hence "
+        f"{sorted({k % 6 for k in ge_b})} mod 6 -- so the declared "
+        f"'k mod 6 != 0' is not invariant to "
+        f"the rotation direction: forward it drops all {len(ge)} shifts that reach "
+        f"{N_OBS}, backward it drops none of them. The mirror-symmetric reading is "
+        "reported for that reason.")
     out["direction_check"] = dict(
         p_forward=p_shift, p_backward=p_shift_b, equal=bool(p_shift == p_shift_b),
         shifts_forward=ge, shifts_backward=ge_b,

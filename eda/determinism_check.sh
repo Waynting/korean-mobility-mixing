@@ -26,6 +26,16 @@
 # That is p36_recompute.py's job (an independent second implementation) and the
 # per-script anchors' job. This one only answers "does it give the same answer
 # twice".
+#
+# THE ONE STRUCTURAL RULE, and it is enforced rather than described. There are
+# three lists here: `ARGS` (what a script is run with), `default_targets` (what
+# a bare invocation runs) and `EXCLUDED` (what is too slow to default, named
+# with its measured cost). Every ARGS key must be in exactly one of the last
+# two, and the guard above the loop exits 2 if it is not. That rule is written
+# in blood: p44 said "so it sits in the default set" for three rounds while it
+# did not, and p32/p34/p37 sat in ARGS and in neither list for eleven -- p34
+# being the script this file was written for. A comment could be wrong out
+# loud; a list cannot.
 set -u
 
 REPO=${0:a:h:h}
@@ -40,8 +50,33 @@ ARGS=(
   p33_coverage  "--boot 400"
   p35_seir      "--boot 200"
   p36_recompute ""
+  # --- the three that were in ARGS and in neither list below -----------------
+  # Added here in the 08-19/08-20 rounds and never added to `targets`, so they
+  # were named in this file, described nowhere as deliberately excluded, and run
+  # twice by nobody. That is exactly p44's shape below, and it is what the
+  # EXCLUDED array and the guard under it now make impossible: a key in ARGS is
+  # in the default set or in EXCLUDED, and there is no third place to sit.
+  # Timed 2026-09-02 with the drive mounted, each script on its own rather than
+  # inside a pass of this script.
+  #
+  # p34 is the script this whole file exists for -- the seed built from
+  # `hash(str)` -- and it was the one not in its own default set, with nothing
+  # saying why. 105 s a run, so the pair is 3.5 min; both runs sha256
+  # d5cb1d4bf7fff96d.
   p34_ksweep    "--months 202001,202012,202312,202402,202512,202606"
+  # Reads results_p26/p27/p9.json and the survey micro-data, never the parquet.
+  # 4.6 s a run (pair sha256 dac1d1ea8e03a908). One rng stream feeds the
+  # 500-draw bootstrap, the 500 permutations and the 400-draw multinomial null
+  # IN THAT ORDER, so it is reorder-fragile in precisely the way p44 and p61
+  # are, which is what a pair of runs is for.
   p32_pmix      ""
+  # 79 months x 3 panels x 3 levels off the cached arrival tables, plus the
+  # holiday-free variant. 145 s a run, so the pair is ~4.9 min -- the same order
+  # as p49, which is in the default set, and worth paying: `spectrum_dong`'s
+  # gap_to_pm_max is the 0.00202 that SI 3 names as a lower bound, and the
+  # abstract's "at most 0.0258" is p67's distance over these same matrices, so
+  # p37 is the only producer of either. No rng anywhere in it; what a pair of runs catches is the pandas
+  # pivot_table ordering underneath `matrices`. Both runs sha256 8b51858178530cfb.
   p37_timeseries ""
   # 79 months x 2 arms x 200 replicates is ~27 minutes per run, so the pair is
   # most of an hour and this one is named explicitly rather than sitting in the
@@ -169,25 +204,151 @@ ARGS=(
   # p38/p39/p45/p51/p52 this one is named explicitly rather than sitting in the
   # default set:   eda/determinism_check.sh p59_betastar
   p59_betastar  "--reps 100"
+  # --- the 2026-08-31 round --------------------------------------------------
+  # p64 replaces the seven-point sign test with a regression over all 79 months
+  # and recounts the rotation test's effective alignments. It reads results
+  # files only (p42's series, p41/p51/p54/p58/p63 for anchors), touches no
+  # parquet and holds no rng, so a pair of runs is cheap and says the HAC
+  # arithmetic is deterministic. Seconds.
+  p64_semreg    ""
+  # --- the 2026-09-01 round --------------------------------------------------
+  # p65 re-reads the survey CSV like p57 and then runs p27's own estimator four
+  # times per arm. No rng, but it is NOT deterministic by inspection: the three
+  # household arms build boolean masks with pandas .apply over free text and the
+  # panel column is reassigned on a copy, so what a pair of runs catches here is
+  # a row order or a mask that depends on something other than the file. About a
+  # minute a run.
+  p65_chaereply ""
+  # --- the 2026-09-05 round --------------------------------------------------
+  # p66 re-indexes p39/p59's bound from the design beta the grid was laid out on
+  # onto the realised beta the survey is measured in. It reads two results files,
+  # divides one stored median by another, and interpolates; no parquet, no rng,
+  # no simulation. A pair of runs says the interpolation and the dict ordering
+  # behind the conversion table are stable. Under a second.
+  p66_betareal  ""
+  # p67 recomputes the rank-one-to-null distance on p37's 79 stored matrices.
+  # numpy's SVD is the only thing here that could drift, and that is exactly
+  # what a pair of runs is for -- the phase exists because a difference of two
+  # norms was published where a norm of a difference was meant, so its own
+  # arithmetic had better be reproducible. Seconds.
+  p67_rank1gap  ""
+  # p69 re-draws every grid point p39 and p59 ran, from p39's own seeds and
+  # stored knobs, to get the venue level in the SURVEY's pairing convention. Its
+  # anchors are bit-exact against results_p39/p59, so a drift here is a drift in
+  # the world, not in the reading -- but the multinomial that draws phi is the
+  # one rng in it and it is drawn 8,800 times. About 9 minutes a run, so the pair
+  # is a fifth of an hour and this one is named explicitly rather than sitting in
+  # the default set:
+  #   eda/determinism_check.sh p69_betacollapse
+  p69_betacollapse ""
+  # --- the 2026-09-01 round, part two ----------------------------------------
+  # THE ABSTRACT'S OWN COUNTS. data_inventory supplies "79 consecutive months"
+  # and "10.2 billion records", and it is the one producer in this project with
+  # no assert of ANY kind -- it counts what it finds and says so. It is also the
+  # only entry here that does not write results_pNN.json, which is what the OUT
+  # map below exists for. About 39 s on the first run after a mount (the
+  # directory walk is cold) and under a second warm, because DuckDB answers
+  # count(*) out of the parquet footers rather than by reading rows. Cheap
+  # enough for the default set; both runs sha256 ef2c27eacb277a88.
+  # Its one plausible drift is not a seed but a dict: `months_partial` is built
+  # from a filesystem glob and keeps that order, so it would move between runs
+  # the moment any month stops holding exactly 24 files. It holds none today,
+  # which is the point of running it twice rather than reasoning about it.
+  data_inventory ""
+  # p2 writes §2.1's masked-cell share and the 475,266 duplicate-key count that
+  # CLAUDE.md calls load-bearing. 7 min 45 s cold and 5 min 43 s warm a run, so
+  # a pair is 11-16 minutes and it is named explicitly rather than sitting in
+  # the default set:   eda/determinism_check.sh p2_masking
+  #
+  # ⚠️ AND IT DOES NOT PASS, measured 2026-09-02: three runs (the committed
+  # file, and two here) give three different sha256. The cause is row ORDER,
+  # not arithmetic -- five of its twelve top-level keys are `GROUP BY` results
+  # with no ORDER BY, and `connect()` runs DuckDB at PRAGMA threads=8, so the
+  # groups come back in whatever order the hash aggregate finishes them in.
+  # Canonicalising each list makes all twelve keys identical across all three
+  # runs, so no VALUE moves: `dedup` (475,266) and `cell_vs_volume_total` (the
+  # 26.1% share) are byte-identical run to run and only the heat-map row lists
+  # permute. Recorded here rather than fixed, because the fix is an ORDER BY in
+  # p2_masking.py and that file belongs to another workstream. Until it lands,
+  # this entry is the record that the failure is known and bounded.
+  p2_masking    ""
+  # p8 is p2's shape at the same resolution and is here for the same reasons:
+  # no rng, no asserts, and every number it writes is a DuckDB parallel float
+  # sum. 7 min 43 s cold and 5 min 31 s warm a run, so a pair is 11-15 minutes
+  # and it too is named rather than defaulted:
+  #   eda/determinism_check.sh p8_panel
+  # One thing is its own: it REWRITES derived/panel_core.parquet on every run,
+  # which nothing else in this file does, so an interrupted pair leaves that
+  # file from run 1 -- harmless, since p14/p15 re-read it and it is
+  # regenerated, but worth knowing before it is blamed for something else.
+  #
+  # ⚠️ AND IT DOES NOT PASS EITHER, measured 2026-09-02: three runs, three
+  # sha256 -- but for the OTHER reason, and the distinction is the whole value
+  # of running both. p2 permutes rows and moves no value; p8 moves values. 50
+  # leaves across five keys drift in the last one or two ulps, worst relative
+  # 1.36e-14, and sorting the lists does not make them agree. That is p36's
+  # finding arriving in a second script: `connect()` runs at PRAGMA threads=8,
+  # DuckDB's parallel hash aggregate combines partial sums in thread-completion
+  # order, and float addition is not associative. p36 fixed it by pinning
+  # threads=1 at a cost of about four seconds per matrix. Nothing p8 concludes
+  # moves at 1e-14; recorded here rather than fixed, because the fix belongs in
+  # p8_panel.py / common.connect() and those are another workstream's files.
+  p8_panel      ""
+)
+
+# The results file each script writes, for the ones where it is NOT
+# results_pNN.json. `num=${name%%_*}` turns p33_coverage into p33 and works for
+# every phase script; data_inventory has no phase number at all and writes
+# results_inventory.json, so the derived name would be results_data.json and the
+# pair would compare two files that have never existed -- silently, since the
+# comparison below is skipped when neither run produced a file.
+typeset -A OUT
+OUT=(
+  data_inventory results_inventory.json
 )
 
 # NOT `targets=(${@:-a b c})`: with an empty $@ that yields ONE element holding
 # the whole default string, so the loop would look for a script named
 # "p33_coverage p35_seir p36_recompute" and report it as a failure.
+default_targets=(p33_coverage p35_seir p36_recompute p41_semester p42_monthscope
+                 p49_dongwor p50_natpop p53_natbeta p54_semrecount
+                 p44_beta p55_fig7 p56_fig5 p47_fig34 p48_fig1 p57_placecode
+                 p58_semshift p60_agescale p61_survspec p62_multiplicity p63_fig2
+                 p46_fig6 p64_semreg p65_chaereply p66_betareal p67_rank1gap
+                 p32_pmix p34_ksweep p37_timeseries data_inventory)
+
+# THE EXCLUSIONS ARE DATA, NOT PROSE. Every long script above already explains
+# in a comment why it is named rather than defaulted, and p44's comment said "so
+# it sits in the default set" for three rounds while it did not, because a
+# comment cannot be wrong out loud. p32/p34/p37 then repeated it in the other
+# direction: in ARGS, in no list, described nowhere. So the exclusions are a
+# list, and the guard below refuses to start if any ARGS key is in neither
+# `default_targets` nor `EXCLUDED`, or in both. A script added to ARGS and to
+# neither is now a hard error instead of another eleven quiet rounds.
+EXCLUDED=(p38_ksweep79 p39_recovery p45_r0 p51_natsym p52_r0nat p59_betastar
+          p69_betacollapse p2_masking p8_panel)
+
+for name in ${(k)ARGS}; do
+  in_def=$(( ${default_targets[(Ie)$name]} > 0 ))
+  in_exc=$(( ${EXCLUDED[(Ie)$name]} > 0 ))
+  if (( in_def + in_exc != 1 )); then
+    where=$(( in_def + in_exc ))
+    print -u2 -- "$name is in ARGS and in $where of {default_targets, EXCLUDED}; it must be in exactly one."
+    print -u2 -- "  the default set, or EXCLUDED with its measured cost as the reason."
+    exit 2
+  fi
+done
+
 if (( $# )); then
   targets=($@)
 else
-  targets=(p33_coverage p35_seir p36_recompute p41_semester p42_monthscope
-           p49_dongwor p50_natpop p53_natbeta p54_semrecount
-           p44_beta p55_fig7 p56_fig5 p47_fig34 p48_fig1 p57_placecode
-           p58_semshift p60_agescale p61_survspec p62_multiplicity p63_fig2
-           p46_fig6)
+  targets=($default_targets)
 fi
 fail=0
 
 for name in $targets; do
   num=${name%%_*}                       # p33_coverage -> p33
-  out=$REPO/eda/results_${num}.json
+  out=$REPO/eda/${OUT[$name]:-results_${num}.json}
   args=${ARGS[$name]:-}
   print -- "=== $name ${args:+($args)} ==="
   # The results file is backed up NEXT TO ITSELF, not into $TMP. $TMP is

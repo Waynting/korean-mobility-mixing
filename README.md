@@ -6,8 +6,8 @@ months (202001–202607), 424 administrative dong, 16 age bands, 10,186,891,962 
 
 The answer is that almost none survives, and the more useful part is that we now know how
 little "almost none" is. Across all 79 months the best rank-one approximation of the measured
-co-arrival matrix never departs from the outer product of its own margins by more than
-0.00202. Forcing those margins onto a contact survey's leaves a factor of 33 to 35. On
+co-arrival matrix departs from the outer product of its own margins by at most
+0.0258 in relative Frobenius norm (0.0209 at the median). Forcing those margins onto a contact survey's leaves a factor of 33 to 35. On
 synthetic worlds whose answer is known the same pipeline recovers 92% to 101% of true age
 assortativity when none of it lies below the spatial cell, and recovery falls as one minus the
 hidden share.
@@ -121,7 +121,7 @@ where each one comes from. When the gate lifts and the results files are added, 
   re-randomises per process.
 - **`p36_recompute.py`** is an independent second implementation, not a gate. It rebuilds the
   headline quantities by different routes (DuckDB self-join, the `holidays` package,
-  `csv` plus dict, power iteration) and agrees on 436 of 436 checks. It pins `threads=1`,
+  `csv` plus dict, power iteration) and agrees on 692 of 692 checks. It pins `threads=1`,
   because DuckDB's parallel hash aggregate merges partial sums in thread completion order and
   float addition is not associative.
 
@@ -152,3 +152,7 @@ derived aggregates must credit both this deposit and the upstream Seoul release.
 ## Citing
 
 See `CITATION.cff`. Cite the **concept DOI**, which always resolves to the latest version.
+
+The paper this archive accompanies is Liu W-T and Lee H-W, *Proportionate mixing is nearly exact in contact matrices derived from aggregated mobility data* (2026). It has
+no DOI yet; when it does, the Zenodo record will carry it as a related identifier, and the
+citation here will name it.

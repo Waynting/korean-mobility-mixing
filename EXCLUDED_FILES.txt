@@ -1,6 +1,6 @@
 # Files present in the source repository and deliberately not deposited
 #
-# Built from commit 170f917 on 2026-08-30T13:22:51Z
+# Built from commit 2d50dbd on 2026-09-19T07:39:48Z
 # Tier A payload: withheld
 #
 # Reasons, by prefix:
@@ -19,6 +19,7 @@
 # helpers under eda/ retrieve the source files and verify them by SHA-256.
 
 CLAUDE.md
+Email_Discussion/Data_Questions_Prof.md
 Email_Discussion/Technical notes 20260822.md
 Email_Discussion/advisor_report_20260818.md
 Email_Discussion/advisor_report_20260819.md
@@ -26,19 +27,33 @@ Email_Discussion/advisor_report_20260821.md
 Email_Discussion/advisor_report_20260824.md
 Email_Discussion/advisor_report_20260827.md
 Email_Discussion/advisor_report_20260830.md
+Email_Discussion/advisor_report_20260831.md
+Email_Discussion/advisor_report_20260903.md
+Email_Discussion/advisor_report_20260905.md
+Email_Discussion/advisor_report_20260911.md
+Email_Discussion/advisor_report_20260916.md
+Email_Discussion/advisor_report_20260918.md
 Email_Discussion/advisor_suggestion_20260816.md
 Email_Discussion/advisor_suggestion_20260819.md
 Email_Discussion/advisor_suggestion_20260821.md
 Email_Discussion/advisor_suggestion_20260824.md
 Email_Discussion/advisor_suggestion_20260827.md
+Email_Discussion/advisor_suggestion_20260831.md
+Email_Discussion/advisor_suggestion_20260903.md
+Email_Discussion/advisor_suggestion_20260905.md
+Email_Discussion/advisor_suggestion_20260909.md
+Email_Discussion/advisor_suggestion_20260915.md
 Email_Discussion/bigdata_campus_application_20260821.md
 Email_Discussion/figure_captions_20260824.md
 Email_Discussion/figure_captions_20260827.md
+Email_Discussion/jrsi_editorial_enquiry_20260901.md
 Email_Discussion/nims_enquiry_20260824.md
+Email_Discussion/nims_reply_20260901.md
 JRSI_投稿規定整理.md
 OVERVIEW.md
 archive/README.md
 archive/REVISION_PLAN.md
+archive/advisor_20260831_contradictions.md
 archive/decisions_and_todos.md
 archive/figure_captions_draft.md
 archive/figures/fig_screen_protocol/fig_screen_protocol.excalidraw
@@ -47,16 +62,23 @@ archive/figures/fig_screen_protocol/fig_screen_protocol.pdf
 archive/figures/fig_screen_protocol/fig_screen_protocol.png
 archive/figures/fig_screen_protocol/fig_screen_protocol.svg
 archive/figures/fig_screen_protocol/render.py
+archive/jrsi_exemplar_benchmarks_20260831.md
 archive/letter_to_advisor.md
+archive/literature_expansion_20260831.md
 archive/manuscript_JBI.md
+archive/reference_verification_20260903.md
+archive/reference_verification_20260918.md
 archive/related_work_lim2026.md
 archive/report.html
+archive/rewrite_log_20260830.md
 archive/section_coverage_draft.md
 archive/section_semester_draft.md
 archive/seoul_topic_memo.md
+authors.md
 cases/daily_panel.csv
 cases/daily_panel.parquet
 cases/kdca_20230831.xlsx
+drive_todo_20260907.md
 eda/archive/20260818/results_p19.json
 eda/archive/20260818/results_p21.json
 eda/archive/20260818/results_p21b.json
@@ -157,11 +179,18 @@ eda/results_p60.json
 eda/results_p61.json
 eda/results_p62.json
 eda/results_p63.json
+eda/results_p64.json
+eda/results_p65.json
+eda/results_p66.json
+eda/results_p67.json
+eda/results_p69.json
 eda/results_p6b.json
 eda/results_p8.json
 eda/results_p9.json
 meeting_note_20260827.md
+paper/ai_use_record.md
 paper/editorial_constraints.md
+paper/figure_rework_20260831.md
 paper/figure_sheet/README.md
 paper/figure_sheet/figure1.md
 paper/figure_sheet/figure1.pdf
@@ -181,9 +210,13 @@ paper/figure_sheet/figure5.png
 paper/figure_sheet/figure6.md
 paper/figure_sheet/figure6.pdf
 paper/figure_sheet/figure6.png
-paper/figure_sheet/figure7.md
-paper/figure_sheet/figure7.pdf
-paper/figure_sheet/figure7.png
+paper/figure_sheet_SI/README.md
+paper/figure_sheet_SI/figureS1.md
+paper/figure_sheet_SI/figureS1.pdf
+paper/figure_sheet_SI/figureS1.png
+paper/jrsi_caption_style_20260902.md
+paper/jrsi_compliance_20260831.md
+paper/jrsi_figure_style_audit_20260831.md
 paper/latex/JRSI/.olcli.json
 paper/latex/JRSI/figures/figure1.png
 paper/latex/JRSI/figures/figure2.png
@@ -191,8 +224,9 @@ paper/latex/JRSI/figures/figure3.png
 paper/latex/JRSI/figures/figure4.png
 paper/latex/JRSI/figures/figure5.png
 paper/latex/JRSI/figures/figure6.png
-paper/latex/JRSI/figures/figure7.png
 paper/latex/JRSI/main.tex
+paper/latex/JRSI_SI/.olcli.json
+paper/latex/JRSI_SI/figures/figureS1.png
 paper/latex/JRSI_SI/main.tex
 paper/latex/README.md
 paper/manuscript_JRSI.md
@@ -204,7 +238,7 @@ paper/priority_searches/2026-08-30-age-coarsening.md
 paper/priority_searches/2026-08-30-proportionate-mixing.md
 paper/priority_searches/README.md
 paper/related_work_positioning.md
-paper/rewrite_log_20260830.md
+paper/scholarone_submission_fields.md
 release/data_descriptor_plan.md
 release/data_release_and_packaging.md
 release/deposit/CITATION.cff

@@ -2,7 +2,7 @@
 """Phase 62 — the size of p52's flip rule, and what the global null really predicts.
 
 WHY. The advisor's 2026-08-27 letter, point 5, wants us to get ahead of the
-R0 = 3.5 circle in Figure 7(b) before a reviewer uses it against us. The framing
+R0 = 3.5 circle in Figure S1(b) before a reviewer uses it against us. The framing
 instinct is right. The arithmetic offered with it is not: "twenty verdicts at
 the 95% level means one false positive in expectation" assumes each verdict is a
 size-0.05 test. It is not. p52's rule is non-overlap of two 95% bootstrap

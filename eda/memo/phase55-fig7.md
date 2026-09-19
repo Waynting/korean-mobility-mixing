@@ -1,6 +1,7 @@
 # Phase 55 — 圖 7：完整的 R₀ 曲線
 
 腳本 `eda/p55_fig7.py` → `eda/fig/p55_figure7.png` / `.pdf` + `results_p55.json`。
+（2026-09-15：這張圖 09-12 起是 SI 的 Figure S1，輸出檔改名 `p55_figureS1.png` / `.pdf`，讓 `scripts/figure_sheet.py` 用圖號找得到它；腳本名不動。）
 只讀 `results_p52.json` 與 `results_p62.json`，不算任何東西。
 
 **一句話結論：這張圖取代 `paper_structure.md` §4.7 原本「綁在 R₀=2.5 上講」的寫法。

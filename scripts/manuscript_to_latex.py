@@ -353,9 +353,23 @@ def check_supplement_flag(md: str, supplement: bool, src_path: Path) -> None:
 # printed in the middle of the abstract, and the whole point of a title page
 # is that a reader can find those four things without hunting.
 FRONT_SEP_RE = re.compile(r'^---[ \t]*$', re.M)
-FRONT_BYLINE_RE = re.compile(r'\*\*(?P<names>[^*\n]+)\*\*(?P<marks>[^\n]*)\Z', re.S)
+# One author is `**Name**^marks^`; the byline is one or more of them separated
+# by commas. The marks are the superscript run and nothing else, so a second
+# bold name cannot be swallowed into the first author's marks -- which is what
+# the old single-author pattern did: `**A**^a^, **B**^b,*^` matched, with
+# `, **B**^b,*^` as A's marks, and the PDF carried one bold author and one not.
+FRONT_AUTHOR_RE = re.compile(r'\*\*(?P<name>[^*\n]+)\*\*(?P<marks>(?:\^[^\^\n]+\^)?)')
+FRONT_BYLINE_RE = re.compile(
+    r'\*\*[^*\n]+\*\*(?:\^[^\^\n]+\^)?(?:,[ \t]*\*\*[^*\n]+\*\*(?:\^[^\^\n]+\^)?)*\Z', re.S)
 FRONT_ADDRESS_RE = re.compile(r'\^[^\^\n]+\^[ \t]+.+\Z', re.S)
 FRONT_KEYWORDS_RE = re.compile(r'\*\*Keywords:\*\*[ \t]*.+\Z', re.S)
+# ORCID joins the centred block with the affiliation and the corresponding
+# author: it identifies the author, not the paper. It is matched separately
+# rather than widened into FRONT_ADDRESS_RE, because that pattern keys on the
+# ^a^ superscript mark and ORCID carries none -- widening it to accept a bare
+# bold label would also swallow any future front matter paragraph that starts
+# with one, which is the silent-passthrough this whole block exists to stop.
+FRONT_ORCID_RE = re.compile(r'\*\*ORCID:?\*\*[ \t]*.+\Z', re.S)
 # The separator is looked for near the top only. A manuscript with no rule
 # under its front matter would otherwise swallow the whole first section.
 FRONT_MAX_LINES = 24
@@ -382,7 +396,7 @@ def split_front_matter(md: str, src_path: Path):
             byline = para
         elif FRONT_KEYWORDS_RE.fullmatch(para):
             keywords = para
-        elif FRONT_ADDRESS_RE.fullmatch(para):
+        elif FRONT_ADDRESS_RE.fullmatch(para) or FRONT_ORCID_RE.fullmatch(para):
             addresses.append(para)
         else:
             raise SystemExit(
@@ -876,12 +890,12 @@ def main():
     # The byline keeps its markers ("^a,\*^") but loses the bold: it is about
     # to be set as \author, which is already set apart from the body, and a
     # bold \author is the journal's decision and not this script's.
-    byline_parts = FRONT_BYLINE_RE.fullmatch(byline)
+    authors = FRONT_AUTHOR_RE.findall(byline)
     # The PDF's Author field gets the names without the affiliation markers.
     # It is read off the same byline rather than kept as a constant here: two
     # copies of an author list is how one of them ends up out of date.
-    author_meta = byline_parts.group('names').strip()
-    byline_md = byline_parts.group('names') + byline_parts.group('marks')
+    author_meta = ', '.join(name.strip() for name, _ in authors)
+    byline_md = ', '.join(name.strip() + marks for name, marks in authors)
     fragments = [byline_md] + addresses + ([keywords] if keywords else [])
     rendered = render_fragments([process(f) for f in fragments])
     byline_tex, rest_tex = rendered[0], rendered[1:]

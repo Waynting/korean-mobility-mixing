@@ -31,7 +31,7 @@ THE MANUSCRIPT CITES THE SHEET, not `../eda/fig/` directly, so the folder you
 edit in and the folder the paper reads are the same folder, and a figure cannot
 be adjusted in one place while the paper quietly renders another. That makes the
 sheet load-bearing, which is why `recover_image` exists below: deleting the
-folder must not leave a manuscript whose seven images no longer resolve and
+folder must not leave a manuscript whose images no longer resolve and
 whose sheet can no longer be rebuilt to make them resolve again.
 
 WHY IT IS NOT CALLED `paper/figures/` by default. That name is one letter of
@@ -43,12 +43,27 @@ above. `figure_sheet` borrows the name `eda/README.md` already uses for the
 Usage:
     python3 scripts/figure_sheet.py --src paper/manuscript_JRSI.md
     python3 scripts/figure_sheet.py --src paper/manuscript_JRSI.md --check
+    python3 scripts/figure_sheet.py --src paper/manuscript_JRSI_SI.md --out paper/figure_sheet_SI
 
-`--out` defaults to `figure_sheet/` beside the manuscript. Unlike
-`manuscript_to_latex.py`, which requires its pair because a defaulted run there
-rebuilt a manuscript nobody submits, the destination here is DERIVED from
-`--src`, so it cannot be pointed at another manuscript's sheet by forgetting an
-argument.
+`--out` defaults to the folder named after the manuscript itself:
+`figure_sheet/` for `manuscript_JRSI.md`, `figure_sheet_SI/` for any `*_SI.md`.
+That is what makes the destination DERIVED from `--src`, so forgetting the
+argument cannot point a run at another manuscript's sheet. It was not always
+true: until 2026-09-18 both defaulted to `figure_sheet/`, the docstring claimed
+the guarantee anyway, and the SI's own generated README printed the run that
+would have emptied the main sheet. `--out` can still name the wrong folder, so
+`owner_of` reads the README already there and refuses a run whose `--src` is not
+the one that wrote it.
+
+THE SI HAS ITS OWN FOLDER. Both manuscripts
+live in `paper/`, so both would default to the same `figure_sheet/`, and each
+run deletes whatever the other wrote (see the stale-file sweep at the end of
+`main`). Figure 7 moved into the SI as Figure S1 on 2026-09-12 and for three
+days the main sheet still held `figure7.*` while the SI cited it; the first
+main-manuscript rebuild would have deleted the SI's only image. The SI's sheet
+is `paper/figure_sheet_SI/` and its image is `figureS1.png`, which
+`recover_image` finds at `eda/fig/p55_figureS1.png` -- the drawing script names
+its output by the figure number it carries, S included.
 """
 import argparse
 import json
@@ -76,7 +91,7 @@ FIGURE_RE = re.compile(
 # Every image paragraph that announces itself as a figure. Counted against the
 # matches above so a figure whose caption is missing, misnumbered, or separated
 # from its image by a stray line aborts the run instead of being dropped from a
-# sheet that then silently has six pages for seven figures.
+# sheet that then silently has one page fewer than the manuscript cites.
 FIGURE_IMAGE_RE = re.compile(r'^!\[Figure\s+(?P<num>S?\d+):', re.MULTILINE)
 HEADING_RE = re.compile(r'^(#{2,4})\s+(?P<title>.+?)\s*$', re.MULTILINE)
 # `p48_figure1.png` -> `p48`: the phase that drew it, which is also the name of
@@ -85,11 +100,16 @@ HEADING_RE = re.compile(r'^(#{2,4})\s+(?P<title>.+?)\s*$', re.MULTILINE)
 # figure would silently fall out of.
 PHASE_RE = re.compile(r'^(?P<phase>p\d+)_')
 
-GENERATED_BANNER = (
-    '<!-- 由 scripts/figure_sheet.py 產生，請勿手動編輯。 -->\n'
-    '<!-- 圖說要改：paper/manuscript_JRSI.md；圖要改：繪圖腳本；'
-    '數字要改：寫出 results 檔的那支腳本。改完重跑本腳本。 -->\n'
-)
+
+def generated_banner(src_rel: str) -> str:
+    """The banner names the manuscript this sheet was lifted from. It used to
+    hard-code `paper/manuscript_JRSI.md`, which was true until the SI got a
+    sheet of its own (2026-09-15, `--out paper/figure_sheet_SI`): a page that
+    tells you to edit the caption in the wrong file is the one kind of note
+    this folder must not carry."""
+    return ('<!-- 由 scripts/figure_sheet.py 產生，請勿手動編輯。 -->\n'
+            f'<!-- 圖說要改：{src_rel}；圖要改：繪圖腳本；'
+            '數字要改：寫出 results 檔的那支腳本。改完重跑本腳本。 -->\n')
 
 
 def md_cell(value) -> str:
@@ -247,7 +267,7 @@ def render_page(fig, src: Path, link_name: str, vector_name) -> str:
     """One figure's page: what it is, where each part of it lives, the image,
     the caption verbatim, and the numbers the caption is allowed to quote."""
     src_rel = repo_rel(src)
-    out = [f'# 圖 {fig["num"]} — {fig["title"]}', '', GENERATED_BANNER, '']
+    out = [f'# 圖 {fig["num"]} — {fig["title"]}', '', generated_banner(src_rel), '']
     rows = [
         ('所在小節', f'{fig["section"]}'),
         ('圖說出處', f'`{src_rel}:{fig["caption_line"]}`'),
@@ -294,17 +314,21 @@ def render_page(fig, src: Path, link_name: str, vector_name) -> str:
 
 def render_index(figures, src: Path, out_dir: Path) -> str:
     src_rel = repo_rel(src)
-    out = [f'# 圖與圖說總表 — {src_rel}', '', GENERATED_BANNER, '',
+    # Print --out only when it is load-bearing: a reader who copies this line
+    # must land back in this folder and not in the other manuscript's.
+    out_arg = ('' if out_dir == default_out(src).resolve()
+               else f' --out {repo_rel(out_dir)}')
+    out = [f'# 圖與圖說總表 — {src_rel}', '', generated_banner(src_rel), '',
            f'`{src_rel}` 用到 {len(figures)} 張圖。每張圖一頁，頁面上有圖、'
            '逐字圖說、繪圖腳本、重繪指令，以及圖說裡每個數字的來源。', '',
-           f'**手稿就是從這裡引用圖的**——`{src_rel}` 裡七個 `![...]()` 指的都是本'
+           f'**手稿就是從這裡引用圖的**——`{src_rel}` 裡 {len(figures)} 個 `![...]()` 指的都是本'
            '資料夾的 `figureN.png`，而那些是指向 `eda/fig/` 的符號連結，所以重跑繪圖'
            '腳本，手稿看到的圖就跟著換，沒有中間那一步。', '',
            '**圖說不是**：它是產生當下從手稿逐字抄來的副本，改圖說要改手稿，'
            '不是改這裡。要改東西，改下表指的那個檔，然後重跑：', '',
            '```bash',
-           f'python3 scripts/figure_sheet.py --src {src_rel}',
-           f'python3 scripts/figure_sheet.py --src {src_rel} --check   '
+           f'python3 scripts/figure_sheet.py --src {src_rel}{out_arg}',
+           f'python3 scripts/figure_sheet.py --src {src_rel}{out_arg} --check   '
            '# 只檢查：這裡的圖說是否還等於手稿裡的圖說',
            '```', '',
            '| 圖 | 頁面 | 小節 | 短標題 | 繪圖腳本 | 數字來源 |',
@@ -350,6 +374,27 @@ def build(src: Path, out_dir: Path):
     return figures, pages, links
 
 
+def default_out(src: Path) -> Path:
+    """The sheet folder that belongs to this manuscript.
+
+    Derived from the manuscript's own name, not from a fixed string, so the
+    SI and the main text cannot default to the same folder. `--out` overrides
+    it; `owner_of` below is what stops an override from landing on the wrong
+    manuscript's sheet.
+    """
+    suffix = '_SI' if src.stem.endswith('_SI') else ''
+    return src.parent / f'figure_sheet{suffix}'
+
+
+def owner_of(out_dir: Path):
+    """Which manuscript last wrote this folder, read back from its README."""
+    readme = out_dir / 'README.md'
+    if not readme.is_file():
+        return None
+    m = re.search(r'--src (\S+)', readme.read_text(encoding='utf-8'))
+    return m.group(1) if m else None
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.split('\n')[0])
     ap.add_argument('--src', required=True, type=Path,
@@ -364,7 +409,21 @@ def main() -> int:
     src = args.src.resolve()
     if not src.is_file():
         raise SystemExit(f'no such manuscript: {src}')
-    out_dir = (args.out or src.parent / 'figure_sheet').resolve()
+    out_dir = (args.out or default_out(src)).resolve()
+
+    # THE GUARD THAT THE DOCSTRING ABOVE PROMISES. The stale sweep at the end
+    # of this function deletes every file in out_dir this run did not write, so
+    # pointing a manuscript at another manuscript's sheet empties it. The
+    # default cannot do that any more, but `--out` still can, and so can a
+    # renamed manuscript. The folder says who owns it, so ask it.
+    owner = owner_of(out_dir)
+    if owner is not None and owner != repo_rel(src):
+        raise SystemExit(
+            f'{out_dir} is {owner}\'s sheet, not {repo_rel(src)}\'s.\n'
+            f'  rebuilding it from {repo_rel(src)} would delete every page '
+            f'{owner} cites.\n'
+            f'  drop --out to use {repo_rel(default_out(src))}, or delete the '
+            f'folder first if the rename is deliberate.')
 
     figures, pages, links = build(src, out_dir)
 
@@ -405,7 +464,8 @@ def main() -> int:
     # renumbered. It is deleted, not left: a page for a figure that no longer
     # exists is the sheet telling you to go edit something the paper does not
     # contain, and it would sit there looking exactly as authoritative as the
-    # seven real ones.
+    # real ones. This is the sweep `owner_of` guards: it is scoped to out_dir,
+    # which is the whole danger when out_dir is the wrong manuscript's.
     keep = set(pages) | set(links)
     stale = sorted(p for p in out_dir.iterdir() if p.name not in keep)
     for path in stale:

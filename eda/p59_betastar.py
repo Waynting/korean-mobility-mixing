@@ -658,9 +658,11 @@ def main():
                                   "diagonal and survives a within-place shuffle "
                                   "at 62%, so it is an artefact and is not a "
                                   "measurement of beta. It is the only reading "
-                                  "anywhere in results_p44 that sits above the "
-                                  "crossing, so it is named rather than "
-                                  "quietly dropped."),
+                                  "anywhere in results_p44 above 0.95: it sits "
+                                  f"above the {x39:.4f} crossing p39's 0.04-wide "
+                                  f"grid gave, and below the refined {bs_lin:.4f} "
+                                  "crossing this phase measures, so it is named "
+                                  "rather than quietly dropped."),
         sentence="at beta = 0.95, above every beta we measure, the bound is "
                  f"{b095:.4f} and the survey's {R_SURVEY:.4f} is excluded. No "
                  "interpolation is used and no grid step is counted.")

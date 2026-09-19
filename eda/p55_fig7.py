@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Phase 55 — Figure 7: the whole R0 curve, not the single point.
+"""Phase 55 — Figure S1: the whole R0 curve, not the single point.
 
 WHAT THIS REPLACES. `paper/paper_structure.md` §4.7 used to instruct the writer
 to bind Claim 3 to R0 = 2.5. The advisor's 2026-08-24 letter changes the claim
@@ -12,11 +12,23 @@ IT COMPUTES NOTHING, on the p46/p47/p48 rule. Every number on it is read from
 
   (a) deterministic regret over the 12-point R0 grid, one line per cell. No
       Monte Carlo, so no error bars belong on it. R0 = 2.5 is marked because it
-      is the only value p40 ever ran, and the point of the panel is that it is
-      the friendly end.
+      is the anchor Figure 6(d) shares with this panel, and the point of the
+      panel is that it is the friendly end.
   (b) the five bootstrapped R0 values, each cell's regret interval against its
       own resample-the-survey null, with the verdicts that flip marked. p40's
       rule: the cell flips iff regret p2.5 > null p97.5.
+
+THIS WAS FIGURE 7 until 2026-09-12 and is now Figure S1 in the SI. The R0 = 2.5
+mark used to be labelled "the only R0 previously run": that is project history a
+reader has no way to know (advisor 2026-09-15, item 4), so the label now names
+the anchor Figure 6(d) shares with this panel and not the round that set it.
+
+LINE 19 IS LOAD-BEARING, which is why the two notes above sit here and not in
+the panel list. Three places cite `p55_fig7.py:19` for p40/p52's flip rule:
+`eda/p61_survspec.py`, `eda/memo/phase61-survspec.md`, and the frozen
+pre-analysis declaration quoted verbatim into `results_p61.json`, which is not
+editable by rule. The 09-15 rename pushed that line down to 23; this docstring
+is shaped to put it back. New text goes BELOW here, never above the (b) block.
 
 THE ONE CIRCLE THAT IS NOT ON THE LOW-R0 SIDE is annotated, because it is the
 first thing a reader asks about. Four of the five flips sit at R0 <= 1.8; the
@@ -56,6 +68,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.lines import Line2D
+from figstyle import WIDTH, finish, plabel
 from paths import FIG, ROOT
 
 # JRSI wants figure text in Times at 9-11 pt and refuses anything under 7.5 pt,
@@ -138,20 +151,23 @@ def main():
         f"p62 measured the rule's size at n_boot = " \
         f"{p62['alpha_rule']['n_boot']} and p52 ran at {d['n_boot']}"
 
-    # 2 x 1, NOT 1 x 2. JRSI reproduces a figure at 180 mm, which is the 7.0 in
-    # p48 and p63 already build to; an 11.6 in row arrives on the page at 0.60x
-    # and the 7.5 pt floor set for this figure lands as 4.5 pt of ink. Stacking
-    # spends height, which the page has, instead of type size, which it does
-    # not. Neither panel loses width in the trade: both now get the full 7 in,
-    # where the old row gave each of them 5.4.
-    fig, ax = plt.subplots(2, 1, figsize=(7.0, 8.0))
+    # 2 x 1, NOT 1 x 2. An 11.6 in row arrives on the page at 0.60x and the
+    # 7.5 pt floor set for this figure lands as 4.5 pt of ink. Stacking spends
+    # height, which the page has, instead of type size, which it does not.
+    # Neither panel loses width in the trade: both get the full measure, where
+    # the old row gave each of them 5.4 in.
+    #
+    # WIDTH is 6.50 in, not the 7.00 this script used to build to: see
+    # figstyle.py. At 7.00 in \pandocbounded scaled the page copy to 0.9286
+    # and every 7.5 pt label below printed at 6.96 pt.
+    fig, ax = plt.subplots(2, 1, figsize=(WIDTH, 8.0))
 
     # ------------------------------------------------- (a) the whole curve
     a = ax[0]
     argmaxes = sorted({v for v in p52["point_summary"]["argmax"].values()})
     a.axvspan(min(argmaxes), max(argmaxes), color=GOLD, alpha=0.12, zorder=0)
     a.text(np.sqrt(min(argmaxes) * max(argmaxes)), 0.985,
-           f"largest here\n({min(argmaxes):g}-{max(argmaxes):g})", ha="center",
+           f"largest here\n({min(argmaxes):g}\u2013{max(argmaxes):g})", ha="center",
            va="top", fontsize=8, color="#7a5320")
     for k in ORDER:
         col, ls, mk, lab = STYLE[k]
@@ -164,7 +180,7 @@ def main():
              p52["point_summary"]["max_over_grid"][k])
         note("a", f"{lab}: R0 at that maximum", p52["point_summary"]["argmax"][k])
     a.axvline(2.5, color=INK, lw=1.0, ls=":", zorder=1)
-    a.annotate("the only $R_0$\npreviously run", xy=(2.5, 0.62),
+    a.annotate("$R_0$ = 2.5, the anchor\nof Figure 6(d)", xy=(2.5, 0.62),
                xytext=(3.15, 0.72), fontsize=8, color=INK,
                arrowprops=dict(arrowstyle="->", lw=0.9, color=INK))
     a.set_xscale("log")
@@ -174,7 +190,7 @@ def main():
     a.set_xlabel("basic reproduction number $R_0$")
     a.set_ylabel("regret: share of achievable benefit forgone")
     a.set_ylim(-0.02, 1.0)
-    a.set_title("(a)  the consequence of matrix choice, over $R_0$",
+    a.set_title(plabel("a", "the consequence of matrix choice, over $R_0$"),
                 fontsize=10, loc="left")
     a.legend(fontsize=8, frameon=False, loc="upper right")
     a.grid(alpha=0.18, lw=0.6)
@@ -238,7 +254,8 @@ def main():
     b.set_xticklabels([f"{g:g}" for g in boot_grid])
     b.set_xlabel("basic reproduction number $R_0$")
     b.set_ylabel("regret, 95% bootstrap interval")
-    b.set_title("(b)  against the cost of simply re-running the survey",
+    b.set_title(plabel("b", "against the cost of simply re-running the "
+                            "survey"),
                 fontsize=10, loc="left")
     b.grid(alpha=0.18, lw=0.6, axis="y")
     # (b) draws the same four cells as (a), so it carries the same key. It used
@@ -294,19 +311,14 @@ def main():
               f"(rank {ep['high_rank']} of {d['n_boot']})", ep["high_level_ci"])
 
     fig.tight_layout()
-    png = f"{FIG}/p55_figure7.png"
-    fig.savefig(png, dpi=300, bbox_inches="tight")
-    if args.pdf:
-        # CreationDate omitted on purpose: matplotlib stamps the wall clock
-        # into the PDF, so two runs of the same figure differ by bytes for a
-        # reason that has nothing to do with the figure. p46 and p63 have
-        # done this since they were written; these four had not, so their
-        # vector files showed up in every diff whether or not the figure
-        # had changed. The PNG beside them was always stable.
-        fig.savefig(f"{FIG}/p55_figure7.pdf", bbox_inches="tight",
-                    metadata={"CreationDate": None})
+    png = f"{FIG}/p55_figureS1.png"
+    # NO bbox_inches="tight". It was the one break from the p46/p63 rule and it
+    # cost the width: the trim left 6.907 in, so this figure alone reproduced
+    # at a different scale from the other six and its 7.5 pt type printed at
+    # 7.05 pt rather than their 6.96. The emitted page is now the figsize.
+    mode = finish(fig, png, pdf=args.pdf)
     plt.close(fig)
-    print(f"wrote {png}" + (" (+ .pdf)" if args.pdf else ""))
+    print(f"wrote {png} ({mode})" + (" (+ .pdf)" if args.pdf else ""))
 
     print("\n=== the numbers this figure's caption may quote ===")
     for panel, what, value in sheet:

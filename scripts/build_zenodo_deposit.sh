@@ -122,8 +122,11 @@ EXCLUDE_PREFIXES=(
   "CLAUDE.md"               # agent instructions, not documentation for a reader
   "OVERVIEW.md"             # internal status board, in Chinese, references private letters
   "meeting_note"            # meeting notes
+  "drive_todo"              # run-sheet for the next time the drive is mounted; internal, cites the letters
   "JRSI_投稿規定"           # journal submission notes
   ".gstack/"                # local tooling
+  "authors.md"              # symlink to the author-fields sheet shared with another submission
+                            # (departments, e-mails, ORCIDs); cp follows the link, so it would ship
 )
 # Tier A payload: the derived aggregates. Held back unless --tier-a.
 #

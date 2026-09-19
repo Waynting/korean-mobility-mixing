@@ -65,6 +65,17 @@ extend the same treatment to the seven other scripts the report quotes:
                                 S A S', and the mechanism claim (proportionate
                                 mixing must collapse to r = 0) is rebuilt from
                                 its own definition
+  36.13 the two abstract numbers that had no second route at all -- p37's
+                                rank-one gap without an SVD, both the difference
+                                of norms SI 3 quotes ("at most 0.00202") and the
+                                distance the abstract quotes since 2026-09-05
+                                ("at most 0.0258", p67's object), and
+                                data_inventory's 79 months and 10.19 billion
+                                rows off the ym COLUMN rather than off the file
+                                names and the parquet footers. data_inventory is
+                                also the one producer in this project with no
+                                assert of its own, so until 36.13 nothing but
+                                the drive itself stood behind those counts.
 
 WHAT IS SHARED, and therefore not checked here: DuckDB's parquet reader, and the
 ETL that wrote the parquet. The ETL already checks itself file by file against
@@ -78,10 +89,12 @@ assert with a stated tolerance, and the tolerances are RELATIVE -- an absolute
 tolerance on a quantity of order 0.005 waves through a 60% error, which is the
 mistake the 8-19 round found in this project's own gate.
 
-36.10 and 36.12 read their month series from results_p42.json and
+36.10, 36.12 and 36.13 read their month series from results_p42.json and
 results_p37.json and do NOT rebuild them: at 79 months section 36.2's route is a
-billion-row scan. Both sections say so in their own output rather than leaving
-it to be inferred. Section 36.3c is the one block here that is not an anchor at
+billion-row scan. All three say so in their own output rather than leaving it to
+be inferred, and 36.13 additionally recomputes its gap for the two months 36.2
+does rebuild from the parquet, so the abstract's 0.00202 has one leg on raw rows
+even though seventy-seven of the months do not. Section 36.3c is the one block here that is not an anchor at
 all -- a permutation null on a different stream cannot reproduce a median bit
 for bit -- so it compares within Monte Carlo error and asserts only the verdict,
 the way 45.4 does.
@@ -122,7 +135,7 @@ NA = len(AGES)
 IMP = 1.5
 SEOUL_LO, SEOUL_HI = 1101000, 1125999
 ALL_SECTIONS = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11",
-                "12"}
+                "12", "13"}
 # 36.3c draws its own permutation null. The seed is deliberately NOT p61's
 # 20260827: two runs of the same stream agreeing says nothing, and the point of
 # that block is to see whether a different stream reaches the same verdict.
@@ -589,6 +602,13 @@ def _power_top(M, iters=4000, rtol=1e-16):
     calls an SVD: the matrices here are symmetric, so the singular values are
     the square roots of the eigenvalues of M'M, and those are reached by
     iteration and deflation instead.
+
+    A NEGATIVE rtol DISABLES THE EARLY EXIT and is a deliberate caller option,
+    not a degenerate argument. The stopping rule watches the Rayleigh quotient,
+    which is stationary at the eigenvector: it returns once the EIGENVALUE has
+    settled, leaving the VECTOR at about the square root of that tolerance. That
+    is all spectrum_2 needs and it is not enough for rank1_pm_gap(), which uses
+    the vector itself -- see the note there.
     """
     n = len(M)
     v = [1.0 / math.sqrt(n)] * n
@@ -630,6 +650,97 @@ def spectrum_2(T):
     D = [[M[i][j] - l1 * v1[i] * v1[j] for j in range(n)] for i in range(n)]
     l2, _ = _power_top(D)
     return l1, (math.sqrt(max(0.0, l2) / l1) if l1 else float("nan"))
+
+
+def frobenius(M):
+    """||M||_F by explicit double summation. p32 calls numpy.linalg.norm."""
+    return math.sqrt(sum(v * v for row in M for v in row))
+
+
+def rank1_residuals(T):
+    """(sigma1^2/sum sigma^2, best rank-1 residual, proportionate-mixing residual).
+
+    These are the three quantities behind the abstract's "departs from rank one
+    by at most 0.00202": the gap is |best - pm|, a DIFFERENCE of two numbers near
+    0.134, so the fourth significant figure of the answer is the thirteenth of
+    its inputs and a route that shares an SVD with p32 would not be testing much.
+    Nothing here calls one: the share comes out of spectrum_2's power iteration
+    and deflation on e'e, and the proportionate-mixing residual is a Frobenius
+    norm written as an explicit sum over cells.
+    """
+    s = sum(sum(row) for row in T)
+    if s == 0:
+        return float("nan"), float("nan"), float("nan")
+    e = [[v / s for v in row] for row in T]
+    share, _ = spectrum_2(T)
+    best = math.sqrt(max(0.0, 1.0 - share))
+    r = [sum(row) for row in e]
+    n = len(e)
+    D = [[e[i][j] - r[i] * r[j] for j in range(n)] for i in range(n)]
+    return share, best, frobenius(D) / frobenius(e)
+
+
+def rank1_pm_gap(T):
+    """||sigma_1 u_1 u_1' - q (x) q||_F / ||e||_F: how far the best rank-one
+    approximation is from the proportionate-mixing null. The abstract's 0.0257.
+
+    NOT rank1_residuals()'s third value, and the difference between them is the
+    correction the 2026-09-05 round made. That one is |best - pm|, a DIFFERENCE
+    OF NORMS, which the triangle inequality makes a LOWER bound on this distance;
+    the abstract used to quote it as an upper one. Both are kept: SI 3 still
+    prints the difference, labelled as the lower bound it is.
+
+    THE SECOND ROUTE, which is the reason this lives here. p67_rank1gap.py takes
+    the leading pair off numpy.linalg.svd. Here it comes out of the same power
+    iteration spectrum_2 uses -- e is symmetric and non-negative, so its dominant
+    eigenpair IS its top singular pair -- and both norms are explicit sums.
+
+    THE ITERATION IS RUN TO A FIXED COUNT, deliberately, which is the one place
+    this file asks _power_top for something spectrum_2 never needed. Its stopping
+    rule leaves the vector at about sqrt(1e-16); the eigenvalue is all a share is
+    made of, but this quantity depends on the vector linearly. Measured against
+    p67 over the 79 months: the early exit costs 7.8e-08, a fixed hundred
+    iterations costs 2.1e-13, and 400 and 1000 iterations do not improve on it.
+    """
+    s = sum(sum(row) for row in T)
+    if s == 0:
+        return float("nan")
+    e = [[v / s for v in row] for row in T]
+    n = len(e)
+    l1, u = _power_top(e, iters=100, rtol=-1.0)
+    q = [sum(row) for row in e]
+    D = [[l1 * u[i] * u[j] - q[i] * q[j] for j in range(n)] for i in range(n)]
+    return frobenius(D) / frobenius(e)
+
+
+def below_80(A):
+    """p37's T for the rank statistics: drop the 80+ band, then symmetrise.
+
+    p37 forms T as pop * (A[sq, sq] / pop) and averages it with its transpose.
+    The population enters and leaves in the same order, so it cancels exactly and
+    is never introduced here at all -- which is the point rather than a shortcut:
+    the rank statistics cannot be sensitive to a denominator that divides out,
+    and a route that carries one would hide that.
+    """
+    n = NA - 1                       # AGES[-1] is 80, the band p32's `sq` drops
+    return [[(A[i][j] + A[j][i]) / 2 for j in range(n)] for i in range(n)]
+
+
+def month_span(first, last):
+    """The months from `first` to `last`, marched one real calendar month at a
+    time with `calendar.monthrange`.
+
+    data_inventory builds the same list by modular arithmetic on y * 100 + m.
+    Walking the actual dates instead is what makes "79 CONSECUTIVE months" -- the
+    abstract's word -- a checked claim rather than a restatement of the same
+    two-line comprehension.
+    """
+    d = dt.date(first // 100, first % 100, 1)
+    out = []
+    while d.year * 100 + d.month <= last:
+        out.append(d.year * 100 + d.month)
+        d += dt.timedelta(days=pycal.monthrange(d.year, d.month)[1])
+    return out
 
 
 def percentile(v, q):
@@ -774,10 +885,14 @@ def main():
     ap.add_argument("--months", default="202312,202402")
     ap.add_argument("--skip-coverage", action="store_true",
                     help="9.6's recompute is a full-month scan; skip for a fast run")
-    ap.add_argument("--sections", default="1,2,3,4,5,6,7,8,9,10,11,12",
+    ap.add_argument("--sections", default="1,2,3,4,5,6,7,8,9,10,11,12,13",
                     help="which sections to run; 6/7/8 are full-month parquet "
                          "scans and 6 covers all twelve months of 2020, while "
-                         "10/11/12 read only results files and are seconds")
+                         "10/11/12 read only results files and are seconds. 13 "
+                         "is mostly a results-file section but ends in a GROUP "
+                         "BY over the ym column of all 79 months, which is the "
+                         "only place the 10.19 billion rows are counted rather "
+                         "than read out of the parquet footers")
     ap.add_argument("--threads", type=int, default=1,
                     help="DuckDB threads. 1 by default and deliberately -- see "
                          "the comment in main(); >1 makes this script's own "
@@ -1477,6 +1592,171 @@ def main():
               f"{len(rungs)} rungs: max |r| = {worst_pm:.3e} "
               f"(p60 measured {pub_pm:.3e}) -- collapsing does not manufacture "
               f"assortativity")
+
+    # -------------- 36.13 p37's rank-one gap, and the inventory the abstract counts
+    if "13" in sections:
+        print("\n=== 36.13 p37's departure from rank one, and the inventory "
+              "the abstract counts ===")
+        # WHY THIS SECTION EXISTS. Two numbers in the abstract had one
+        # implementation each and no second opinion anywhere: p37's
+        # `spectrum_dong.gap_to_pm_max`, quoted as "at most 0.00202", and
+        # data_inventory's 79 months / 10.2 billion rows. data_inventory also
+        # asserts nothing about itself, so until this block it was the only
+        # producer of a quoted number with neither an anchor nor a second route.
+        p37s = json.load(open(f"{ROOT}/eda/results_p37.json"))
+        # p67 is the object the ABSTRACT quotes. It reads the same stored
+        # matrices p37 wrote, so a second route to its number has to come from
+        # somewhere else: the 79 months below are recomputed by power iteration
+        # rather than by p67's SVD, and 202312 and 202402 are recomputed off the
+        # matrix 36.2 built from the parquet, which owes p37 nothing at all.
+        p67s = json.load(open(f"{ROOT}/eda/results_p67.json"))
+        per67 = {int(r["ym"]): r for r in p67s["per_month"]}
+        inv = json.load(open(f"{ROOT}/eda/results_inventory.json"))
+        mats = p37s["matrices_we_dong"]
+        pub37 = {int(r["ym"]): r for r in p37s["rows"]
+                 if r["panel"] == "WE" and r["level"] == "dong"}
+        months = sorted(mats)
+        # As in 36.10 and 36.12: the 79 matrices are p37's and are not rebuilt.
+        # What is rebuilt is every statistic taken off them -- and, below, the
+        # gap itself for the two months 36.2 does build from the parquet, which
+        # is the only place this abstract number is carried back to raw rows.
+        print(f"  {len(months)} matrices from results_p37.json, NOT rebuilt; "
+              f"36.2 rebuilds {', '.join(str(y) for y in yms)} from the parquet "
+              f"and the gap is recomputed off those too")
+        gaps, shares, worst = [], [], (0.0, None)
+        grels = []
+        for ym in months:
+            share, best, pm = rank1_residuals(below_80(mats[ym]["A"]))
+            p = pub37[int(ym)]
+            g = abs(best - pm)
+            compare(f"p37 {ym} sigma1 share", share, p["sigma1_share"])
+            compare(f"p37 {ym} rank-one gap", g,
+                    abs(p["best_rank1_resid"] - p["pm_rank1_resid"]))
+            # The abstract's quantity, at the tolerance the two routes actually
+            # meet at: a fixed-count power iteration against LAPACK's SVD, worst
+            # 2.1e-13 over the 79 months when this was written.
+            gr = rank1_pm_gap(below_80(mats[ym]["A"]))
+            compare(f"p67 {ym} distance to the null", gr,
+                    per67[int(ym)]["gap_rel"], 1e-11)
+            grels.append(gr)
+            gaps.append(g)
+            shares.append(share)
+            if g > worst[0]:
+                worst = (g, ym)
+        sd = p37s["spectrum_dong"]
+        compare("p37 rank-one gap, worst month (the abstract's 0.00202)",
+                max(gaps), sd["gap_to_pm_max"])
+        compare("p37 rank-one gap, median month", median(gaps),
+                sd["gap_to_pm_median"])
+        compare("p37 sigma1 share, median month", median(shares),
+                sd["sigma1_share_median"])
+        compare("p37 sigma1 share, minimum month", min(shares),
+                sd["sigma1_share_min"])
+        # "AT MOST 0.00202" IS A CLAIM ABOUT ALL 79, not about the largest one.
+        # A stored max that reproduces while some other month sits above the
+        # quoted bound would leave the sentence false and every check above
+        # green, so the months over the bound are counted rather than inferred.
+        over = [m for m, g in zip(months, gaps) if g > 0.00202]
+        _record("p37 no month exceeds the quoted 0.00202", float(len(over)),
+                0.0, 0.0 if not over else 1.0, not over, 0.0)
+        print(f"  worst month {worst[1]} at {worst[0]:.11f} (p37 stored "
+              f"{sd['gap_to_pm_max']:.11f}), median {median(gaps):.11f} "
+              f"(p37 {sd['gap_to_pm_median']:.11f}); {len(over)} of "
+              f"{len(months)} months above SI 3's 0.00202")
+        # ...and the same three questions asked of the distance itself, which is
+        # what the abstract, 3.2 and 4.1 now say.
+        s67 = p67s["summary"]
+        compare("p67 distance to the null, worst month (the abstract's 0.0258)",
+                max(grels), s67["gap_rel_max"], 1e-11)
+        compare("p67 distance to the null, median month", median(grels),
+                s67["gap_rel_median"], 1e-11)
+        # 0.0258, not 0.0257: the measured maximum is 0.02573, so the four-
+        # decimal quote has to round UP to be an upper bound at all. Quoting
+        # 0.0257 was the same defect this file already records for "at most
+        # 0.002" against 0.00202, and this row is what found it.
+        over67 = [m for m, g in zip(months, grels) if g > 0.0258]
+        _record("p67 no month exceeds the quoted 0.0258", float(len(over67)),
+                0.0, 0.0 if not over67 else 1.0, not over67, 0.0)
+        print(f"  distance to the null: worst {max(grels):.11f} (p67 stored "
+              f"{s67['gap_rel_max']:.11f}), median {median(grels):.11f} "
+              f"(p67 {s67['gap_rel_median']:.11f}); {len(over67)} of "
+              f"{len(months)} months above the abstract's 0.0258")
+        # The parquet-side leg. For these months the gap owes results_p37.json
+        # nothing: the matrix underneath it was built by 36.2's SQL self-join.
+        # The tolerance is looser than the 1e-9 above and has to be: the two
+        # matrices are the same object summed in two different orders, and the
+        # gap is a difference of two residuals near 0.134, so whatever they
+        # disagree by is amplified about ninetyfold on the way out.
+        for ym in (yms if matrices_36_2 else []):
+            key = f"{ym}|WE|dong"
+            if key not in matrices_36_2 or ym not in pub37:
+                continue
+            _, best, pm = rank1_residuals(below_80(matrices_36_2[key]))
+            theirs = abs(pub37[ym]["best_rank1_resid"]
+                         - pub37[ym]["pm_rank1_resid"])
+            compare(f"p37 {ym} rank-one gap, from 36.2's SQL matrix",
+                    abs(best - pm), theirs, 1e-6)
+            # The abstract's number, on the same parquet-side leg, and it gets
+            # three orders more tolerance than it needs rather than its sibling's
+            # 1e-6: a norm of a difference has none of the cancellation that
+            # amplifies the line above about ninetyfold, so this one tracks how
+            # well the two matrices themselves agree. Measured on 2026-09-07,
+            # 6.3e-14 for 202312 and 2.1e-14 for 202402.
+            g67 = rank1_pm_gap(below_80(matrices_36_2[key]))
+            compare(f"p67 {ym} distance to the null, from 36.2's SQL matrix",
+                    g67, per67[ym]["gap_rel"], 1e-9)
+            print(f"  {ym} gap from the SQL matrix {abs(best - pm):.11f} "
+                  f"(p37 {theirs:.11f}); distance {g67:.11f} "
+                  f"(p67 {per67[ym]['gap_rel']:.11f})")
+        if not matrices_36_2:
+            print("  36.2 did not run, so the parquet-side leg is skipped; the "
+                  "79 months above still ran off results_p37.json")
+
+        # ---------- the inventory, from the data rather than the directory names
+        first, last = inv["span_first"], inv["span_last"]
+        span = month_span(first, last)
+        compare("inventory months in the span", float(len(span)),
+                float(inv["span_months"]))
+        # DuckDB's `glob` lists the tree; data_inventory walks it with pathlib.
+        # Same files, no shared line.
+        by_dir = {int(y): n for y, n in con.execute(
+            f"SELECT regexp_extract(file, 'ym=([0-9]+)', 1) AS ym, count(*) "
+            f"FROM glob('{PARQUET_GLOB}') GROUP BY 1").fetchall() if y}
+        compare("inventory parquet files", float(sum(by_dir.values())),
+                float(inv["parquet_files"]))
+        compare("inventory months holding a full 24 files",
+                float(sum(1 for n in by_dir.values() if n == 24)),
+                float(inv["months_complete"]))
+        # ...and now off the ym COLUMN. This is the one that costs something and
+        # the one worth paying for: `count(*)` over the glob -- what
+        # data_inventory asks for -- is answered out of the parquet footers
+        # without a row being decoded, so the published 10,186,891,962 is a
+        # metadata sum. Grouping on ym decodes the column, which both counts the
+        # rows for real and is the only thing here that would catch a file whose
+        # rows disagree with the ym= directory it was written into.
+        by_col = {int(y): n for y, n in con.execute(f"""
+            SELECT ym, count(*) AS n
+            FROM read_parquet('{PARQUET_GLOB}', hive_partitioning=false)
+            GROUP BY 1 ORDER BY 1""").fetchall()}
+        compare("inventory rows in the parquet (the abstract's 10.2 billion)",
+                float(sum(by_col.values())), float(inv["parquet_rows"]))
+        compare("inventory distinct months in the ym column",
+                float(len(by_col)), float(inv["months_complete"]))
+        stray = sorted(set(by_col) ^ set(by_dir))
+        _record("inventory the ym column and the ym= directories name the same "
+                "months", float(len(stray)), 0.0, 0.0 if not stray else 1.0,
+                not stray, 0.0)
+        missing = sorted(set(span) - set(by_col))
+        _record(f"inventory {len(span)} consecutive months, none missing",
+                float(len(missing)), float(inv["months_missing"]),
+                0.0 if not missing else 1.0, not missing, 0.0)
+        print(f"  {len(span)} consecutive months {first}..{last}, marched with "
+              f"calendar.monthrange; {len(by_dir)} ym= directories holding "
+              f"{sum(by_dir.values()):,} files")
+        print(f"  the ym column carries {sum(by_col.values()):,} rows over "
+              f"{len(by_col)} months (data_inventory: {inv['parquet_rows']:,} "
+              f"over {inv['months_complete']}), and {len(missing)} of the "
+              f"{len(span)} span months are absent")
 
     # ------------------------------------------------------------------ verdict
     print(f"\n=== {len(checks) - len(fails)} of {len(checks)} independent "

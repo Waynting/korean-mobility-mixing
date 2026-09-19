@@ -5,6 +5,15 @@ Phase 7 (the survey comparison, the step that decides Q2 vs Q1) needs the
 respondent-level file, not the published tables. Sci Data 13, 603 (2026),
 doi 10.1038/s41597-026-06896-y; data at doi 10.6084/m9.figshare.29312222, CC0.
 
+THE VERSION IS PINNED, and that is not decoration. On 2026-09-01 the authors
+confirmed a coding error in the released CSV -- wherever `Q5_8_etc` carries text,
+`Q5_8` should have been set and is not -- and said they intend to correct it
+(`Data_Questions_Prof.md`, and `eda/memo/phase65-chaereply.md` for what it moves).
+Every survey number in this project is computed from VERSION 1, so the API is
+asked for version 1 by URL rather than for whatever is current. Without the pin,
+the day v2 appears is the day this downloader silently replaces the analysed
+file with a different one.
+
 figshare publishes an md5 per file, so verification here is exact rather than
 heuristic: fetch, hash, compare, and refuse to keep a file that does not match.
 
@@ -22,7 +31,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from paths import DATA_ROOT  # noqa: E402
 
 ARTICLE = 29312222
-API = f"https://api.figshare.com/v2/articles/{ARTICLE}"
+VERSION = 1                      # see the docstring: v2 is expected, v1 is ours
+API = f"https://api.figshare.com/v2/articles/{ARTICLE}/versions/{VERSION}"
 DEST = DATA_ROOT / "raw" / "chae2026"
 MANIFEST = DEST / "manifest.json"
 
@@ -46,6 +56,13 @@ def main():
     files = meta["files"]
     print(f"{meta['title']}\n  licence {meta.get('license', {}).get('name')}"
           f"  version {meta['doi']}  posted {meta['timeline']['posted']}")
+    # The URL asks for a version; this checks that a version came back. A
+    # redirect to the current version would otherwise look exactly like success.
+    if not str(meta.get("doi", "")).endswith(f".v{VERSION}"):
+        print(f"\nREFUSING: asked for version {VERSION}, got doi "
+              f"{meta.get('doi')!r}. Every number in this project is computed "
+              f"from v{VERSION}; fix the pin deliberately or not at all.")
+        return 1
 
     bad = []
     for f in files:
@@ -67,12 +84,17 @@ def main():
         else:
             print(f"    ok, md5 {got}")
 
-    with open(MANIFEST, "w") as fh:
-        json.dump({"article": ARTICLE, "doi": meta["doi"],
-                   "resource_doi": meta.get("resource_doi"),
-                   "title": meta["title"],
-                   "files": [{k: f[k] for k in ("name", "size", "computed_md5")}
-                             for f in files]}, fh, indent=1, ensure_ascii=False)
+    # --verify does NOT rewrite the manifest. The manifest is the record of
+    # what was analysed, and rewriting it from the remote during a verification
+    # run would turn a failed check into a silently updated expectation -- which
+    # is precisely the failure the version pin above exists to prevent.
+    if not args.verify:
+        with open(MANIFEST, "w") as fh:
+            json.dump({"article": ARTICLE, "version": VERSION, "doi": meta["doi"],
+                       "resource_doi": meta.get("resource_doi"),
+                       "title": meta["title"],
+                       "files": [{k: f[k] for k in ("name", "size", "computed_md5")}
+                                 for f in files]}, fh, indent=1, ensure_ascii=False)
 
     if bad:
         print(f"\n{len(bad)} FAILED:")

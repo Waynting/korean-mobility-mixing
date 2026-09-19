@@ -46,8 +46,20 @@ p37_timeseries; `TERM`, `VAC` from p41_semester. The term/vacation partition is
 p41's, unchanged, December in neither set -- redefining it here would let the
 split be chosen after seeing which months clear.
 
-NOTHING FROZEN IS REWRITTEN. results_p26/p32/p37/p40 are left alone; p31 gates
-them and p36 recomputes them. The only output is results_p42.json.
+NOTHING FROZEN IS REWRITTEN. results_p26/p32/p37/p40/p51 are read and left
+alone; p31 gates them and p36 recomputes them. The only output is
+results_p42.json.
+
+THE COUNTS ARE p40's, THE SENTENCE IS p51's. Every count in 42.3b-42.5 is taken
+against results_p40.json's four permutation medians, which is what p40 declared
+and what the 08-22 letter published; p54 anchors on the 13 that follows and p63
+asserts this file's `counts` floor is still p40's. p51_natsym.py has since
+corrected the national median -- p40 built the national arm on Seoul's
+population vector -- so 42.6's `sentence_allowed`, whose only job is to say what
+the manuscript may write, is written against p51's floor and the count that
+follows from it. Both floors and that count are read at run time; nothing in
+that field is a typed number. This makes p51 a run-order dependency: p42 has to
+run after p51.
 
 FULLY DETERMINISTIC. There is no rng in this file. The permutation nulls in 42.4
 are exact -- hypergeometric tails and their convolution, computed in closed form
@@ -155,6 +167,20 @@ def main():
     sq = [i for i, a in enumerate(AGES) if a < 80]     # no 80+ survey egos
     p37 = json.load(open(f"{ROOT}/eda/results_p37.json"))
     p40 = json.load(open(f"{ROOT}/eda/results_p40.json"))
+    # p51 IS A BACKWARD DEPENDENCY AND IT IS DELIBERATE. Every count below is
+    # taken against results_p40.json's four permutation medians, because those
+    # are what p40 published and what the 08-22 letter quotes -- p54 anchors on
+    # this file's 13 and p63 asserts that this file's `counts` floor is NOT the
+    # corrected one, so that block does not move. But p51_natsym.py corrected
+    # the national median (p40 built the national arm on Seoul's population
+    # vector), and 42.6's `sentence_allowed` is the one field here whose whole
+    # job is to say what the manuscript may write. A superseded floor typed into
+    # that field as a string is the defect this load exists to remove: the
+    # sentence now READS both floors and re-counts against them. The cost is
+    # that p42 must be run after p51 (eda/README.md orders p42 at line 163 and
+    # p51 at line 249), and it is loaded here, before the 80-second rebuild, so
+    # a missing file fails in the first second rather than the last.
+    p51 = json.load(open(f"{ROOT}/eda/results_p51.json"))
     print(f"=== 42.0 {len(yms)} months: {yms[0]}..{yms[-1]} ===")
     print(f"  p40 declared primary cell: {p40['declaration']['primary_cell']}")
 
@@ -324,8 +350,18 @@ def main():
               f"{'   <- p40 PRIMARY' if cell == PRIMARY_CELL else ''}")
     out["counts"] = counts
 
+    # F is p40's declared primary floor, and the assert is what ties it to a
+    # DECLARED cell rather than to a scalar somebody chose: p40 stores the same
+    # float twice and the two copies must not drift. It does not pin this file
+    # to a literal -- there is no number typed here -- but it does keep every
+    # count below on p40's arm, which p51 has since corrected. That is
+    # deliberate and it is what p54 re-counts against; the corrected floor
+    # enters only in 42.6, where the sentence is written.
     F = p40["verdict_primary"]["floor"]
-    assert F == p40["cells"][PRIMARY_CELL]["mi_perm_median"]
+    assert F == p40["cells"][PRIMARY_CELL]["mi_perm_median"], (
+        f"p40's verdict_primary.floor {F!r} is not its own "
+        f"cells[{PRIMARY_CELL!r}].mi_perm_median "
+        f"{p40['cells'][PRIMARY_CELL]['mi_perm_median']!r}")
     clear = R[R.mi_bits_hf >= F].sort_values("mi_bits_hf", ascending=False)
     print(f"\n  the {len(clear)} months at or above the declared primary floor "
           f"{F:.5f}:")
@@ -355,8 +391,8 @@ def main():
           + ", ".join(f"{int(r.ym)} {r.mi_bits_hf:.5f} [{r.semester}]"
                       for _, r in near.sort_values("mi_bits_hf",
                                                    ascending=False).iterrows()))
-    print("  -> the floor is not a gap in the distribution, so 13 is a count "
-          "at a declared threshold and not a natural break in the data")
+    print(f"  -> the floor is not a gap in the distribution, so {len(clear)} is "
+          f"a count at a declared threshold and not a natural break in the data")
     out["floor_sensitivity"] = dict(
         floor=F, se=se, counts_at_offsets=sens,
         perm_lo=lo, perm_hi=hi,
@@ -540,7 +576,40 @@ def main():
     out["by_semester"] = by_lab
 
     # ------------------------------------------------------ 42.6 the verdict
+    # THE SENTENCE IS NOT WRITTEN AGAINST THIS FILE'S OWN FLOOR, and that is the
+    # point of this section. 42.3b counted against p40's four medians; p51
+    # corrected the national one, so a sentence quoting p40's floor is quoting a
+    # number that has been withdrawn. Every figure in the sentence below is READ
+    # -- the two passive readings and the two national floors out of
+    # results_p51.json, the count re-derived from this file's own series at that
+    # floor -- so a re-run corrects it and nothing in it can go stale as a typed
+    # string. The p40-floor count stays beside it under its own names because it
+    # is what the 08-22 letter published and what p54 anchors on.
     n_pri = counts[PRIMARY_CELL]["n_at_or_above"]
+    F51 = p51["cells"][PRIMARY_CELL]["mi_perm_median"]
+    assert F51 != F, (
+        f"results_p51.json's {PRIMARY_CELL} median is p40's own {F!r}; the "
+        f"corrected national floor and the superseded one must differ, and if "
+        f"they no longer do then p51 is not the correction this section reads")
+    floors51 = {ym: p51["cells"][f"{ym}|national"]["mi_perm_median"]
+                for ym in SURVEY_MONTHS}
+    passive51 = {ym: p51["cells"][f"{ym}|national"]["passive_mi_bits"]
+                 for ym in SURVEY_MONTHS}
+    # p51's passive readings must BE the ones rebuilt here, or the sentence
+    # would pair p51's floors with somebody else's numerator.
+    for ym in SURVEY_MONTHS:
+        if ym in set(R.ym):
+            assert float(R[R.ym == ym].mi_bits_hf.iloc[0]) == passive51[ym], (
+                f"{ym}: p51 stores passive_mi_bits {passive51[ym]!r}, this run "
+                f"rebuilt {float(R[R.ym == ym].mi_bits_hf.iloc[0])!r}")
+    clear51 = R[R.mi_bits_hf >= F51].sort_values("mi_bits_hf", ascending=False)
+    n_cor = int(len(clear51))
+    n_cor_term = int((clear51.semester == "term").sum())
+    print("\n=== 42.6 what the paper may write ===")
+    print(f"  p40's floor {F!r} -> {n_pri} of {len(R)} months "
+          f"(this file's own count, unchanged, and p54's anchor)")
+    print(f"  p51's floor {F51!r} -> {n_cor} of {len(R)} months, "
+          f"{n_cor_term} of them term months (the sentence's count)")
     verdict = dict(
         primary_cell=PRIMARY_CELL, floor=F, n_months=int(len(R)),
         n_at_or_above=n_pri,
@@ -550,21 +619,44 @@ def main():
             if ym in set(R.ym)),
         n_clearing_term=int((clear.semester == "term").sum()),
         survey_months_are_term=[label(ym) for ym in SURVEY_MONTHS],
+        floor_corrected=F51,
+        floor_corrected_source=(f"results_p51.json cells['{PRIMARY_CELL}']"
+                                ".mi_perm_median"),
+        floors_corrected_national={str(ym): floors51[ym]
+                                   for ym in SURVEY_MONTHS},
+        passive_corrected_national={str(ym): passive51[ym]
+                                    for ym in SURVEY_MONTHS},
+        n_at_or_above_corrected=n_cor,
+        n_clearing_term_corrected=n_cor_term,
+        months_corrected=[int(x) for x in clear51.ym],
+        survey_month_claim_supported_corrected=all(
+            float(R[R.ym == ym].mi_bits_hf.iloc[0]) < floors51[ym]
+            for ym in SURVEY_MONTHS if ym in set(R.ym)),
+        which_floor_the_sentence_uses=(
+            "`floor`, `n_at_or_above` and `n_clearing_term` are this file's own "
+            "count against results_p40.json's national permutation median. They "
+            "are kept under those names because that is the count the 08-22 "
+            "letter published, p54_semrecount.py anchors on it, and p63_fig2.py "
+            "asserts that this file's `counts` block still holds it. "
+            "`sentence_allowed` is written against `floor_corrected` instead -- "
+            "p51_natsym.py's corrected national median, because p40 built the "
+            "national arm on Seoul's population vector -- and against the count "
+            "that follows from it. p54 re-counts at that floor and p58 replaces "
+            "the null on the recounted set."),
         sentence_allowed=(
             "In 2023-12 and 2024-02, the two months the survey covers, the "
             "passive matrix's entire departure from proportionate mixing "
-            "(0.0196 and 0.0177 bits) is smaller than the permutation floor of "
-            "the national survey it is measured against (0.0238 and 0.0283 "
-            "bits). This is a statement about those two months and does not "
-            f"generalise: measured the same way on the same holiday-free day "
-            f"set, {n_pri} of the {len(R)} months on record reach the 2023-12 "
-            f"floor, and all {int((clear.semester == 'term').sum())} of them "
-            f"are Korean school-term months -- a class neither survey month "
-            f"belongs to."),
+            f"({passive51[202312]:.4f} and {passive51[202402]:.4f} bits) is "
+            "smaller than the permutation floor of the national survey it is "
+            f"measured against ({floors51[202312]:.5f} and "
+            f"{floors51[202402]:.5f} bits). This is a statement about those two "
+            "months and does not generalise: measured the same way on the same "
+            f"holiday-free day set, {n_cor} of the {len(R)} months on record "
+            f"reach the 2023-12 floor, and all {n_cor_term} of them are Korean "
+            f"school-term months -- a class neither survey month belongs to."),
         sentence_forbidden=(
             "The passive matrix carries less age information than the survey's "
             "sampling noise."))
-    print("\n=== 42.6 what the paper may write ===")
     print(f"  ALLOWED:   {verdict['sentence_allowed']}")
     print(f"  FORBIDDEN: {verdict['sentence_forbidden']}")
     out["verdict"] = verdict

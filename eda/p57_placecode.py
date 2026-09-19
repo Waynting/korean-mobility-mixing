@@ -33,6 +33,17 @@ Validation describes exactly this recoding, but that is a reading and it is
 labelled as one. Nothing downstream consumes this file yet -- it exists so the
 number is measured before the reply rather than after it.
 
+ANSWERED 2026-09-01, AND THIS FILE IS DELIBERATELY NOT EDITED. The reply is in
+`Data_Questions_Prof.md`; what it moves is measured in `eda/p65_chaereply.py`
+and written up in `eda/memo/phase65-chaereply.md`. Two things above are now
+known to be wrong and are left standing on purpose. Q5 is a MULTIPLE-response
+item -- the descriptor's sentence, and hence the declaration below's stated
+reason, is withdrawn by the authors -- and the released CSV carries a second
+error in the opposite direction, which p65 models and this file does not. The
+declaration below records what was pre-registered BEFORE the answer arrived,
+and rewriting a pre-registration once the answer is known is the exact failure
+it exists to prevent. p65 carries the post-reply declaration.
+
     python eda/p57_placecode.py
 """
 import csv

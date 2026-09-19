@@ -2,11 +2,24 @@
 """Phase 47 — Figures 3 and 4, the two composites the paper still owed.
 
 `paper/paper_structure.md` §7 listed both as "materials exist, has to be
-composed": Figure 3 out of `p32_excess`, `p32_spectrum` and `p37_timeseries`,
-Figure 4 out of `p38_ksweep79` and `p19_bandwidth`.
+composed": Figure 3 out of `p32_excess` and `p32_spectrum`, Figure 4 out of
+`p38_ksweep79` and `p19_bandwidth`.
+
+3(c) IS GONE, AND IT WENT TO FIGURE 2 (2026-09-02). It drew `p37_timeseries`'s
+spatial ladder on 79 months, tinted by school term and hatched over 2020 with
+the annotation "2020: schools shut, the cycle is absent". Neither section this
+figure belongs to cited it: §3.2 and §3.3 never mention the panel, and its only
+reader was §3.1, two subsections EARLIER -- a forward reference to a panel
+placed by neither of the sections that use it. Its 2020 reading is §3.1's
+argument and its ladder reading is §3.4's, so it now sits under Figure 2's own
+79-month axis in `p63_fig2.py`, where §3.1 can point at it locally and §3.4
+points back. Nothing about the panel's content changed except its band key,
+which had to become Figure 2(a)'s -- see the note where p63 draws it. The
+`p37` gate that guarded it moved with it; p47 keeps only the p60/p37 month-set
+gate, which is Figure 4's.
 
 IT COMPUTES NO NEW QUANTITY, on the p46 rule. Every curve, bar and singular
-value is read from `results_p19/p26/p32/p37/p38/p60/p61.json`. The one thing
+value is read from `results_p19/p26/p32/p38/p60/p61.json`. The one thing
 that is not in a results file is the excess matrix behind panel 3(a) —
 `results_p32.json` stores its summary statistics, not the matrix — so that panel
 reuses `symmetrise` and `pm_null` imported FROM `p32_pmix`. Imported, not
@@ -80,9 +93,10 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.lines import Line2D
-from matplotlib.patches import Patch
+from matplotlib.patches import Patch, Rectangle
 from matplotlib.ticker import ScalarFormatter
 from common import AGE_LABEL, AGES
+from figstyle import WIDTH, finish, plabel
 from p32_pmix import pm_null, symmetrise
 from paths import FIG, ROOT
 
@@ -96,11 +110,18 @@ from paths import FIG, ROOT
 plt.rcParams.update({"font.family": "serif",
                      "font.serif": ["STIXGeneral", "Times New Roman",
                                     "DejaVu Serif"],
-                     "mathtext.fontset": "stix"})
+                     "mathtext.fontset": "stix",
+                     # One hatch left on this figure: the deficit cells in
+                     # 3(a). At the default 1.0 that is a black cell rather
+                     # than a texture, because a cell is 36 px across. (The
+                     # 2020 band that shared this setting left with 3(c).)
+                     "hatch.linewidth": 0.35})
 
-
+# The six months released in earlier rounds of this work. They are no longer
+# marked on any panel: to a journal reader "the months we published before" is
+# internal history, not information (advisor 2026-08-31, item 3.10). The list is
+# kept for traceability and because p37/p38/p60 still anchor against it.
 PUBLISHED_MONTHS = [202001, 202012, 202312, 202402, 202512, 202606]
-TERM = {3, 4, 5, 6, 9, 10, 11}
 PANEL = "WE"
 REF_MONTH = 202312
 
@@ -141,9 +162,9 @@ def gates(p18b, p19, p32, p37, p38, p60, p61):
         "p38: adjacency graph is not the connected 424-node graph"
     assert p19["p18_reproduction_max_abs_diff_pp"] == 0.0, \
         "p19: no longer reproduces p18"
-    assert p37["ladder"]["n_monotone"] == p37["ladder"]["n_months"] == 79, \
-        "p37: the dong > gu > city ladder no longer holds in every month"
-    assert not p37["ladder"]["breaks"], "p37: the ladder has breaks"
+    # The dong > gu > city ladder asserts moved to p63_fig2.py with the panel
+    # that draws them (2026-09-02). p37 is still loaded here for the month-set
+    # gate below, which belongs to Figure 4's age ladder, not to the spatial one.
 
     # p18b carries the scope pair panel 4(c) now draws. Two things have to hold
     # before those markers may sit on the same axes as p19's bars.
@@ -208,7 +229,7 @@ def gates(p18b, p19, p32, p37, p38, p60, p61):
                   ["sigma2_over_sigma1"]), \
         "p61's null was drawn against a different observation than (b) plots"
 
-    print(f"  gates: identity, p34 anchor, adjacency, p18 reproduction, ladder, "
+    print(f"  gates: identity, p34 anchor, adjacency, p18 reproduction, "
           f"p18b scope pair (worst {worst:.4f} pp outside 20-44), "
           f"p60 anchors + one shared 3-band partition, p61 "
           f"({p61['anchors']['n_ok']}/{p61['anchors']['n']}) — all hold")
@@ -217,36 +238,71 @@ def gates(p18b, p19, p32, p37, p38, p60, p61):
 # --------------------------------------------------------------------------
 # figure 3
 # --------------------------------------------------------------------------
-def figure3(p26, p27, p32, p37, p61, pdf):
+def figure3(p26, p27, p32, p61, pdf):
     pops = {int(k): np.array(v, float) for k, v in p26["population"].items()}
     sq = [i for i, a in enumerate(AGES) if a < 80]      # no 80+ survey egos
     lbl = [AGE_LABEL[AGES[i]] for i in sq]
 
     mats = []
-    for key, title in (("202312|WE|dong|holidayfree", "passive, dong (424)"),
-                       ("202312|WE|gu", "passive, district (25)")):
+    for key, title, tag in (
+            ("202312|WE|dong|holidayfree", "passive, dong (424)", "dong"),
+            ("202312|WE|gu", "passive, district (25)", "district")):
         A = np.array(p26["matrices"][key]["A"])[np.ix_(sq, sq)]
         T, _ = symmetrise(A / pops[REF_MONTH][sq][:, None], pops[REF_MONTH][sq])
         e, _, E = pm_null(T)
-        mats.append((np.log10(e / E), title))
+        mats.append((np.log10(e / E), title, tag))
     Cs = np.array(p27["survey"]["202312|WE|seoul"]["C"])[np.ix_(sq, sq)]
     Ts, _ = symmetrise(Cs, pops[REF_MONTH][sq])
     e, _, E = pm_null(Ts)
-    mats.append((np.log10(np.where(e > 0, e / E, np.nan)), "contact survey, Seoul"))
-    vmax = max(np.nanmax(np.abs(m)) for m, _ in mats)
-    note(3, "a", "shared colour limit, log10 excess", round(float(vmax), 4))
-    for m, t in mats:
-        note(3, "a", f"max |log10 excess|, {t}", round(float(np.nanmax(np.abs(m))), 4))
+    mats.append((np.log10(np.where(e > 0, e / E, np.nan)),
+                 "contact survey, Seoul", "survey"))
+    # TWO EMPTY-CELL COUNTS EXIST AND THEY ARE NOT THE SAME NUMBER. p61 counts
+    # 24 empty cells in the RAW 15x15 survey block, which is what its own
+    # diagnostic is about. This panel draws the field AFTER symmetrise(), and
+    # symmetrisation fills any cell whose transpose was reported: only the 10
+    # pairs empty in BOTH directions stay empty, and those are the grey cells.
+    # Both are true of the same survey and a caption that quotes one for the
+    # other is wrong, so the relation is asserted here rather than left to the
+    # reader of two sheets.
+    _raw_zero = int((Cs == 0).sum())
+    _both_zero = int(((Cs == 0) & (Cs.T == 0)).sum())
+    _drawn_zero = int(np.count_nonzero(e <= 0))
+    assert _raw_zero == p61["emptiness_diagnostic_post_hoc"]["cells"][
+        str(REF_MONTH)]["observed_zero_cells"], \
+        "3(a)'s raw survey block no longer has p61's empty-cell count"
+    assert _drawn_zero == _both_zero, \
+        f"3(a) draws {_drawn_zero} empty cells but {_both_zero} pairs are " \
+        f"empty in both directions; symmetrise() is not what fills the rest"
+    note(3, "a", "empty cells in the raw survey block (p61's count)", _raw_zero)
+    note(3, "a", "of those, empty in both directions and so still empty after "
+                 "symmetrisation, which is what this panel greys", _both_zero)
+    vmax = max(np.nanmax(np.abs(m)) for m, _, _ in mats)
+    note(3, "a", "shared colour limit, log10 ratio to the null",
+         round(float(vmax), 4))
+    for m, t, _ in mats:
+        note(3, "a", f"max |log10 ratio to the null|, {t}",
+             round(float(np.nanmax(np.abs(m))), 4))
+    # What the hatch and the grey ground each cover, so a caption can name them
+    # without counting cells off the PNG. Display aggregates of drawn values.
+    for m, _, tag in mats:
+        note(3, "a", f"{tag} matrix: cells below the null (hatched)",
+             int(np.count_nonzero(m < 0)))
+        note(3, "a", f"{tag} matrix: cells greyed as unobserved after "
+                     "symmetrisation", int(np.count_nonzero(np.isnan(m))))
+    note(3, "a", "cells in each matrix", int(mats[0][0].size))
 
-    # 7.00 in wide, which is what p48 and p63 already build to and what JRSI
-    # reproduces a full-page figure at (~180 mm). The old canvas was 13.2 in
-    # and arrived on the page at 0.56x, so the 7.5 pt floor this figure was
-    # raised to landed as 4.2 pt of ink -- the width defeated the type size.
+    # WIDTH in wide, which is JRSI's own measure (figstyle.py). The old canvas
+    # was 13.2 in and arrived on the page at 0.56x, so the 7.5 pt floor this
+    # figure was raised to landed as 4.2 pt of ink -- the width defeated the
+    # type size. The 7.00 in that replaced it was still scaled, to 0.9286.
     # Height is not capped, so the row that used to hold (b) beside (c) is
-    # spent instead: (a) keeps its three-across row, and (b) and (c) each take
-    # a full-width row of their own. Nothing is merged and nothing is
-    # re-lettered; (a), (b), (c) still carry exactly the content the caption
-    # describes, now stacked in reading order.
+    # spent instead: (a) keeps its three-across row and (b) takes a full-width
+    # row of its own. 2026-09-02: (c) left for Figure 2 (see the docstring),
+    # and its 2.90 in came off H rather than being redistributed -- the two
+    # panels that remain were already at the size their content needs, and
+    # growing them to fill a hole would only push the figure's reproduction
+    # factor back down. Nothing is merged and nothing is re-lettered; (a) and
+    # (b) carry exactly the content the caption describes.
     #
     # Saved WITHOUT bbox_inches="tight" (the p46/p63 rule), so the emitted page
     # IS the figsize rather than whatever the trim happens to leave. That makes
@@ -256,45 +312,65 @@ def figure3(p26, p27, p32, p37, p61, pdf):
     # what has to be reserved is a text height (a rotated tick label, a title)
     # and that does not scale with the panel. Each row's band is written out so
     # the arithmetic is checkable: the numbers below sum to H.
-    H = 8.90
+    H = 6.00
     def fy(inches):                       # inches from the bottom -> fraction
         return inches / H
-    # (c) 0.10 pad | 0.55 rotated ym labels | 1.95 axes | 0.30 title
-    # (b) 0.28 gap | 0.30 xlabel | 2.10 axes | 0.30 title
+    # (b) 0.28 pad | 0.30 xlabel | 2.10 axes | 0.30 title
     # (a) 0.30 gap | 0.44 rotated band labels | 1.80 axes | 0.16 titles
     #             | 0.30 header
-    C_LO, C_HI = fy(0.65), fy(2.60)
-    B_LO, B_HI = fy(3.48), fy(5.58)
-    A_LO, A_HI = fy(6.62), fy(8.42)
+    # The bands below sum to 5.98 against H = 6.00, the same 0.02 of slack the
+    # three-row version carried at 8.88 against 8.90.
+    B_LO, B_HI = fy(0.58), fy(2.68)
+    A_LO, A_HI = fy(3.72), fy(5.52)
     LEFT, RIGHT = .105, .985
     # Row (a) stops short of the right margin so the colour bar and its tick
     # labels have somewhere to be. At 13.2 in the bar hung off the third matrix
     # and its labels rode the figure edge; at 7 in they fell off it.
     A_LEFT, A_RIGHT = .070, .885
 
-    fig = plt.figure(figsize=(7.0, H))
+    fig = plt.figure(figsize=(WIDTH, H))
     gsA = fig.add_gridspec(1, 3, left=A_LEFT, right=A_RIGHT,
                            top=A_HI, bottom=A_LO, wspace=.09)
     gsB = fig.add_gridspec(1, 1, left=LEFT, right=RIGHT, top=B_HI, bottom=B_LO)
-    gsC = fig.add_gridspec(1, 1, left=LEFT, right=RIGHT, top=C_HI, bottom=C_LO)
 
     def panel_letter(s, y_top):
         """Panel letters flush at the left edge, on the row's title line.
 
         They used to be offsets in AXES fractions, which is a fixed distance
         only while the axes stays the same size; at half the width they walked
-        into the tick labels. Anchoring all three to the figure instead also
-        lines them up with each other, which the old placement never did.
+        into the tick labels. Anchoring them to the figure instead also lines
+        them up with each other, which the old placement never did.
         """
-        fig.text(.010, y_top + 0.09 / H, s, fontsize=12, fontweight="bold",
+        fig.text(.010, y_top + 0.09 / H, s, fontsize=10,
                  va="baseline", ha="left")
 
     # (a) three excess matrices on one colour scale
     axes_a = []
-    for j, (m, t) in enumerate(mats):
+    for j, (m, t, _) in enumerate(mats):
         ax = fig.add_subplot(gsA[0, j])
         axes_a.append(ax)
+        # Empty cells read as ABSENT, not as zero excess. The survey block has
+        # age pairs no respondent reported, and imshow leaves NaN as the axes
+        # background: on white that is indistinguishable from the pale middle
+        # of a diverging scale, which is exactly the reading the panel must not
+        # invite. A grey ground separates "no observation" from "no excess".
+        ax.set_facecolor("0.86")
         im = ax.imshow(m, cmap="RdBu_r", vmin=-vmax, vmax=vmax)
+        # THE SIGN IS NOT LEFT TO COLOUR. JRSI prints black and white by
+        # default, and RdBu_r is symmetric in lightness: +1.82 and -1.82
+        # convert to the same dark grey, so a greyscale reader could not tell
+        # excess from deficit -- which is the entire content of this panel.
+        # Hatching the cells below the null is a redundant encoding that
+        # survives the conversion and costs nothing in colour.
+        # r, c and NOT i, j: `j` is the panel index this loop sits inside,
+        # and rebinding it here left `j` holding the column of the last
+        # below-null cell by the time set_yticklabels tested `j == 0` --
+        # so every panel took the empty branch and all three matrices lost
+        # their age labels. Silent: the ticks still drew, only the text went.
+        for r, c in np.argwhere(m < 0):
+            ax.add_patch(Rectangle((c - .5, r - .5), 1, 1, fill=False, lw=0,
+                                   hatch="///", edgecolor=(0, 0, 0, .34),
+                                   zorder=3))
         ax.set_title(t, fontsize=8.5, pad=3)
         ax.set_xticks(range(len(lbl)))
         ax.set_yticks(range(len(lbl)))
@@ -303,11 +379,21 @@ def figure3(p26, p27, p32, p37, p61, pdf):
         # labelled once. Repeating them would cost 0.6 in of the 7 that exist,
         # and the width is the whole constraint here.
         ax.set_yticklabels(lbl if j == 0 else [], fontsize=7.5)
+        # The axes carry a title as well as the band ticks (advisor 2026-09-15,
+        # item 7: no panel may leave an axis untitled). "age band" once on the
+        # y side, for the same width reason the tick labels appear once.
+        ax.set_xlabel("age band", fontsize=7.8)
+        if j == 0:
+            ax.set_ylabel("age band", fontsize=7.8)
         ax.tick_params(length=2, pad=1.5)
-    panel_letter("(a)", A_HI + 0.16 / H)
+    panel_letter(plabel("a"), A_HI + 0.16 / H)
+    # What stays on the panel is the key, not the description: "hatched =
+    # below the null" decodes a mark the reader cannot otherwise read,
+    # while the statistic, the month and the shared limits are the
+    # caption's own first sentence.
     fig.text(A_LEFT, A_HI + 0.25 / H,
-             "log$_{10}$ excess over proportionate mixing, 2023-12, "
-             "shared colour limits", fontsize=8.5, va="baseline", ha="left")
+             "hatched = below the null, grey = no pair observed",
+             fontsize=8.5, va="baseline", ha="left")
     # One colour bar for the row, in its own axes rather than carved out of the
     # third matrix: carving made that matrix smaller than the two beside it,
     # which reads as a difference in the data.
@@ -315,6 +401,11 @@ def figure3(p26, p27, p32, p37, p61, pdf):
                         .016, .80 * (A_HI - A_LO)])
     cb = fig.colorbar(im, cax=cax)
     cb.ax.tick_params(labelsize=7.5, length=2, pad=1.5)
+    # A RATIO, NOT A DIFFERENCE. The scale runs negative, and the log of a
+    # difference cannot; what is drawn is log10 of the observed cell over its
+    # proportionate-mixing null. The bar carried no label at all until now,
+    # which is how the caption and the results keys drifted apart.
+    cb.set_label("log10 ratio to the null", fontsize=7.5, labelpad=3)
 
     # (b) the rank test, with the survey's own null drawn behind it
     ax = fig.add_subplot(gsB[0, 0])
@@ -375,9 +466,8 @@ def figure3(p26, p27, p32, p37, p61, pdf):
               handlelength=1.8, handletextpad=.6, labelspacing=.35,
               borderpad=.4)
     ax.grid(alpha=.3, which="both")
-    panel_letter("(b)", B_HI)
-    ax.set_title("how close to rank one? (2023-12)   "
-                 "grey = the survey's own null at $k=2$",
+    panel_letter(plabel("b"), B_HI)
+    ax.set_title("grey = the survey's own null at $k=2$",
                  fontsize=8.5, loc="left", pad=5)
 
     v2 = c61["verdict_sigma2_over_sigma1"]
@@ -410,85 +500,26 @@ def figure3(p26, p27, p32, p37, p61, pdf):
     note(3, "b", "passive district sigma2/sigma1, percentile in the survey's null",
          float(pin[f"{REF_MONTH}|gu"]["percentile_within_survey_null"]))
     emp = p61["emptiness_diagnostic_post_hoc"]["cells"][str(REF_MONTH)]
-    note(3, "b", "observed empty cells, 15x15 survey block",
-         int(emp["observed_zero_cells"]))
+    # RAW, before the symmetrisation 3(a) draws through -- see the assert in
+    # (a). 24 here against the 10 cells (a) greys, and neither is the other.
+    note(3, "b", "observed empty cells, 15x15 survey block (raw, before "
+                 "symmetrisation)", int(emp["observed_zero_cells"]))
     note(3, "b", "null median empty cells", float(emp["null_zero_cells_median"]))
 
-    # (c) the same estimator on 79 months
-    ax = fig.add_subplot(gsC[0, 0])
-    rows = p37["rows"]
-    months = p37["months"]
-
-    def series(scale):
-        by = {r["ym"]: r for r in rows
-              if r["level"] == scale and r["panel"] == PANEL}
-        return np.array([by[m]["assortativity"] for m in months], float)
-
-    for scale, lab, c in (("dong", "dong (424)", TEAL), ("gu", "district (25)", BLUE),
-                          ("city", "city (1)", GOLD)):
-        ax.plot(range(len(months)), series(scale), "-", c=c, lw=1.3, label=lab)
-    dong = series("dong")
-    for i, m in enumerate(months):
-        if m % 100 in TERM:
-            ax.axvspan(i - .5, i + .5, color=TEAL, alpha=.07, lw=0)
-    idx = [i for i, m in enumerate(months) if m // 100 == 2020]
-    ax.axvspan(min(idx) - .5, max(idx) + .5, color=RED, alpha=.06, lw=0)
-    pub = [i for i, m in enumerate(months) if m in PUBLISHED_MONTHS]
-    ax.plot(pub, dong[pub], "*", c=RED, ms=12, zorder=5,
-            label="the six published months")
-    ax.annotate("2020: schools shut,\nthe cycle is absent",
-                xy=((min(idx) + max(idx)) / 2, dong.max()),
-                ha="center", va="top", fontsize=7.5, color=RED)
-    ax.set_xticks(range(0, len(months), 6))
-    ax.set_xticklabels([str(m) for m in months][::6], rotation=90, fontsize=7.5)
-    ax.set_ylabel("assortativity")
-    # A four-entry legend needs a strip of its own, and at 7 in it can only get
-    # one across the top. Headroom is added rather than the legend being moved
-    # down: the dong series is the top curve for all 79 months, so every other
-    # corner of this panel is either on a curve or on the 2020 annotation.
-    _lo, _hi = ax.get_ylim()
-    ax.set_ylim(_lo, _hi + .26 * (_hi - _lo))
-    ax.legend(fontsize=7.5, ncol=4, loc="upper right", framealpha=.92,
-              handlelength=1.6, handletextpad=.5, columnspacing=1.0,
-              borderpad=.35)
-    ax.grid(alpha=.3)
-    panel_letter("(c)", C_HI)
-    ax.set_title(f"the ladder holds in all {len(months)} months; "
-                 "shading = school term", fontsize=8.5, loc="left", pad=5)
-
-    s = p37["summary_dong"]
-    for k in ("assort_min", "assort_max", "assort_median",
-              "published_six_min", "published_six_max"):
-        note(3, "c", f"dong {k}", round(float(s[k]), 5))
-    note(3, "c", "months", int(s["n_months"]))
-    note(3, "c", "months where the ladder holds", int(p37["ladder"]["n_monotone"]))
-
     out = f"{FIG}/p47_figure3.png"
-    fig.savefig(out, dpi=300)
-    if pdf:
-        # CreationDate omitted on purpose: matplotlib stamps the wall clock
-        # into the PDF, so two runs of the same figure differ by bytes for a
-        # reason that has nothing to do with the figure. p46 and p63 have
-        # done this since they were written; these four had not, so their
-        # vector files showed up in every diff whether or not the figure
-        # had changed. The PNG beside them was always stable.
-        fig.savefig(f"{FIG}/p47_figure3.pdf",
-                    metadata={"CreationDate": None})
+    mode = finish(fig, out, pdf=pdf)
     plt.close(fig)
     print(f"  -> {out}   ({fig.get_size_inches()[0]:.2f} x "
-          f"{fig.get_size_inches()[1]:.2f} in)")
-    assert fig.get_size_inches()[0] <= 7.0, \
-        "figure 3 is wider than the 7-inch reproduction width"
+          f"{fig.get_size_inches()[1]:.2f} in, {mode})")
 
 
 # --------------------------------------------------------------------------
 # figure 4
 # --------------------------------------------------------------------------
 def figure4(p18b, p19, p38, p60, pdf):
-    # WAS 1x3 at 17.6 in, which reproduces at 0.44x on a 7 in page: the 7.5 pt
-    # floor this figure was raised to arrived as 3.3 pt of ink. 7.0 in is the
-    # width p48 and p63 build to and the width JRSI prints a full-page figure
-    # at, so the row has to become two.
+    # WAS 1x3 at 17.6 in, which reproduces at 0.44x: the 7.5 pt floor this
+    # figure was raised to arrived as 3.3 pt of ink. WIDTH is JRSI's own
+    # measure (figstyle.py), so the row has to become two.
     #
     # The old comment here refused a spanning bottom row on the grounds that
     # "a full-width bottom row reads as a promotion, and that panel is being
@@ -504,13 +535,16 @@ def figure4(p18b, p19, p38, p60, pdf):
     # Rows are placed in INCHES, not by height_ratios: what has to be reserved
     # is a text height (a rotated tick label, a two-line title), and that does
     # not scale with the panel.
-    H = 7.50
+    # 2026-08-31 (advisor 3.5/3.6): the third panel is gone. It was the one
+    # behavioural, single-year result in a figure of 79-month measurements,
+    # and it sat on neither of the two scale axes (a) and (b) plot -- see the
+    # note where its notes used to be drawn, a few lines below. H drops to
+    # just the top row's own height; the panel's numbers are unchanged and
+    # still read at draw time, they are just no longer rendered as a panel.
+    H = 2.95
     def fy(inches):
         return inches / H
-    # (c) 0.10 pad | 0.45 rotated band labels | 3.20 axes | 0.32 title
-    # (ab) 0.30 gap | 0.28 xlabel | 2.50 axes | 0.30 two-line titles | 0.05 pad
-    C_LO, C_HI = fy(0.55), fy(3.75)
-    R_LO, R_HI = fy(4.65), fy(7.15)
+    R_LO, R_HI = fy(0.55), fy(2.55)
     RIGHT = .985
     # The top row starts further in than the bottom one. Both (a) and (b) are
     # log axes whose minor labels read "2 x 10^-2", which is half an inch of
@@ -519,13 +553,10 @@ def figure4(p18b, p19, p38, p60, pdf):
     # stack twice, because (b) carries its own copy of it.
     R_LEFT, R_WSPACE = .130, .30
 
-    fig = plt.figure(figsize=(7.0, H))
+    fig = plt.figure(figsize=(WIDTH, H))
     gsR = fig.add_gridspec(1, 2, left=R_LEFT, right=RIGHT,
                            top=R_HI, bottom=R_LO, wspace=R_WSPACE)
-    gsC = fig.add_gridspec(1, 1, left=.075, right=RIGHT,
-                           top=C_HI, bottom=C_LO)
-    axes = [fig.add_subplot(gsR[0, 0]), fig.add_subplot(gsR[0, 1]),
-            fig.add_subplot(gsC[0, 0])]
+    axes = [fig.add_subplot(gsR[0, 0]), fig.add_subplot(gsR[0, 1])]
 
     def panel_letter(ax, s, dy_in=.22):
         """Letter to the LEFT of the axes, on the title's first line.
@@ -535,19 +566,18 @@ def figure4(p18b, p19, p38, p60, pdf):
         these are now half the width they were.
         """
         p = ax.get_position()
-        fig.text(p.x0 - .34 / 7.0, p.y1 + dy_in / H, s,
-                 fontsize=12, fontweight="bold", va="baseline", ha="left")
+        fig.text(p.x0 - .34 / WIDTH, p.y1 + dy_in / H, s,
+                 fontsize=10, va="baseline", ha="left")
 
-    # (a) spatial scale
+    # (a) spatial scale. All 79 curves are drawn alike: the six previously
+    # published months are no longer picked out in red (advisor 3.10).
     ax = axes[0]
     for ym in p38["months"]:
         b = p38["band"][f"{ym}|{PANEL}|adjacency"]
         n = np.array([x["n_loc"] for x in b], float)
         r = np.array([x["assortativity"]["median"] for x in b], float)
         k = r > 0
-        pub = ym in PUBLISHED_MONTHS
-        ax.plot(n[k], r[k], "-", lw=1.6 if pub else .7,
-                color=RED if pub else "0.72", zorder=3 if pub else 1)
+        ax.plot(n[k], r[k], "-", lw=.7, color="0.72", zorder=1)
     ax.set_xscale("log")
     ax.set_yscale("log")
     ax.axvspan(424, 1e7, color="0.85", zorder=0)
@@ -566,9 +596,9 @@ def figure4(p18b, p19, p38, p60, pdf):
     ax.text(.03, .96, "coarsening geography\nlowers r", transform=ax.transAxes,
             va="top", ha="left", fontsize=8.5, color="#33475B", linespacing=1.3,
             bbox=dict(fc="white", ec="none", alpha=.85, pad=2.0))
-    panel_letter(ax, "(a)")
+    panel_letter(ax, plabel("a"))
     ax.set_title(f"spatial scale: {len(p38['months'])} monthly curves,\n"
-                 "adjacency arm (red = the six published months)",
+                 "adjacency merge arm",
                  fontsize=8.5, loc="left", pad=4)
     ex = p38["extrapolation_support"]
     note(4, "a", "curves", len(p38["months"]))
@@ -588,17 +618,14 @@ def figure4(p18b, p19, p38, p60, pdf):
     for ym in p60["months"]:
         nested = p60["per_month"][ym]["nested"]
         r = np.array([nested[str(k)]["r"] for k in NESTED_K], float)
-        pub = int(ym) in PUBLISHED_MONTHS
-        ax.plot(xk, r, "-", lw=1.6 if pub else .7,
-                color=RED if pub else "0.72", zorder=3 if pub else 1)
+        ax.plot(xk, r, "-", lw=.7, color="0.72", zorder=1)
         # Lim et al.'s three bands are not a rung of the nested ladder (3, 8 and
         # 5 boxes, not a dyadic split), so they are a marker and not a point on
         # the curve. Gold is the 3-band colour in (c), so both age panels key
         # the same partition to the same colour; gates() asserts it IS the same
         # partition rather than trusting the two files to agree.
         ax.plot([3], [p60["per_month"][ym]["lim"]["r"]], "o",
-                ms=3.2 if pub else 2.0, color=GOLD, mec=GOLD,
-                zorder=5 if pub else 4)
+                ms=2.0, color=GOLD, mec=GOLD, zorder=4)
     ax.set_xscale("log")
     ax.set_yscale("log")
     ax.axvline(3, color=GOLD, lw=1.0, ls="--", zorder=2)
@@ -625,15 +652,13 @@ def figure4(p18b, p19, p38, p60, pdf):
     ax.grid(alpha=.3, which="major")
     handles_b = [Line2D([], [], color="0.72", lw=.9,
                         label=f"one curve per month ({len(p60['months'])})"),
-                 Line2D([], [], color=RED, lw=1.6,
-                        label="the six published months"),
                  Line2D([], [], color=GOLD, marker="o", ms=3.2, ls="--", lw=1.0,
                         label="Lim et al., 3 bands")]
     ax.legend(handles=handles_b, fontsize=7.5, loc="lower right",
               framealpha=.92, handlelength=1.9, handletextpad=.6)
-    panel_letter(ax, "(b)")
+    panel_letter(ax, plabel("b"))
     ax.set_title(f"age scale: the same {len(p60['months'])} matrices,\n"
-                 "nested ladder (red = the six published months)",
+                 "nested ladder, every rung coarsens the one above",
                  fontsize=8.5, loc="left", pad=4)
 
     aa = p60["axis_asymmetry"]
@@ -663,23 +688,18 @@ def figure4(p18b, p19, p38, p60, pdf):
     note(4, "b", "spatial median ratio, city / dong",
          round(float(aa["spatial"]["city_over_dong"]["median"]), 4))
 
-    # (c) age scale, the March-vs-December composition. Demoted from (b) when
-    # the ladder above took that slot.
+    # (c) is gone (advisor 2026-08-31, item 3.6): the March-vs-December 2020
+    # discretionary-arrival composition was the one behavioural, single-year
+    # result in a figure otherwise built from 79-month measurements, and it
+    # sat on neither of the two scale axes (a) and (b) plot. The main text
+    # now carries it as one sentence (SS 3.4) and SI 6 carries it in full.
     #
-    # 2026-08-30: the endpoint-filter overlay came off the panel. It was four
-    # more series (two marker sets, and two more rules inside each of the three
-    # bands), a three-line box, and half of an eight-entry legend whose opaque
-    # frame sat on top of the 20-24 whisker -- all of it drawn over the single
-    # comparison this panel exists to make, sixteen bands against three. The
-    # filter is a robustness check ON that comparison, not the comparison, and
-    # SI 6 prints every number it moves: +0.84 against +0.55 at 80+, -3.96
-    # against -3.13 at 20-24, the crossing at 70-74/75-79, -0.16 for the 60+
-    # block, and the 0.48 pp gap that is the masking fill rather than the
-    # filter. NOTHING below the drawing changes: the caption sheet still
-    # records all twelve p18b values, because what a panel draws and what its
-    # sheet is allowed to quote are two different lists, and p31 checks the
-    # second one.
-    ax = axes[2]
+    # NOTHING BELOW HERE DRAWS ANYTHING. d16/d3/span/b18/labs/mid are kept
+    # because the note() calls a few lines down still read them, and every
+    # number they register is still checked by p31 and still quoted in the
+    # manuscript pair -- what changed is that this page no longer renders a
+    # bar chart to go with them, not that the underlying measurement went
+    # anywhere.
     d16 = {r["age"]: r for r in p19["e_share_change_16band"]}
     d3 = {r["band"]: r for r in p19["e_share_change_3band"]}
     span = {r["resolution"]: r for r in p19["resolution_span"]}
@@ -688,129 +708,54 @@ def figure4(p18b, p19, p38, p60, pdf):
     # prose either. gates() still asserts the agreement outside 20-44.
     b18 = {r["band"]: r for r in p18b["by_age"]}
     labs = [AGE_LABEL[a] for a in AGES]
-    x = np.arange(len(labs))
     mid = np.array([d16[l]["meas"] for l in labs], float)
-    lo = np.array([d16[l]["lo"] for l in labs], float)
-    hi = np.array([d16[l]["hi"] for l in labs], float)
 
-    ax.bar(x, mid, width=.68, color=[RED if v > 0 else TEAL for v in mid])
-    ax.vlines(x, lo, hi, color="#333", lw=1.1)
-    ax.axhline(0, color="k", lw=.8)
-    ax.set_ylim(min(lo.min(), mid.min()) - .45,
-                max(hi.max(), mid.max()) + 1.55)
-    top = ax.get_ylim()[1]
-    start = 0
-    for band, n in LIM_SPAN:
-        end = start + n
-        v = d3[band]["meas"]
-        ax.hlines(v, start - .45, end - .55, color=GOLD, lw=3.4, zorder=6)
-        # Each rule is labelled off whichever end has room. The first two have
-        # it on the right; the last does not -- 60+ ends half a bar from the
-        # frame, and its label used to be typeset half on top of the spine.
-        # Above its LEFT end is the one place in that band with nothing in it,
-        # because 60-64 and 65-69 are the two bars still below zero.
-        at_left = band == LIM_SPAN[-1][0]
-        ax.annotate(f"{v:+.2f}",
-                    (start - .45 if at_left else end - .55, v), xytext=(4, 8),
-                    textcoords="offset points", ha="left", va="bottom",
-                    fontsize=8, color="#8A5A18", zorder=7,
-                    bbox=dict(fc="white", ec="none", alpha=.85, pad=.8))
-        ax.text((start + end - 1) / 2, top - .28, band, ha="center", va="top",
-                fontsize=9, color="#8A5A18", weight="bold")
-        if end < len(labs):
-            ax.axvline(end - .5, color="#999", lw=.7, ls=":")
-        start = end
-    ax.axhspan(top - .95, top, color=GOLD, alpha=.07)
-    ax.set_xticks(x)
-    ax.set_xticklabels(labs, rotation=45, ha="right", fontsize=8)
-    ax.set_ylabel("change in arrival share, pp")
-    ax.grid(axis="y", alpha=.3)
-    # The bars are sign-coded, so the legend has to name both colours or it
-    # implies the 16-band series is one colour and the reader mistrusts the rest.
-    handles = [Patch(fc=RED, label="16 bands, share rises"),
-               Patch(fc=TEAL, label="16 bands, share falls"),
-               Line2D([], [], color=GOLD, lw=3.4, label="3 bands (Lim et al.)"),
-               Line2D([], [], color="#333", lw=1.1,
-                      label="masking range, 0 to 3 per cell")]
-    # Bottom RIGHT, not bottom left. The deep whiskers are all in 20-34 and the
-    # axis has to reach -5.59 to hold them, so the empty quarter of this panel
-    # is under the small right-hand bars -- which is where the old legend was
-    # not, and it covered the 20-24 whisker it was there to explain.
-    ax.legend(handles=handles, fontsize=7.5, loc="lower right", framealpha=.92,
-              ncol=2, columnspacing=1.0, handletextpad=.6)
-    panel_letter(ax, "(c)", dy_in=.24)
-    # "Mar to Dec", not "Dec vs Mar": the quantity is still Dec - Mar, but the
-    # caption narrates it as "between March and December 2020" and a panel that
-    # names the two months in the other order reads as the opposite difference.
-    ax.set_title("age scale: the 16 published bands against the three of "
-                 "Lim et al.,\n"
-                 "change in E (discretionary) arrival share, Mar to Dec 2020",
-                 fontsize=8.5, loc="left", pad=4)
-    # What (a) and (b) each carry in one short line, (c) now carries too, and
-    # it reads out of p19 at draw time like every other number on the sheet.
-    # It replaces the endpoint-filter box, which answered a question the reader
-    # of this panel was not asking.
-    ax.text(.985, .90,
-            f"three bands keep {100 * p19['range_retained_frac']:.1f}% of the "
-            f"{span['16 bands']['range_pp']:.2f} pp spread:\n"
-            f"60+ reads {d3['60+']['meas']:+.2f} pp where its 80+ constituent "
-            f"reads {d16['80+']['meas']:+.2f} pp",
-            transform=ax.transAxes, ha="right", va="top", fontsize=8,
-            color="#33475B", linespacing=1.35,
-            bbox=dict(fc="white", ec="none", alpha=.85, pad=2.0))
-
-    note(4, "c", "16-band range, pp", span["16 bands"]["range_pp"])
-    note(4, "c", "3-band range, pp", span["3 bands (Lim)"]["range_pp"])
-    note(4, "c", "fraction of the range three bands retain",
+    note(4, "not drawn", "16-band range, pp", span["16 bands"]["range_pp"])
+    note(4, "not drawn", "3-band range, pp", span["3 bands (Lim)"]["range_pp"])
+    note(4, "not drawn", "fraction of the range three bands retain",
          p19["range_retained_frac"])
-    note(4, "c", "largest single absorption, pp",
+    note(4, "not drawn", "largest single absorption, pp",
          max(p19["what_the_bands_absorb"], key=lambda r: abs(r["absorbed"]))["absorbed"])
-    note(4, "c", "3-band 60+ , pp (both-ends-in-Seoul scope)", d3["60+"]["meas"])
-    note(4, "c", "16-band 80+ , pp (both-ends-in-Seoul scope)", d16["80+"]["meas"])
+    note(4, "not drawn", "3-band 60+ , pp (both-ends-in-Seoul scope)", d3["60+"]["meas"])
+    note(4, "not drawn", "16-band 80+ , pp (both-ends-in-Seoul scope)", d16["80+"]["meas"])
     # The scope pair, all from p18b so the caption never pairs it with a bar.
-    note(4, "c", "p18b 16-band 80+, both endpoints, pp",
+    note(4, "not drawn", "p18b 16-band 80+, both endpoints, pp",
          round(b18["80+"]["both_ends_pp"], 4))
-    note(4, "c", "p18b 16-band 80+, origin only, pp",
+    note(4, "not drawn", "p18b 16-band 80+, origin only, pp",
          round(b18["80+"]["origin_only_pp"], 4))
-    note(4, "c", "p18b 16-band 20-24, both endpoints, pp",
+    note(4, "not drawn", "p18b 16-band 20-24, both endpoints, pp",
          round(b18["20-24"]["both_ends_pp"], 4))
-    note(4, "c", "p18b 16-band 20-24, origin only, pp",
+    note(4, "not drawn", "p18b 16-band 20-24, origin only, pp",
          round(b18["20-24"]["origin_only_pp"], 4))
-    note(4, "c", "p18b 3-band 60+, both endpoints, pp",
+    note(4, "not drawn", "p18b 3-band 60+, both endpoints, pp",
          round(p18b["three_band_int"]["band_pp"]["60+"], 4))
-    note(4, "c", "p18b 3-band 60+, origin only, pp",
+    note(4, "not drawn", "p18b 3-band 60+, origin only, pp",
          round(p18b["three_band_out"]["band_pp"]["60+"], 4))
-    note(4, "c", "p18b 3-band 20-59, both endpoints, pp",
+    note(4, "not drawn", "p18b 3-band 20-59, both endpoints, pp",
          round(p18b["three_band_int"]["band_pp"]["20-59"], 4))
-    note(4, "c", "p18b 3-band 20-59, origin only, pp",
+    note(4, "not drawn", "p18b 3-band 20-59, origin only, pp",
          round(p18b["three_band_out"]["band_pp"]["20-59"], 4))
-    note(4, "c", "zero crossing, both endpoints",
+    note(4, "not drawn", "zero crossing, both endpoints",
          p18b["claims"]["both_ends"]["zero_crossing"])
-    note(4, "c", "zero crossing, origin only",
+    note(4, "not drawn", "zero crossing, origin only",
          p18b["claims"]["origin_only"]["zero_crossing"])
-    note(4, "c", "range three bands retain, both endpoints",
+    note(4, "not drawn", "range three bands retain, both endpoints",
          round(p18b["three_band_int"]["range_kept"], 4))
-    note(4, "c", "range three bands retain, origin only",
+    note(4, "not drawn", "range three bands retain, origin only",
          round(p18b["three_band_out"]["range_kept"], 4))
     # Renamed with the markers that used to carry it: the two series are still
     # measured, still compared here, and still reported in SI 6 -- the panel
     # just no longer draws the second one, so "marker" would name nothing.
-    note(4, "c", "largest gap between p19's bars and p18b's both-endpoints "
+    note(4, "not drawn", "largest gap between p19's bars and p18b's both-endpoints "
                  "series, pp (the masking fill, not the scope)",
          round(float(max(abs(mid[i] - b18[l]["both_ends_pp"])
                          for i, l in enumerate(labs))), 4))
 
     out = f"{FIG}/p47_figure4.png"
-    fig.savefig(out, dpi=300)
-    if pdf:
-        # CreationDate omitted, for the reason figure 3 gives above.
-        fig.savefig(f"{FIG}/p47_figure4.pdf",
-                    metadata={"CreationDate": None})
+    mode = finish(fig, out, pdf=pdf)
     plt.close(fig)
     print(f"  -> {out}   ({fig.get_size_inches()[0]:.2f} x "
-          f"{fig.get_size_inches()[1]:.2f} in)")
-    assert fig.get_size_inches()[0] <= 7.0, \
-        "figure 4 is wider than the 7-inch reproduction width"
+          f"{fig.get_size_inches()[1]:.2f} in, {mode})")
 
 
 def main():
@@ -824,7 +769,7 @@ def main():
     print("=== 47.0 gates ===")
     gates(p18b, p19, p32, p37, p38, p60, p61)
     print("\n=== 47.1 figure 3 ===")
-    figure3(p26, p27, p32, p37, p61, args.pdf)
+    figure3(p26, p27, p32, p61, args.pdf)
     print("\n=== 47.2 figure 4 ===")
     figure4(p18b, p19, p38, p60, args.pdf)
 
