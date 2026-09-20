@@ -2925,8 +2925,15 @@ check("27", "p48's Claim 3 flips equal p52's", 0.0,
       abs(p48["claim3_flips"] - p52["answer"]["n_flips"]), 0.0)
 check("27", "p48's Claim 3 verdicts equal p52's", 0.0,
       abs(p48["claim3_verdicts"] - p52["answer"]["n_verdicts"]), 0.0)
-check("27", "p48's p36 check count equals the live p36's", 0.0,
-      abs(p48["p36_checks"] - p36_live["n_checks"]), 0.0)
+# 2026-09-21: the row "p48's p36 check count equals the live p36's" is gone
+# with the thing it gated. Figure 1 carried a verification strip ("checked
+# three ways ... 692 of 692") under its claim boxes from 09-03 to today; the
+# advisor's 09-15 item 4 struck the same kind of self-advertisement from
+# Figure 7, and the strip was the one instance that was not on an old figure
+# number and so was not swept. p48 no longer reads p36 and its sheet no longer
+# has a `p36_checks` key, so a row here would be a row over a value the figure
+# does not show. The 692 is still gated where the prose says it: the two
+# "data accessibility" check() rows and the 2.6 cms() row below.
 check("27", "p48's month count", 79.0, float(p48["months"]), 1e-9)
 check("27", "p48's dong count", 424.0, float(p48["dong"]), 1e-9)
 c27("p48's weighted masking rate is 0.261349", 0.261349,

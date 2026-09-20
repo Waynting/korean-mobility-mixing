@@ -336,7 +336,13 @@ def main():
     # data, and again to (-1.66, 1.66) when those labels took the month with
     # them. The curves are unchanged; only the empty margin either side grew.
     b.set_xlim(-1.66, 1.66)
-    b.set_xlabel(r"$\theta$")
+    # The same label as (a), word for word. Until 2026-09-21 this panel said a
+    # bare theta while (a) beside it spelled out what the ends of the axis mean,
+    # so the reader who started on the right-hand panel had to look left to
+    # learn which way device space is. The two panels are the same width, so
+    # what fits at 9 pt in (a) fits here.
+    b.set_xlabel(r"$\theta$   (device space $\leftarrow$  published  "
+                 r"$\rightarrow$ expansion twice)")
     b.set_ylabel(r"Kendall $\tau$ of the dominant NGM" "\n"
                  r"eigenvector against $\theta = 0$")
     b.set_title(plabel("b", "Seoul: the ordering does not"), loc="left")
@@ -497,7 +503,23 @@ def main():
     note("d", "smallest bar on the panel", min(_reg_all))
     note("d", "largest bar on the panel", max(_reg_all))
 
-    fig.tight_layout()
+    # tight_layout sizes the columns from the axes boxes and lets an x label
+    # that is wider than its axes hang over both ends. Under (a) the overhang
+    # lands in the margin the y labels leave; under (b) it lands past the
+    # canvas, and the closing parenthesis of the label was cut off the PNG.
+    # The rect gives the right column the 3% the overhang needs, and the
+    # assert makes the cut a failure rather than something to notice on the
+    # page: every axis label has to end inside the canvas.
+    fig.tight_layout(rect=(0, 0, 0.97, 1))
+    fig.canvas.draw()
+    _r = fig.canvas.get_renderer()
+    _W = fig.get_figwidth() * fig.dpi
+    for _a in fig.axes:
+        for _lab in (_a.xaxis.label, _a.yaxis.label):
+            _bb = _lab.get_window_extent(_r)
+            assert 0 <= _bb.x0 and _bb.x1 <= _W, \
+                f"an axis label runs off the canvas: {_lab.get_text()[:40]!r} " \
+                f"spans {_bb.x0:.0f}-{_bb.x1:.0f} px of {_W:.0f}"
     out_png = f"{FIG}/p46_figure6.png"
     mode = finish(fig, out_png, pdf=args.pdf)
     print(f"  figure -> {out_png} ({mode})")

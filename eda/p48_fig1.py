@@ -8,7 +8,7 @@ long after the inventory moves.
 
 So the schematic is drawn, but EVERY NUMBER ON IT IS READ FROM A RESULTS FILE at
 draw time — the span, the file and row counts, the masking rate and which bands
-it touches, the measured fill, the gate tallies, the scale ladder. Nothing here
+it touches, the measured fill, the scale ladder. Nothing here
 is typed as a literal. If the inventory changes and this figure is not rerun, the
 next run disagrees with itself and the assertions below stop it.
 
@@ -99,7 +99,7 @@ GREY, GREY_F = "#5F6B72", "#F2F4F5"
 TEAL, TEAL_F = "#0E7C86", "#E4F0F1"
 BLUE, BLUE_F = "#4C6E8A", "#ECF0F4"
 RED = "#A8434E"
-BAND, STAT = "#F7F8F8", "#4C5860"
+STAT = "#4C5860"
 
 # JRSI wants figure text in Times at 9-11 pt and refuses anything under 7.5 pt,
 # so 7.5 is the floor for every size below. STIXGeneral is the serif: it is
@@ -141,7 +141,7 @@ def main():
     args = ap.parse_args()
 
     inv, p16 = load("inventory"), load("p16")
-    p29, p36 = load("p29"), load("p36")
+    p29 = load("p29")
     p37, p38 = load("p37"), load("p38")
     # Claims 1 and 3 quote numbers, so they are read like everything else here.
     # p54 is the semester count against the corrected floor; p52 is the R0 sweep
@@ -230,11 +230,13 @@ def main():
     fill = p29["202012"]["per_cell_mean"]
     fill_share = p29["202012"]["measured_share"]
 
-    gates_n = p36["n_checks"]
-    assert p36["n_fail"] == 0, "p36: the independent recompute has failures"
-    # p31 is a pass/fail gate script and writes no results file, so the strip
-    # carries it without a number; p36 is the one with a tally. Neither phase
-    # number is drawn: they are this repo's bookkeeping, not the reader's.
+    # Until 2026-09-21 this read p36's check count for a verification strip
+    # under the claims ("checked three ways ... 692 of 692"). The strip was the
+    # paper's own quality control advertising itself inside a data-flow figure
+    # -- the same kind of thing as the "only R0 previously run" the advisor
+    # struck from Figure 7 -- so it is gone, and with it the p36 read and the
+    # `p36_checks` key this sheet used to carry. The count still lives where a
+    # reader meets it in prose: section 2.6 and Data accessibility, both gated.
 
     n_dong = p38["adjacency"]["n_nodes"]
     assert p37["ladder"]["n_monotone"] == months, \
@@ -542,23 +544,8 @@ def main():
                 fontweight="bold", color=BLUE, ha="left", va="bottom", zorder=5)
     y -= ch
 
-    # ---- the verification strip -------------------------------------------
-    # Not a step in the pipeline and not a claim, so it is drawn as neither: a
-    # band with no border, under the flow rather than in it. It is also the
-    # paper's strongest credibility asset, which is why it is on the figure.
-    y -= 0.16
-    strip = 2 * 0.09 + 2 * LEAD
-    ax.add_patch(FancyBboxPatch((L, y - strip), R - L, strip,
-                                boxstyle="round,pad=0,rounding_size=0.055",
-                                fc=BAND, ec="none", zorder=2))
-    for i, ln in enumerate(
-            ["Every number is checked three ways before it is quoted",
-             f"citation audit{SEP}independent second implementation, "
-             f"{gates_n} of {gates_n}{SEP}bit-for-bit determinism"]):
-        ax.text(CX, y - 0.09 - i * LEAD, ln, fontsize=BODY_PT, color=INK,
-                fontweight="bold" if i == 0 else "normal",
-                ha="center", va="top", zorder=5)
-    y -= strip
+    # The verification strip that used to hang under the claims (2026-09-03 to
+    # 2026-09-21) is not drawn any more; see the note where p36 was read.
 
     # Crop to what the layout actually used. Data units are inches and the axes
     # fills the canvas, so the cursor IS the crop edge -- no scale factor.
@@ -593,7 +580,6 @@ def main():
                    masked_bands_exactly_zero=none,
                    masked_material_cell_share=round(float(mat_share), 6),
                    measured_fill=fill, measured_fill_share=fill_share,
-                   p36_checks=gates_n,
                    # The claim boxes quote these, so they belong in the sheet
                    # too -- this file IS the record of what the figure shows,
                    # and a number on the figure that is not in the sheet is a

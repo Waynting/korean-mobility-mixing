@@ -23,6 +23,9 @@
 #   GET    the draft again, diff it against the live record, expect ONE field
 #   POST   /api/records/<id>/draft/actions/publish
 # Files are immutable on a published record; metadata is not.
+# scripts/zenodo_edit_metadata.sh runs exactly this sequence for the
+# description, stops before publish unless told otherwise, and refuses if any
+# other metadata field moved between the live record and the draft.
 #
 # IMPORTANT, and the reason this is not a one-line curl: Zenodo's legacy API
 # (`GET /api/records/<id>`, the default response) serialises only the FIRST

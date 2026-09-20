@@ -15,7 +15,7 @@
 全篇最沒有人會去核對的東西，也因此是唯一一種可以錯上好幾個月而不被發現的圖。
 
 做法：跨度、檔數列數、遮蔽率與它碰到哪些帶、實測填充、閘門項數、尺度階梯，
-**全部在畫圖時從 `results_inventory/p16/p29/p36/p37/p38` 讀**。inventory 一動而這張圖
+**全部在畫圖時從 `results_inventory/p16/p29/p37/p38` 讀**（p36 到 2026-09-21 為止也在，見 §7）。inventory 一動而這張圖
 沒重跑，下一次執行就會自我矛盾，而 assert 會擋住。
 
 ## 2. 五層
@@ -52,7 +52,7 @@
 | `masked_span_material` / `_trace` / `_none` | 20-24 to 40-44／45-64／0-19 and 65+ | p16 |
 | `masked_bands_exactly_zero` | 上面兩段 none 的聯集，保留供追溯 | p16 |
 | `measured_fill` | 2.2673（佔 11.09%） | p30 |
-| `p36_checks` | 216 | p36 |
+| ~~`p36_checks`~~ | ~~216~~ | ~~p36~~ ——**2026-09-21 拿掉**，見 §7 |
 | `claim1_months_clearing` | 17 | p54 |
 | `claim1_shift_matches` / `_alternatives` | 3／78 | p58 |
 | `claim1_p_shift` | 0.05063 | p58 |
@@ -140,3 +140,17 @@ p 值換成對齊計數，從 `results_p58.json` 的 `p_shift.n_shifts_at_or_abo
 ⚠️ **`p48_fig1.py` 不在任何 determinism 清單裡**，卻會寫 `results_p48.json`——正是
 `p55`／`p56`／`p47` 當初被加進清單要防的那個失效模式。本輪已確認它連跑兩次
 sha256 相同（`cc29d69d…`），加進 `eda/determinism_check.sh` 由另一輪處理。
+
+## 7. 2026-09-21：驗證帶拿掉了
+
+宣稱方框底下原本有一條沒有邊框的底色帶：「Every number is checked three ways before
+it is quoted — citation audit · independent second implementation, 692 of 692 ·
+bit-for-bit determinism」。它不是管線的一步、也不是宣稱，是這個 repo 自己的品管在一張
+資料流程圖裡替自己打廣告——和老師 09-15 第 4 點從圖 7 點掉的「the only R₀ previously
+run」是同一類，只是它不掛在舊圖號上，09-16 那一輪沒掃到。
+
+拿掉的東西：`p48_fig1.py` 不再讀 `results_p36.json`，`results_p48.json` 少了 `p36_checks`
+一欄，`p31` 那列「p48's p36 check count equals the live p36's」跟著退掉（閘門 1950 → 1949
+項）。圖 1 圖說末句「the strip beneath names the three checks every quoted number passes」
+一併刪除（−11 字）。692 這個數還在讀者會在散文裡遇到它的地方：§2.6 與 Data accessibility，
+兩處都有自己的閘門列。圖高 7.79 → 7.08 in，其餘一個像素沒動。
