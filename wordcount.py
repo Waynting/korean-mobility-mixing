@@ -101,7 +101,8 @@ FRONT_HEAD = "# "          # the H1 title, byline, affiliation, keywords
 DECLARATION_HEADS = (
     "## Data accessibility", "## Author contributions", "## Authors' contributions",
     "## Competing interests", "## Conflict of interest",
-    "## Funding", "## Ethics", "## Use of generative AI", "## Acknowl",
+    "## Funding", "## Ethics", "## Use of generative AI", "## Declaration of AI use",
+    "## Acknowl",
     "## Declarations", "## Statement of Significance",
 )
 REFERENCE_HEADS = ("## References", "## Bibliography")
@@ -124,7 +125,11 @@ DISPLAY_LABEL_RE = re.compile(r"^(?:!\[|>?\s*\*\*)(Table|Figure|Fig\.)\s*([A-Z]?
 # A thin space (U+2009) between two digits is the thousands separator Royal
 # Society style asks for, not a gap between two words.
 THIN_SPACE_IN_NUMBER_RE = re.compile(r"(?<=\d) (?=\d)")
-SECTION_RE = re.compile(r"^## (\d+)\.\s*(.*)")
+# A numbered top-level section. The supplement numbers its sections S1, S2, ...
+# (since 2026-10-02, so that the main text can cite "electronic supplementary
+# material, section S7" in JRSI's form); without the optional S every SI section
+# fell through to "no sections found".
+SECTION_RE = re.compile(r"^## (S?\d+)\.\s*(.*)")
 
 
 def plain_words(markdown: str) -> int:
@@ -369,7 +374,9 @@ def main():
                 cur, in_skipped = None, True
                 continue
             m = SECTION_RE.match(ln)
-            cur, in_skipped = (f"§{m.group(1)} {m.group(2)}" if m else None), False
+            num = m.group(1) if m else None
+            cur, in_skipped = ((f"§{num}" if num[0].isdigit() else num)
+                               + f" {m.group(2)}" if m else None), False
             continue
 
         if cur is None:
@@ -397,10 +404,11 @@ def main():
         sections.setdefault(cur, []).append(ln)
 
     if not sections:
-        sys.exit(f"{args.path}: no `## <n>. <title>` sections found -- nothing counted.")
+        sys.exit(f"{args.path}: no `## <n>. <title>` or `## S<n>. <title>` "
+                 "sections found -- nothing counted.")
 
     total = 0
-    for k in sorted(sections, key=lambda s: int(s.split()[0].lstrip("§"))):
+    for k in sorted(sections, key=lambda s: int(s.split()[0].lstrip("§S"))):
         n = plain_words("\n\n".join(sections[k]))
         total += n
         print(f"  {k:38s} {n:>6d}")

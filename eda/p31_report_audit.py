@@ -2221,6 +2221,11 @@ p47 = load("p47", LIVE)
 p48 = load("p48", LIVE)
 p55 = load("p55", LIVE)
 p56 = load("p56", LIVE)
+# p56 draws two crossings since 2026-09-21, one from each of these, and the
+# sheet rows it records them on are checked against the files they were read
+# from. Loaded again below as p66_ms/p69_ms for the manuscript rows; same file.
+p66 = load("p66", LIVE)
+p69 = load("p69", LIVE)
 # p46's two sources, read LIVE. They are ALSO loaded at :478 from ARCHIVE_0822,
 # for the 08-19 round, and the two objects are deliberately kept apart: that
 # round is closed and is checked against the state its letter was written from,
@@ -3129,9 +3134,12 @@ for _end55, _src55 in (("0.025 endpoint", _ef62["low_level_ci"]),
 
 # --- p56: Figure 5 ------------------------------------------------------------
 _c56 = p56["caption_numbers"]
-check("27", "p56's caption sheet has rows to check", 43.0, float(len(_c56)), 1e-9)
+check("27", "p56's caption sheet has rows to check", 50.0, float(len(_c56)), 1e-9)
 # 35 -> 43 on 2026-09-05: panel (b) gained one "realised beta at requested x"
 # row per grid point when the panel moved onto the realised axis.
+# 43 -> 50 on 2026-09-21: the inset draws the bound on the survey's pairing
+# convention too, so the two crossings actually drawn (p66's and p69's) and the
+# five survey-convention grid points went on the sheet.
 check("27", "p56 was built at p59's pinned 100 replicates", 0.0,
       abs(p56["reps"] - p59["config"]["reps"]), 0.0)
 check("27", "p56's bound at beta = 0.95 equals p59's", 0.0,
@@ -3140,6 +3148,22 @@ check("27", "p56's bound at beta = 0.95 equals p59's", 0.0,
 check("27", "p56's beta* equals p59's primary value", 0.0,
       abs(_cap(_c56, None, "b", "beta* where the bound meets the survey")
           - _bs59["primary_value"]), 0.0)
+# The crossings the panel DRAWS. The row above is p59's design-axis crossing,
+# which the sheet kept while the panel printed p66's realised one -- so for
+# sixteen days the sheet's beta* was not the figure's.
+check("27", "p56's drawn beta* equals p66's primary value", 0.0,
+      abs(_cap(_c56, None, "b", "beta* drawn on the realised axis")
+          - p66["beta_star"]["primary_value"]), 0.0)
+check("27", "p56's survey-convention beta* equals p69's realised C", 0.0,
+      abs(_cap(_c56, None, "b", "beta* on the survey's pairing convention")
+          - p69["beta_star"]["realised_C"]), 0.0)
+_c69 = {r["design"]: r[f"realised_C_{p69['axis_used']}"]
+        for r in p69["conversion"]}
+check("27", "p56's five survey-convention grid points equal p69's C axis", 0.0,
+      float(sum(abs(_cap(_c56, None, "b",
+                         f"realised beta on the survey's convention at "
+                         f"requested {_b:g}") - _c69[_b])
+                for _b in (0.95, 0.96, 0.97, 0.98, 0.99))), 0.0)
 check("27", "p56's beta* spread equals p59's", 0.0,
       abs(_cap(_c56, None, "b", "spread of the four declared interpolation rules")
           - _bs59["spread"]), 0.0)
@@ -3626,16 +3650,22 @@ BOUNDS = []
 # re-argued the moment the wording it exempts changes. A key is matched against
 # a row's label and against the prose sentence, so one entry covers both sides.
 BOUND_NOT_A_BOUND = {
-    "SI 5: with seven years the p cannot fall below 0.008":
+    "S5: with seven years the p cannot fall below 0.008":
         "the bound is printed exactly beside it, as 2**-7; 0.008 is the gloss "
         "on that closed form and not the bound, so rounding it down to 0.0078 "
         "would make the sentence harder to read and no truer",
     "cannot return a p below 2":
         "the same sentence, read from the prose side",
-    "SI 3: their upper edge is 21% below the 79-month maximum":
+    "S3: their upper edge is 21% below the 79-month maximum":
         "\"21% below\" is how far apart two numbers are, not a bound on 21; "
         "the quantity being bounded is the edge, and it is gated on its own row",
     "upper edge is 21% below that maximum":
+        "the same sentence, read from the prose side",
+    "Fig 5(b): whose crossing, 0.918, lies below the band":
+        "\"below the band\" places the crossing against the band's low end, "
+        "0.9217, and that ordering is gated at full precision on the next row; "
+        "0.918 is the crossing's value at three decimals, not a bound on it",
+    "crossing, 0.918, lies below the band":
         "the same sentence, read from the prose side",
 }
 
@@ -3653,7 +3683,7 @@ def _bound_value(tok):
     """The float a number token spells, or None.
 
     Compared numerically rather than as a string, which is the whole reason
-    this exists: SI 7 writes its bound "8e-4" in the row and "8 x 10^-4" in the
+    this exists: S7 writes its bound "8e-4" in the row and "8 x 10^-4" in the
     prose, and _forms() generates neither of those from 0.0008. A rule that
     only matched spellings would have passed that row over in silence, which is
     the failure this block was written to remove rather than to reproduce.
@@ -3816,8 +3846,8 @@ def _manuscript_corpus():
 # yes by a sentence somewhere else entirely, so the row was gating the envelope
 # rather than the claim. Measured on 2026-08-31 on §3.4: putting its superseded
 # "13.0%" back left this gate GREEN, exit 0, on a sentence that was wrong,
-# because SI §8 prints 12.8% for an unrelated normalised mutual information and
-# SI §6 restates the same quantity a third time. §3.4 was the case that was
+# because SI section S8 prints 12.8% for an unrelated normalised mutual information and
+# SI section S6 restates the same quantity a third time. §3.4 was the case that was
 # caught by a human, not a special one.
 #
 # Counting occurrences instead of asking for one would not have caught it
@@ -3825,7 +3855,7 @@ def _manuscript_corpus():
 # one still clears the bar. The question has to be asked of a smaller document.
 #
 # Every cms() label already opens with the section its sentence lives in --
-# "3.3:", "SI 8:", "Fig 5(c):", "abstract:". That was the author saying where
+# "3.3:", "S8:", "Fig 5(c):", "abstract:". That was the author saying where
 # the claim is, and nothing had ever read it. Now the matcher does.
 def _ms_regions(claimed):
     """The manuscript pair cut into the regions its labels name.
@@ -3856,8 +3886,17 @@ def _ms_regions(claimed):
             head = re.match(r"^#{2,3}\s+(.+?)\s*$", first)
             if head:
                 title = head.group(1)
-                num = re.match(r"^(\d+(?:\.\d+)?)[.\s]", title)
-                section = (("SI " if si else "") + num.group(1) if num
+                # The SI numbers its sections S1, S2, ... (2026-10-02, so the
+                # main text can cite "electronic supplementary material,
+                # section S7"), and a label names an SI section the same way:
+                # "S7:". A numbered heading counts only when its S matches the
+                # file it is in, so an SI heading that lost its S cannot merge
+                # into the main text's region of the same number and keep a
+                # row green by coincidence.
+                num = re.match(r"^(S?\d+(?:\.\d+)?)[.\s]", title)
+                if num and num.group(1).startswith("S") != si:
+                    num = None
+                section = (num.group(1) if num
                            else ("SI " if si else "") + title.strip("* ").lower())
                 regions.setdefault(section, [])
                 block = None
@@ -4063,12 +4102,12 @@ cms("2.2: the Seoul subsample is 465 respondents", 465.0,
     float(p44_ms["sensitivity"]["n_seoul_respondents"]), 1e-12)
 
 # --- 2.3 the estimator, and the pairing convention it is not neutral under
-cms("SI 2: the without-replacement correction at dong is -4.29%", -4.29,
+cms("S2: the without-replacement correction at dong is -4.29%", -4.29,
     100 * p49_ms["primary"]["rel_change"], _dp(4.29, 2))
-cms("SI 2: the same correction at a survey venue is -43.0%", -43.0,
+cms("S2: the same correction at a survey venue is -43.0%", -43.0,
     100 * p49_ms["answer"]["venue_relative_difference"], _dp(43.0, 1))
 _VEN_MS = {r["grouping"]: r for r in p44_ms["ladder"]["national|pooled"]["rows"]}
-cms("SI 2: a survey venue holds 4.2 people on average", 4.2,
+cms("S2: a survey venue holds 4.2 people on average", 4.2,
     _VEN_MS["venue-visit (ego,date,place)"]["mean_persons"], _dp(4.2, 1))
 
 # --- 2.4 the coverage profile
@@ -4139,8 +4178,8 @@ _PY_MS = p41_ms["per_year"]
 _C6_MS = [_PY_MS[str(_y)]["contrast_median"] for _y in range(2021, 2027)]
 check("MS", "3.1: the contrast is positive in all six years 2021-2026", 6.0,
       float(sum(1 for _c in _C6_MS if _c > 0)), 1e-9)
-cms("SI 5: the six contrasts start at 0.0032", 0.0032, min(_C6_MS), _dp(0.0032, 4))
-cms("SI 5: the six contrasts reach 0.0046", 0.0046, max(_C6_MS), _dp(0.0046, 4))
+cms("S5: the six contrasts start at 0.0032", 0.0032, min(_C6_MS), _dp(0.0032, 4))
+cms("S5: the six contrasts reach 0.0046", 0.0046, max(_C6_MS), _dp(0.0046, 4))
 cms("3.1: 2020's contrast is -0.0001", -0.0001,
     _PY_MS["2020"]["contrast_median"], _dp(0.0001, 4))
 # The two shares the sentence turns on, both derived rather than restated.
@@ -4151,19 +4190,19 @@ cms("3.1: the 79-month median they are measured against is 0.01938", 0.01938,
     p37["summary_dong"]["assort_median"], _dp(0.01938, 5))
 cms("3.1: the mean contrast is 20.5% of the 79-month median", 20.5,
     100 * _MEAN6_MS / p37["summary_dong"]["assort_median"], _dp(20.5, 1))
-cms("SI 5: and 31% of the entire 79-month range", 31.0,
+cms("S5: and 31% of the entire 79-month range", 31.0,
     100 * _MEAN6_MS / (p37["summary_dong"]["assort_max"]
                        - p37["summary_dong"]["assort_min"]), _dp(31.0, 0))
 # The sign test, and the floor its resolution imposes. THE 0.0625 ROW WAS
 # DELETED HERE and the 0.008 row relabelled, on the rule that rows follow the
 # prose. §3.1 reports the regression and no longer names the sign test at all;
-# SI §5 carries it, and already registers the same 8/128 at its own sentence.
+# SI section S5 carries it, and already registers the same 8/128 at its own sentence.
 # Both rows had been passing on a substring collision rather than on the
 # sentence they claimed: _forms(0.0625) contains "0.1" and _forms(0.008)
 # contains "0.0", which §3.1's other decimals supplied for free.
 check("MS", "3.1: six of seven years are positive", 6.0,
       float(p41_ms["sign_test"]["contrast"]["n_positive"]), 1e-9)
-cms("SI 5: with seven years the p cannot fall below 0.008", 0.008,
+cms("S5: with seven years the p cannot fall below 0.008", 0.008,
     1.0 / p41_ms["sign_test"]["contrast"]["denominator"], _dp(0.008, 3))
 # The ten readings. Counted, not quoted: "in all ten" is a universal.
 _VAR_MS = p41_ms["robustness"]["variants"]
@@ -4191,9 +4230,9 @@ cms("3.1: the 0-24 bands carry at least 82% of the contrast", 82.0,
 cms("3.1: and at most 93% of it", 93.0, max(_SH_MS), _dp(93.0, 0),
     bound="upper")
 _GRP_MS = p41_ms["bands"]["groups"]
-cms("SI 5: 2020's 0-24 contrast is -0.00075", -0.00075,
+cms("S5: 2020's 0-24 contrast is -0.00075", -0.00075,
     _GRP_MS["student_0_24"]["control"], _dp(0.00075, 5))
-cms("SI 5: against a median of +0.00381 in the other six years", 0.00381,
+cms("S5: against a median of +0.00381 in the other six years", 0.00381,
     _GRP_MS["student_0_24"]["others_median"], _dp(0.00381, 5))
 check("MS", "3.1: the 25-and-over contrast is positive in all seven years", 7.0,
       float(_GRP_MS["adult_25plus"]["sign_test"]["n_positive"]), 1e-9)
@@ -4267,15 +4306,15 @@ cms("3.1: which is a t of 7.68", 7.68, _R64["t"]["term"], _dp(7.68, 2))
 cms("3.1: and a p of 7.6e-11", 7.6e-11, _R64["p_t"]["term"], _dp(7.6e-11, 12))
 # The lag sweep is stated in SI 5, not in 3.1: the body gives the fitted lag
 # and its p, and the sentence that sweeps zero to twelve is the SI's.
-cms("SI 5: no lag from zero to twelve takes the p above 4.7e-08", 4.7e-08,
+cms("S5: no lag from zero to twelve takes the p above 4.7e-08", 4.7e-08,
     max(p64["lag_band"]["assortativity_all"]["p_max"],
         p64["lag_band"]["mi_bits_hf"]["p_max"]), _dp(4.7e-08, 9),
     bound="upper")
 cms("3.1: the same regression on the MI series gives 0.00599 bits", 0.00599,
     _R64M["coef"]["term"], _dp(0.00599, 5))
-cms("SI 5: with a standard error of 0.00078", 0.00078,
+cms("S5: with a standard error of 0.00078", 0.00078,
     _R64M["se"]["term"], _dp(0.00078, 5))
-cms("SI 5: and a t of 7.70", 7.70, _R64M["t"]["term"], _dp(7.70, 2))
+cms("S5: and a t of 7.70", 7.70, _R64M["t"]["term"], _dp(7.70, 2))
 check("MS", "3.1: six variants of the statistic were fitted", 6.0,
       float(p64["sign_agreement"]["n_series"]), 1e-9)
 check("MS", "3.1: the term coefficient is positive on all six", 6.0,
@@ -4295,7 +4334,7 @@ cms("3.1: and a p of 0.021", 0.021, _S4["extra"]["term_x_2020"]["p_t"],
 # numbers: 0.00368 as the denominator gives 20%, not 28%.
 cms("3.1: the interaction specification re-estimates the term coefficient at 0.00412",
     0.00412, _S4["b_term"], _dp(0.00412, 5))
-cms("SI 5: and at 0.00666 on the mutual-information series",
+cms("S5: and at 0.00666 on the mutual-information series",
     0.00666, _S4M["b_term"], _dp(0.00666, 5))
 cms("3.1: leaving 28% of the term effect standing in 2020", 28.0,
     100.0 * (_S4["b_term"] + _S4["extra"]["term_x_2020"]["coef"])
@@ -4314,7 +4353,7 @@ check("MS", "3.1: no shift that changes the calendar reaches seventeen", 0.0,
       float(len(p64["letter_verdict"]
                  ["iii_mechanism_is_the_six_month_symmetry"]
                  ["odd_multiples_reaching_observed"])), 1e-9)
-check("MS", "3.1: the 79 rotations realise twelve distinct calendars", 12.0,
+check("MS", "3.1: the 79 rotations realize twelve distinct calendars", 12.0,
       float(_E64["E_exact"]), 1e-9)
 check("MS", "3.1: none of the eleven alternative calendars matches", 0.0,
       float(_D64["exact"]["n_nonidentity_classes_reaching_observed"]), 1e-9)
@@ -4436,19 +4475,19 @@ cms("3.2: the national span ends at 45.5x", 45.5,
     max(p51_ms["national_span"][_m]["hi"] for _m in ("202312", "202402")),
     _dp(45.5, 1))
 # The 79-month context.
-cms("SI 3: the 79-month dong series runs from 0.01311", 0.01311,
+cms("S3: the 79-month dong series runs from 0.01311", 0.01311,
     p37["summary_dong"]["assort_min"], _dp(0.01311, 5))
-cms("SI 3: ...to 0.02589", 0.02589, p37["summary_dong"]["assort_max"],
+cms("S3: ...to 0.02589", 0.02589, p37["summary_dong"]["assort_max"],
     _dp(0.02589, 5))
-cms("SI 3: with a median of 0.01938", 0.01938,
+cms("S3: with a median of 0.01938", 0.01938,
     p37["summary_dong"]["assort_median"], _dp(0.01938, 5))
 _WE_MS = sorted([r for r in p37["rows"]
                  if r["panel"] == "WE" and r["level"] == "dong"],
                 key=lambda r: r["assortativity"])
 _RANK_MS = {r["ym"]: i + 1 for i, r in enumerate(_WE_MS)}
-check("MS", "SI 3: December 2023 sits at rank 50 of 79", 50.0,
+check("MS", "S3: December 2023 sits at rank 50 of 79", 50.0,
       float(_RANK_MS[202312]), 1e-9)
-check("MS", "SI 3: February 2024 sits at rank 24 of 79", 24.0,
+check("MS", "S3: February 2024 sits at rank 24 of 79", 24.0,
       float(_RANK_MS[202402]), 1e-9)
 # The two-sided floor, and the agreement between its two unrelated routes.
 cms("3.2: the zero-structure world reads 0.00455", 0.00455,
@@ -4468,7 +4507,7 @@ cms("3.2: 20.7% of the December 2023 reading is device noise", 20.7,
     100 * _ST12_MS["noise_bias"] / _ST12_MS["point"], _dp(20.7, 1))
 cms("3.2: 22.9% in February 2024", 22.9,
     100 * _ST02_MS["noise_bias"] / _ST02_MS["point"], _dp(22.9, 1))
-cms("3.2: the 79-month normalised mutual information median is 0.0045", 0.0045,
+cms("3.2: the 79-month normalized mutual information median is 0.0045", 0.0045,
     p37["summary_dong"]["nmi_median"], _dp(0.0045, 4))
 
 
@@ -4559,8 +4598,8 @@ check("MS", "3.2: the passive dong spectrum sits at the null's 43rd percentile",
 # gated -- including the ratio, which is the part that carries the correction
 # and which nothing checked while the sentence was wrong.
 _MN61 = p61["survey_multinomial_null"]["202312"]["sigma2_over_sigma1"]["median"]
-cms("SI 3: sampling alone gives a median of 0.0518", 0.0518, _MN61, _dp(0.0518, 4))
-cms("SI 3: which the passive reading exceeds by a factor of 2.4", 2.4,
+cms("S3: sampling alone gives a median of 0.0518", 0.0518, _MN61, _dp(0.0518, 4))
+cms("S3: which the passive reading exceeds by a factor of 2.4", 2.4,
     _pi61["202312|dong"]["passive_sigma2_over_sigma1"] / _MN61, _dp(2.4, 1))
 
 
@@ -4603,8 +4642,8 @@ cms("3.3: B075 reaches 32.5% of the survey under the optimistic law", 32.5,
 # superseded documents and keep their own wording; the manuscript does not, so
 # this is a cms() gated at the precision the prose now uses.
 # THE WORKED EXAMPLE OF `phrase`. Scoping the reverse direction to §3.4 is
-# already enough to stop the cover this row was caught by on 2026-08-31 -- SI §8
-# prints 12.8% for an unrelated normalised mutual information and SI §6 restates
+# already enough to stop the cover this row was caught by on 2026-08-31 -- SI section S8
+# prints 12.8% for an unrelated normalised mutual information and SI section S6 restates
 # this same quantity, and neither is in §3.4 any more. The phrase is here on top
 # of that because the two decay laws in this sentence are a pair, 32.5% under
 # the optimistic law and 12.8% under the measured one, and the failure that
@@ -4646,15 +4685,15 @@ cms("3.2: the empty world reads +0.00455 through this pipeline", 0.00455,
 # the ratio by 5% because 0.00005 is a one-significant-digit denominator, and a
 # figure that only exists after rounding is not a measurement. Each of the three
 # is registered against its source at the precision the prose prints.
-cms("SI 7: the masking arm reads +0.00005", 5e-05,
+cms("S7: the masking arm reads +0.00005", 5e-05,
     _ARMS_MS["mask only"]["median"], _dp(5e-05, 5))
-cms("SI 7: the device-noise arm reads +0.00432", 0.00432,
+cms("S7: the device-noise arm reads +0.00432", 0.00432,
     _ARMS_MS["noise only"]["median"], _dp(0.00432, 5))
 # 2026-09-12: moved from 3.3 to SI 7 with the sentence. Two digits are a poor
 # needle -- SI 7 also prints 0.2182, and "82" is a substring of it, so a
 # mutation to "86 times" stayed green on the number alone. The phrase is the
 # needle instead.
-cms("SI 7: masking is worth 82 times less than device noise", 82.0,
+cms("S7: masking is worth 82 times less than device noise", 82.0,
     _ARMS_MS["noise only"]["median"] / _ARMS_MS["mask only"]["median"],
     _dp(82.0, 0), phrase="82 times the masking arm")
 cms("3.3: recovery at beta = 0 runs from 92%", 92.0, min(_REC_MS[0.0]),
@@ -4677,7 +4716,7 @@ cms("3.3: and ends at 9.1%", 9.1, max(_REC_MS[0.95]), _dp(9.1, 1))
 # in twenty-eight" is: the manuscript spells it "eleven", and _forms() reads
 # digits. Registering it as an in-text value would report it as quoted nowhere
 # on a sentence that quotes it perfectly well.
-check("MS", "SI 7: a cell holds eleven venues at the median", 11.0,
+check("MS", "S7: a cell holds eleven venues at the median", 11.0,
       p39_ms["design"]["venues_per_cell_median"], 1e-9)
 # 9.2% is recomputed over EVERY r_true point on the beta = 0.95 slice, because
 # the sentence is about the slice and not about one grid point, and the second
@@ -4686,11 +4725,11 @@ check("MS", "SI 7: a cell holds eleven venues at the median", 11.0,
 _BTW95_MS = [100 * _pt["r_between_med"] / _pt["r_true_med"]
              for _pt in p39_ms["surface"].values()
              if _pt["beta"] == 0.95 and _pt["r_true_med"] > 0]
-check("MS", "SI 7: the beta = 0.95 slice carries ten r_true points", 10.0,
+check("MS", "S7: the beta = 0.95 slice carries ten r_true points", 10.0,
       float(len(_BTW95_MS)), 1e-9)
-cms("SI 7: the finite venue draw leaves 9.2% of the truth between cells", 9.2,
+cms("S7: the finite venue draw leaves 9.2% of the truth between cells", 9.2,
     max(_BTW95_MS), _dp(9.2, 1))
-check("MS", "SI 7: ...and that share is flat across the slice, to 0.01 pp", 1.0,
+check("MS", "S7: ...and that share is flat across the slice, to 0.01 pp", 1.0,
       1.0 if max(_BTW95_MS) - min(_BTW95_MS) < 0.01 else 0.0, 1e-9)
 # The bound table, every cell, plus the verdict row underneath it.
 # Every cell of this row is a printed UPPER BOUND, and the row label carries no
@@ -4719,9 +4758,9 @@ cms("3.3: 0.9347 with national weighting", 0.9347,
 cms("3.3: 0.9217 on the Seoul arm", 0.9217, p53_ms["asymmetry"]["beta_seoul"],
     _dp(0.9217, 4))
 _KS_MS = {r["k"]: r for r in p44_ms["sensitivity"]["venue_size"]["rows"]}
-cms("SI 7: unobserved venue members push beta down to 0.9037 at k = 1.25",
+cms("S7: unobserved venue members push beta down to 0.9037 at k = 1.25",
     0.9037, _KS_MS[1.25]["beta"], _dp(0.9037, 4))
-cms("SI 7: and to 0.8578 at k = 1.5", 0.8578, _KS_MS[1.5]["beta"],
+cms("S7: and to 0.8578 at k = 1.5", 0.8578, _KS_MS[1.5]["beta"],
     _dp(0.8578, 4))
 check("MS", "3.3: eleven readings of beta are weighed", 11.0,
       float(len(p59["claim"]["measured_betas"])), 1e-9)
@@ -4729,9 +4768,9 @@ check("MS", "3.3: all eleven lie below 0.95", 1.0,
       1.0 if p59["claim"]["all_below_0p95"] else 0.0, 1e-9)
 check("MS", "3.3: the survey is excluded at the measured grid point 0.95", 1.0,
       1.0 if p59["claim"]["excluded"] else 0.0, 1e-9)
-cms("3.3: the crossing on the realised scale is beta* = 0.923", 0.923,
+cms("3.3: the crossing on the realized scale is beta* = 0.923", 0.923,
     p66_ms["beta_star"]["realised_A"], _dp(0.923, 3))
-cms("SI 7: the refined crossing on the requested grid is 0.9659", 0.9659,
+cms("S7: the refined crossing on the requested grid is 0.9659", 0.9659,
     p59["beta_star"]["primary_value"], _dp(0.9659, 4))
 # The realised bound at the Seoul arm's own beta, which is what the margin is.
 cms("3.3: at the Seoul arm's beta the bound is 0.2182", 0.2182,
@@ -4758,14 +4797,14 @@ cms("3.4: Kendall tau falls to 0.167 at theta = -1 in December 2023", 0.167,
     _TH12_MS[-1.0]["kendall_tau_vs_theta0"], _dp(0.167, 3))
 cms("3.4: and to 0.117 at theta = +1", 0.117,
     _TH12_MS[1.0]["kendall_tau_vs_theta0"], _dp(0.117, 3))
-cms("SI 8: 0.167 and 0.250 in February 2024", 0.250,
+cms("S8: 0.167 and 0.250 in February 2024", 0.250,
     _TH02_MS[1.0]["kendall_tau_vs_theta0"], _dp(0.250, 3))
 check("MS", "3.4: the leading band moves across three", 3.0,
       float(len({_TH12_MS[_t]["top_band"] for _t in (-1.0, 0.0, 1.0)})), 1e-9)
 _MVC_MS = p33_live["mask_vs_coverage"]
-cms("SI 8: the masking band is 0.00242 wide in December 2023", 0.00242,
+cms("S8: the masking band is 0.00242 wide in December 2023", 0.00242,
     _MVC_MS["202312"]["mask_width"], _dp(0.00242, 5))
-cms("SI 8: the coverage family spans 0.03395", 0.03395,
+cms("S8: the coverage family spans 0.03395", 0.03395,
     _MVC_MS["202312"]["theta_width"], _dp(0.03395, 5))
 cms("3.4: coverage is 14.0 times masking", 14.0, _MVC_MS["202312"]["ratio"],
     _dp(14.0, 1))
@@ -4781,25 +4820,25 @@ _CM12_MS = {r["pair"]: r for r in p35_live["comparison_marginal"]["202312"]}
 check("MS", "3.4: all three matrices name 15-19 first in December 2023", 1.0,
       _eq(_cap(_c46, None, "c", "the first choice they agree on"), "15-19"),
       1e-9)
-cms("SI 9: the Kendall tau against the survey is +0.429 at dong", 0.429,
+cms("S9: the Kendall tau against the survey is +0.429 at dong", 0.429,
     _CM12_MS["survey vs passive_dong"]["tau"], _dp(0.429, 3))
 _REG_MS = [100 * p35_live["allocation"][f"{_m}|R0={_r:g}"]["cross_application"]
            ["regret_share_of_benefit"]
            for _m in (202312, 202402) for _r in (1.3, 1.8, 2.5)]
 check("MS", "3.4: the regret band is taken over two months x three R0", 6.0,
       float(len(_REG_MS)), 1e-9)
-cms("SI 9: the plan forgoes at least 2.97% of the benefit", 2.97, min(_REG_MS),
+cms("S9: the plan forgoes at least 2.97% of the benefit", 2.97, min(_REG_MS),
     _dp(2.97, 2), bound="lower")
-cms("SI 9: and at most 23.3%", 23.3, max(_REG_MS), _dp(23.3, 1), bound="upper")
+cms("S9: and at most 23.3%", 23.3, max(_REG_MS), _dp(23.3, 1), bound="upper")
 _PS_MS = p52_ms["point_summary"]
 cms("3.4: December 2023 national regret is 1.27% at R0 = 2.5", 1.27,
     100 * _PS_MS["at_anchor"]["202312|national"], _dp(1.27, 2))
-cms("SI 9: and 50.9% at R0 = 1.5", 50.9,
+cms("S9: and 50.9% at R0 = 1.5", 50.9,
     100 * _PS_MS["max_over_grid"]["202312|national"], _dp(50.9, 1))
-cms("SI 9: a factor of 40", 40.0,
+cms("S9: a factor of 40", 40.0,
     _PS_MS["max_over_grid"]["202312|national"]
     / _PS_MS["at_anchor"]["202312|national"], _dp(40.0, 0))
-cms("SI 9: February 2024 runs from 11.2%", 11.2,
+cms("S9: February 2024 runs from 11.2%", 11.2,
     100 * _PS_MS["at_anchor"]["202402|national"], _dp(11.2, 1))
 cms("3.4: to a peak of 62.6%", 62.6,
     100 * _PS_MS["max_over_grid"]["202402|national"], _dp(62.6, 1))
@@ -4839,18 +4878,18 @@ _A25_MS = {_c: _p52_at(_c, 2.5) for _c in _PT_MS}
 # matching inside the 0.117 Kendall tau three paragraphs up, and 0.016's "0.0"
 # form matches inside any 0.0xx in the section. A section was the right question
 # for the rows around these; for a sentence made of four small decimals it is not.
-cms("SI 9: at their peaks the survey plan holds the attack rate at or below "
+cms("S9: at their peaks the survey plan holds the attack rate at or below "
     "0.016", 0.016,
     max(_r["attack_own_plan"] for _r in _PEAK_MS.values()), _dp(0.016, 3),
     phrase="holds the final attack rate at or below 0.016", bound="upper")
-cms("SI 9: while the passive plan leaves at least 0.057 infected there", 0.057,
+cms("S9: while the passive plan leaves at least 0.057 infected there", 0.057,
     min(_r["attack_passive_plan"] for _r in _PEAK_MS.values()), _dp(0.057, 3),
     phrase="leaves between 0.057 and 0.171", bound="lower")
 # 0.171: the largest of the four is 0.170305, and 0.170 is under it.
-cms("SI 9: and at most 0.171", 0.171,
+cms("S9: and at most 0.171", 0.171,
     max(_r["attack_passive_plan"] for _r in _PEAK_MS.values()), _dp(0.171, 3),
     phrase="leaves between 0.057 and 0.171", bound="upper")
-cms("SI 9: at R0 = 2.5 the two plans end within 0.023 of each other", 0.023,
+cms("S9: at R0 = 2.5 the two plans end within 0.023 of each other", 0.023,
     max(_r["attack_passive_plan"] - _r["attack_own_plan"]
         for _r in _A25_MS.values()), _dp(0.023, 3),
     phrase="within 0.023 of each other")
@@ -4899,7 +4938,7 @@ cms("4.1: the distance is never further than 0.0258", 0.0258,
 # size is gated beside the bound rather than left to the reader of this file.
 _B69_MS = [_r for _r in p69_ms["conversion"]
            if round(_r["realised_A"], 3) <= 0.908]
-check("MS", "3.3: four grid rows have a realised beta up to 0.908", 4.0,
+check("MS", "3.3: four grid rows have a realized beta up to 0.908", 4.0,
       float(len(_B69_MS)), 1e-9)
 cms("3.3: below that the bound excludes the survey by 0.037 or more", 0.037,
     min(p69_ms["answer"]["r_survey"] - _r["bound"] for _r in _B69_MS),
@@ -4912,9 +4951,8 @@ cms("3.4: and to 0.167 in February 2024", 0.167,
 # not a statement about the eigenvector ordering (Fig 6(b)), and 4.1 used to
 # attach it to the ordering. The prose now says the family spans fourteen times
 # more of the reading, so the phrase this row greps for moves with it.
-cms("4.1: the coverage family spans fourteen times more of the reading",
-    14.0, _MVC_MS["202312"]["ratio"], _dp(14.0, 0),
-    phrase="fourteen times more")
+# 2026-09-21: the sentence went in the word-count cut that paid for the ten new
+# references; 3.4 states the same ratio as 14.0 and 14.3 and those rows stand.
 cms("4.1: age coarsening inflates by a median factor of 3.96", 3.96,
     _s60["retained_frac"]["median"], _dp(3.96, 2))
 # "takes up", not "at most": 3.2 prints this as a measurement at one decimal
@@ -4973,12 +5011,12 @@ cms("2.6: the second implementation agrees on 692 of 692 checks", 692.0,
 # round, so registering the manuscript against _cap() closes the chain end to
 # end rather than opening a second, parallel one.
 cms("Fig 1: 1 896 parquet files", 1896.0, float(p48["parquet_files"]), 1e-12)
-cms("SI 2: bands 20-24 to 40-44 lose 10.9% of their cells at least", 10.9,
+cms("S2: bands 20-24 to 40-44 lose 10.9% of their cells at least", 10.9,
     100 * p48["masked_band_rate_range"][0], _dp(10.9, 1), bound="lower")
 # 69.6, not 69.5: the largest band rate is 0.6952.
-cms("SI 2: and 69.6% at most", 69.6, 100 * p48["masked_band_rate_range"][1],
+cms("S2: and 69.6% at most", 69.6, 100 * p48["masked_band_rate_range"][1],
     _dp(69.6, 1), bound="upper")
-cms("SI 2: bands 45-64 lose a trace under 0.13%", 0.13,
+cms("S2: bands 45-64 lose a trace under 0.13%", 0.13,
     p48["masked_band_trace_cap_pct"], 1e-12)
 check("MS", "Fig 1: the largest trace band is 50-54", 1.0,
       _eq(p48["masked_band_trace_max_band"], "50-54"), 1e-9)
@@ -5029,9 +5067,14 @@ check("MS", "Fig 2(a): they fall in nine runs", 9.0,
       _cap(_c63, 2, "a", "=the clearing months sit in this many runs"), 1e-9)
 _YM63 = [float(_x) for _x
          in _cap(_c63, 2, "a", "year medians, first to last").split("->")]
-cms("Fig 2(a): the year medians start at 0.01372 bits", 0.01372, _YM63[0],
-    _dp(0.01372, 5))
-cms("Fig 2(a): and end at 0.02329", 0.02329, _YM63[1], _dp(0.02329, 5))
+# 2026-10-02: JRSI caption-length pass (every caption <= 150 words). The
+# caption stopped printing these; the values are still verified against the
+# caption sheet, only the document assertion goes (the beta = 0.98
+# convention). check() takes an absolute tolerance, hence the multiplication.
+check("MS", "Fig 2(a): the year medians start at 0.01372 bits", 0.01372, _YM63[0],
+      _dp(0.01372, 5) * 0.01372)
+check("MS", "Fig 2(a): and end at 0.02329", 0.02329, _YM63[1],
+      _dp(0.02329, 5) * 0.02329)
 cms("3.1: a factor of 1.70 over the period", 1.70,
     _cap(_c63, 2, "a", "level trend over the period"), _dp(1.70, 2))
 
@@ -5059,9 +5102,13 @@ check("MS", "Fig 2(b): 36 of the 78 shifts clear chance", 1.0,
 # gated above; these are the three that were missing, and they are read from
 # p58 rather than p63 because the deleted panel took them out of the sheet.
 _AGK = p58["degeneracy"]["agreement_by_k"]
-cms("Fig 2(b): and 59 labels at k = 48", 59.0, float(_AGK[48]), _dp(59.0, 0))
-cms("Fig 2(b): 54 at k = 60", 54.0, float(_AGK[60]), _dp(54.0, 0))
-cms("Fig 2(b): and 49 at k = 72", 49.0, float(_AGK[72]), _dp(49.0, 0))
+# 2026-10-02: JRSI caption-length pass (every caption <= 150 words). The
+# caption stopped printing these; the values are still verified against the
+# caption sheet, only the document assertion goes (the beta = 0.98
+# convention). check() takes an absolute tolerance, hence the multiplication.
+check("MS", "Fig 2(b): and 59 labels at k = 48", 59.0, float(_AGK[48]), 1e-9)
+check("MS", "Fig 2(b): 54 at k = 60", 54.0, float(_AGK[60]), 1e-9)
+check("MS", "Fig 2(b): and 49 at k = 72", 49.0, float(_AGK[72]), 1e-9)
 check("MS", "Fig 2(b): agreement falls five months per twelve-month step", 1.0,
       1.0 if all(_AGK[k] - _AGK[k + 12] == 5
                  for k in (12, 24, 36, 48, 60)) else 0.0, 1e-9)
@@ -5082,9 +5129,9 @@ check("MS", "Fig 2(b): which is p64's 1/12 = 0.083 resolution floor", 0.0,
 check("MS", "Fig 2(b): or 1/6 = 0.17 collapsed", 0.0,
       abs(_cap(_c63, 2, "b", "resolution floor after collapsing")
           - p64["deduplicated"]["advisor"]["resolution_floor"]), 1e-9)
-cms("SI 5: the secondary contrast reads 0.0253", 0.0253,
+cms("S5: the secondary contrast reads 0.0253", 0.0253,
     _cap(_c63, 2, "b", "secondary median-contrast p"), _dp(0.0253, 4))
-cms("SI 5: on a D(0) of 0.00563 bits", 0.00563,
+cms("S5: on a D(0) of 0.00563 bits", 0.00563,
     _cap(_c63, 2, "b", "secondary median-contrast D(0)"), _dp(0.00563, 5))
 check("MS", "Fig 2(b): D(0)'s rank among the rotations is 1", 1.0,
       _cap(_c63, 2, "b", "secondary contrast rank among"), 1e-9)
@@ -5125,7 +5172,7 @@ check("MS", "Fig 2(b) caption: the only one no rotation beats", 0.0,
 # and points at SI 3, whose own rows (against p37) gate them. These two became
 # check(), on the beta = 0.98 convention: p63 still has to have drawn the same
 # series, but no document sentence quotes the figures here any more.
-check("MS", "Fig 2(c) draws the dong series from 0.01311 (SI 3 quotes it)", 0.01311,
+check("MS", "Fig 2(c) draws the dong series from 0.01311 (S3 quotes it)", 0.01311,
       _cap(_c63, 2, "c", "dong assort_min"), 5e-6)
 check("MS", "Fig 2(c): ...to 0.02589", 0.02589,
       _cap(_c63, 2, "c", "dong assort_max"), 5e-6)
@@ -5140,16 +5187,26 @@ check("MS", "Fig 2(c): on the weekday-evening panel every other reading uses",
 
 cms("Fig 3(a): the shared colour limit is 1.82", 1.82,
     _cap(_c47, 3, "a", "shared colour limit"), _dp(1.82, 2))
-cms("Fig 3(a): the passive dong maximum is 0.353", 0.353,
-    _cap(_c47, 3, "a", "passive, dong (424)"), _dp(0.353, 3))
-cms("Fig 3(a): the district maximum is 0.183", 0.183,
-    _cap(_c47, 3, "a", "passive, district (25)"), _dp(0.183, 3))
-cms("Fig 3(b): sigma2/sigma1 is 0.066 at district", 0.066,
-    _cap(_c47, 3, "b", "sigma2/sigma1, passive, district"), _dp(0.066, 3))
-cms("Fig 3(b): the district leading share is 99.5%", 99.5,
-    100 * _cap(_c47, 3, "b", "sigma1 share, passive, district"), _dp(99.5, 1))
-cms("Fig 3(b): the dong leading share is 98.0%", 98.0,
-    100 * _cap(_c47, 3, "b", "sigma1 share, passive, dong"), _dp(98.0, 1))
+# 2026-10-02: JRSI caption-length pass (every caption <= 150 words). The
+# caption stopped printing these; the values are still verified against the
+# caption sheet, only the document assertion goes (the beta = 0.98
+# convention). check() takes an absolute tolerance, hence the multiplication.
+check("MS", "Fig 3(a): the passive dong maximum is 0.353", 0.353,
+      _cap(_c47, 3, "a", "passive, dong (424)"), _dp(0.353, 3) * 0.353)
+check("MS", "Fig 3(a): the district maximum is 0.183", 0.183,
+      _cap(_c47, 3, "a", "passive, district (25)"), _dp(0.183, 3) * 0.183)
+# check(), not cms(), since 2026-09-21: the caption sentence carrying these
+# three went in the word-count cut (3.2 prints the dong pair at four decimals,
+# 97.95% and 0.1237, on its own rows). The values are still verified against the
+# sheet; only the document assertion goes.
+# check() takes an absolute tolerance where cms() took a relative one, hence
+# the multiplication, the same as the beta = 0.96 rows on Figure 5(b).
+check("MS", "Fig 3(b): sigma2/sigma1 is 0.066 at district", 0.066,
+      _cap(_c47, 3, "b", "sigma2/sigma1, passive, district"), _dp(0.066, 3) * 0.066)
+check("MS", "Fig 3(b): the district leading share is 99.5%", 99.5,
+      100 * _cap(_c47, 3, "b", "sigma1 share, passive, district"), _dp(99.5, 1) * 99.5)
+check("MS", "Fig 3(b): the dong leading share is 98.0%", 98.0,
+      100 * _cap(_c47, 3, "b", "sigma1 share, passive, dong"), _dp(98.0, 1) * 98.0)
 cms("Fig 3(b): the null's 2.5th percentile is 0.0998", 0.0998,
     _cap(_c47, 3, "b", "p2.5 (lower edge"), _dp(0.0998, 4))
 cms("Fig 3(b): its 97.5th is 0.1671", 0.1671,
@@ -5159,90 +5216,103 @@ cms("Fig 3(b): its 97.5th is 0.1671", 0.1671,
 # offers coarse spellings and the region contained one. Verified, not quoted.
 check("MS", "Fig 3(b): the null's smallest draw is 0.0858", 0.0858,
       _cap(_c47, 3, "b", "min over 500 ego-band shuffles"), _dp(0.0858, 4) * 0.0858)
-cms("SI 3: its largest is 0.2117", 0.2117,
+cms("S3: its largest is 0.2117", 0.2117,
     _cap(_c47, 3, "b", "max over 500 ego-band shuffles"), _dp(0.2117, 4))
-cms("SI 3: the declared escape threshold is 0.1585", 0.1585,
+cms("S3: the declared escape threshold is 0.1585", 0.1585,
     _cap(_c47, 3, "b", "p95 (the declared escape threshold)"), _dp(0.1585, 4))
-cms("SI 3: the bootstrap interval starts at 0.5161", 0.5161,
+cms("S3: the bootstrap interval starts at 0.5161", 0.5161,
     _cap(_c47, 3, "b", "bootstrap, p2.5"), _dp(0.5161, 4))
-cms("SI 3: and ends at 0.7899", 0.7899,
+cms("S3: and ends at 0.7899", 0.7899,
     _cap(_c47, 3, "b", "bootstrap, p97.5"), _dp(0.7899, 4))
-cms("SI 3: its smallest of 500 resamples is 0.4793", 0.4793,
+cms("S3: its smallest of 500 resamples is 0.4793", 0.4793,
     _cap(_c47, 3, "b", "bootstrap, min over 500 respondent resamples"),
     _dp(0.4793, 4))
 check("MS", "Fig 3(b): the passive district spectrum sits at the 0th percentile",
       0.0, _cap(_c47, 3, "b", "passive district sigma2/sigma1, percentile"),
       1e-9)
-check("MS", "SI 3: the survey block has 24 empty cells", 24.0,
+check("MS", "S3: the survey block has 24 empty cells", 24.0,
       float(_cap(_c47, 3, "b", "observed empty cells")), 1e-9)
-check("MS", "SI 3: against a null median of 8", 8.0,
+check("MS", "S3: against a null median of 8", 8.0,
       _cap(_c47, 3, "b", "null median empty cells"), 1e-9)
 check("MS", "Fig 3(a): 10 of the survey's 24 empty cells are empty in both "
             "directions", 10.0,
       float(_cap(_c47, 3, "a", "empty in both directions and so still empty")),
       1e-9)
 
-cms("SI 6: the adjacency graph carries 1 153 edges", 1153.0,
+cms("S6: the adjacency graph carries 1 153 edges", 1153.0,
     float(p34["adjacency"]["edges"]), 1e-12)
-cms("SI 6: at mean degree 5.44", 5.44, p34["adjacency"]["mean_degree"],
+cms("S6: at mean degree 5.44", 5.44, p34["adjacency"]["mean_degree"],
     _dp(5.44, 2))
-cms("Fig 4(b): the nested ladder reads 0.019377 at 16 bins", 0.019377,
-    _cap(_c47, 4, "b", "nested ladder median, 16 bins"), _dp(0.019377, 6))
-cms("Fig 4(b): 0.033988 at 8", 0.033988,
-    _cap(_c47, 4, "b", "nested ladder median, 8 bins"), _dp(0.033988, 6))
-cms("Fig 4(b): 0.056344 at 4", 0.056344,
-    _cap(_c47, 4, "b", "nested ladder median, 4 bins"), _dp(0.056344, 6))
-cms("Fig 4(b): 0.086885 at 2", 0.086885,
-    _cap(_c47, 4, "b", "nested ladder median, 2 bins"), _dp(0.086885, 6))
-cms("Fig 4(b): the Lim marker sits at 0.082904", 0.082904,
-    _cap(_c47, 4, "b", "median 3-bin assortativity"), _dp(0.082904, 6))
-cms("Fig 4(b): a factor of 3.9577", 3.9577,
-    _cap(_c47, 4, "b", "median 3-bin / 16-bin ratio"), _dp(3.9577, 4))
+# 2026-10-02: JRSI caption-length pass (every caption <= 150 words). The
+# caption stopped printing these; the values are still verified against the
+# caption sheet, only the document assertion goes (the beta = 0.98
+# convention). check() takes an absolute tolerance, hence the multiplication.
+# 3.3 prints the 16-bin, three-band and ratio medians at four or two decimals
+# on its own rows (0.01938, 0.08290, 3.96).
+check("MS", "Fig 4(b): the nested ladder reads 0.019377 at 16 bins", 0.019377,
+      _cap(_c47, 4, "b", "nested ladder median, 16 bins"), _dp(0.019377, 6) * 0.019377)
+check("MS", "Fig 4(b): 0.033988 at 8", 0.033988,
+      _cap(_c47, 4, "b", "nested ladder median, 8 bins"), _dp(0.033988, 6) * 0.033988)
+check("MS", "Fig 4(b): 0.056344 at 4", 0.056344,
+      _cap(_c47, 4, "b", "nested ladder median, 4 bins"), _dp(0.056344, 6) * 0.056344)
+check("MS", "Fig 4(b): 0.086885 at 2", 0.086885,
+      _cap(_c47, 4, "b", "nested ladder median, 2 bins"), _dp(0.086885, 6) * 0.086885)
+check("MS", "Fig 4(b): the Lim marker sits at 0.082904", 0.082904,
+      _cap(_c47, 4, "b", "median 3-bin assortativity"), _dp(0.082904, 6) * 0.082904)
+check("MS", "Fig 4(b): a factor of 3.9577", 3.9577,
+      _cap(_c47, 4, "b", "median 3-bin / 16-bin ratio"), _dp(3.9577, 4) * 3.9577)
 check("MS", "Fig 4(b): ranging from 3.4705 to 4.7933", 1.0,
       _eq(_cap(_c47, 4, "b", "ratio, range over the months"),
           "3.4705-4.7933"), 1e-9)
-cms("SI 6: the absorbed-excess term is 2.2708", 2.2708,
+cms("S6: the absorbed-excess term is 2.2708", 2.2708,
     _cap(_c47, 4, "b", "absorbed-excess gain"), _dp(2.2708, 4))
-cms("SI 6: the margin-concentration term is 1.71", 1.71,
+cms("S6: the margin-concentration term is 1.71", 1.71,
     _cap(_c47, 4, "b", "margin-concentration shrink"), _dp(1.71, 2))
 # The caption's own null had no row at all until the direction rule swept the
 # prose for it: "no larger than 4.94e-16" is a bound, and the measured maximum
 # is 4.940347e-16, which sits above it. 4.95 is that rounded up at the two
 # decimals the caption prints.
-cms("Fig 4(b): under proportionate mixing every rung returns at most 4.95e-16",
+# 2026-10-02: the sentence moved from Figure 4(b)'s caption into 3.3, where
+# "Aggregation does not manufacture the rise" now carries it, and the row
+# follows it there.
+cms("3.3: under proportionate mixing every rung returns at most 4.95e-16",
     4.95e-16, _m60["proportionate_mixing_null_max_abs_r"],
     _dp(4.95e-16, 18), bound="upper")
-cms("Fig 4(b): the spatial medians move to 0.4692 at district", 0.4692,
+# 2026-09-22: figure 4 has two panels and its caption described a third, so the
+# sentence carrying these two ratios moved into §3.3, where the spatial axis is
+# argued. The row follows the sentence rather than staying green on a caption
+# that no longer prints it -- the rule p31-rows-must-follow-the-prose states.
+cms("3.3: the spatial medians move to 0.4692 at district", 0.4692,
     _cap(_c47, 4, "b", "district / dong"), _dp(0.4692, 4))
-cms("Fig 4(b): and 0.2454 at city", 0.2454,
+cms("3.3: and 0.2454 at city", 0.2454,
     _cap(_c47, 4, "b", "city / dong"), _dp(0.2454, 4))
-cms("SI 6: the 16-band series spans 5.79 pp", 5.79,
+cms("S6: the 16-band series spans 5.79 pp", 5.79,
     _cap(_c47, 4, "not drawn", "16-band range, pp"), _dp(5.79, 2))
-cms("SI 6: three bands retain 2.93 pp", 2.93,
+cms("S6: three bands retain 2.93 pp", 2.93,
     _cap(_c47, 4, "not drawn", "3-band range, pp"), _dp(2.93, 2))
-cms("SI 6: which is 50.6% of it", 50.6,
+cms("S6: which is 50.6% of it", 50.6,
     100 * _cap(_c47, 4, "not drawn", "fraction of the range three bands retain"),
     _dp(50.6, 1))
-cms("SI 6: the largest single absorption is 3.17 pp", 3.17,
+cms("S6: the largest single absorption is 3.17 pp", 3.17,
     abs(_cap(_c47, 4, "not drawn", "largest single absorption, pp")), _dp(3.17, 2))
-cms("SI 6: the 60+ rule reads +0.07 pp", 0.07,
+cms("S6: the 60+ rule reads +0.07 pp", 0.07,
     _cap(_c47, 4, "not drawn", "3-band 60+ , pp"), _dp(0.07, 2))
-cms("SI 6: its 80+ constituent reads +0.84 pp", 0.84,
+cms("S6: its 80+ constituent reads +0.84 pp", 0.84,
     _cap(_c47, 4, "not drawn", "16-band 80+ , pp"), _dp(0.84, 2))
-cms("SI 6: 80+ reads +0.55 pp under origin-only filtering", 0.55,
+cms("S6: 80+ reads +0.55 pp under origin-only filtering", 0.55,
     _cap(_c47, 4, "not drawn", "p18b 16-band 80+, origin only, pp"), _dp(0.55, 2))
-cms("SI 6: 20-24 reads -3.96 pp with both endpoints", -3.96,
+cms("S6: 20-24 reads -3.96 pp with both endpoints", -3.96,
     _cap(_c47, 4, "not drawn", "p18b 16-band 20-24, both endpoints, pp"), _dp(3.96, 2))
-cms("SI 6: and -3.13 pp with the origin only", -3.13,
+cms("S6: and -3.13 pp with the origin only", -3.13,
     _cap(_c47, 4, "not drawn", "p18b 16-band 20-24, origin only, pp"), _dp(3.13, 2))
-cms("SI 6: three bands read -0.16 pp under origin-only filtering", -0.16,
+cms("S6: three bands read -0.16 pp under origin-only filtering", -0.16,
     _cap(_c47, 4, "not drawn", "p18b 3-band 60+, origin only, pp"), _dp(0.16, 2))
-check("MS", "SI 6: the zero crossing moves one bin under filtering", 1.0,
+check("MS", "S6: the zero crossing moves one bin under filtering", 1.0,
       1.0 if (_cap(_c47, 4, "not drawn", "zero crossing, both endpoints")
               == "65-69/70-74"
               and _cap(_c47, 4, "not drawn", "zero crossing, origin only")
               == "70-74/75-79") else 0.0, 1e-9)
-cms("SI 6: the two series differ by at most 0.48 pp", 0.48,
+cms("S6: the two series differ by at most 0.48 pp", 0.48,
     _cap(_c47, 4, "not drawn", "largest gap between p19's bars"), _dp(0.48, 2),
     bound="upper")
 
@@ -5258,18 +5328,34 @@ check("MS", "Fig 5(b): 0.2340 at 0.97", 0.2340,
 # still verified against the caption sheet; only the document assertion goes.
 check("MS", "Fig 5(b): the bound at beta = 0.98 is 0.2707", 0.2707,
       _cap(_c56, None, "b", "bound at beta = 0.98"), 5e-5)
+# The caption prints both crossings since 2026-09-21; before that its 0.923
+# was gated only under "abstract:" and "3.3:", and captions are carved out of
+# their section's region, so the caption's own copy was checked by nothing.
+cms("Fig 5(b): straddling the crossing beta* = 0.923", 0.923,
+    p66_ms["beta_star"]["realised_A"], _dp(0.923, 3))
+cms("Fig 5(b): whose crossing, 0.918, lies below the band", 0.918,
+    p69_ms["beta_star"]["realised_C"], _dp(0.918, 3))
+check("MS", "Fig 5(b): 'lies below the band' -- the survey-convention crossing "
+            "is below the band's low end, the Seoul arm", 1.0,
+      1.0 if p69_ms["beta_star"]["realised_C"]
+      < p53_ms["asymmetry"]["beta_seoul"] else 0.0, 1e-9)
 check("MS", "Fig 5(b): the survey is excluded up to and including 0.96", 1.0,
       1.0 if (_cap(_c56, None, "b", "survey excluded at beta = 0.96") is True
               and _cap(_c56, None, "b", "survey excluded at beta = 0.97")
               is False) else 0.0, 1e-9)
-cms("SI 7: the analytic form reads 0.3354 at beta = 0.95", 0.3354,
+cms("S7: the analytic form reads 0.3354 at beta = 0.95", 0.3354,
     _cap(_c56, None, "b", "analytic r_obs/(1-beta)"), _dp(0.3354, 4))
-cms("Fig 5(c): the synthetic data field reads 32.7%", 32.7,
-    100 * _cap(_c56, None, "c", "synthetic data field"), _dp(32.7, 1))
-cms("Fig 5(c): the archetype field reads 14.9%", 14.9,
-    100 * _cap(_c56, None, "c", "synthetic archetype field"), _dp(14.9, 1))
-cms("Fig 5(c): the December 2023 rung is 30.1%", 30.1,
-    100 * _cap(_c56, None, "c", "the real 202312 rung"), _dp(30.1, 1))
+# 2026-10-02: JRSI caption-length pass (every caption <= 150 words). The
+# caption stopped printing these; the values are still verified against the
+# caption sheet, only the document assertion goes (the beta = 0.98
+# convention). check() takes an absolute tolerance, hence the multiplication.
+# 3.3 prints 32.7%; SI 7 prints all three on its own rows.
+check("MS", "Fig 5(c): the synthetic data field reads 32.7%", 32.7,
+      100 * _cap(_c56, None, "c", "synthetic data field"), 0.05)
+check("MS", "Fig 5(c): the archetype field reads 14.9%", 14.9,
+      100 * _cap(_c56, None, "c", "synthetic archetype field"), 0.05)
+check("MS", "Fig 5(c): the December 2023 rung is 30.1%", 30.1,
+      100 * _cap(_c56, None, "c", "the real 202312 rung"), 0.05)
 cms("3.3: the measured band runs from 27.6%", 27.6,
     100 * _cap(_c56, None, "c", "p37 band, low"), _dp(27.6, 1))
 cms("3.3: to 32.6%", 32.6, 100 * _cap(_c56, None, "c", "p37 band, high"),
@@ -5342,73 +5428,73 @@ cms("Fig S1(b): the fifth circle clears its null by only 0.015", 0.015,
     _cap(_c55, None, "b", "thinnest margin"), _dp(0.015, 3),
     phrase="clears its null by only 0.015")
 
-cms("SI 8: February 2024's smallest assortativity in the family is 0.01459",
+cms("S8: February 2024's smallest assortativity in the family is 0.01459",
     0.01459, _cap(_c46, None, "a", "smallest assortativity anywhere"),
     _dp(0.01459, 5))
-cms("SI 9: December 2023 forgoes 2.97% at the low end of the three original R0", 2.97,
+cms("S9: December 2023 forgoes 2.97% at the low end of the three original R0", 2.97,
     100 * _cap(_c46, None, "d", "December 2023: benefit forgone at R0 = 1.8"),
     _dp(2.97, 2))
 
 
 # ============================================================ SI
 # --- SI 2: the pairing convention, the reconciliation and the dedup rule
-cms("SI 2: the dong-level correction is -4.29%", -4.29,
+cms("S2: the dong-level correction is -4.29%", -4.29,
     100 * p49_ms["primary"]["rel_change"], _dp(4.29, 2))
-cms("SI 2: 0.021154 falls to 0.020247", 0.020247, p49_ms["primary"]["r_wor"],
+cms("S2: 0.021154 falls to 0.020247", 0.020247, p49_ms["primary"]["r_wor"],
     _dp(0.020247, 6))
 _L49_MS = {r["level"]: r for r in p49_ms["ladder"] if r["ym"] == 202312}
-cms("SI 2: at district it is -0.55%", -0.55, 100 * _L49_MS["gu"]["rel_change"],
+cms("S2: at district it is -0.55%", -0.55, 100 * _L49_MS["gu"]["rel_change"],
     _dp(0.55, 2))
-cms("SI 2: at city -0.044%", -0.044, 100 * _L49_MS["city"]["rel_change"],
+cms("S2: at city -0.044%", -0.044, 100 * _L49_MS["city"]["rel_change"],
     _dp(0.044, 3))
-cms("SI 2: the arithmetic mean group size is 1 080", 1080.0,
+cms("S2: the arithmetic mean group size is 1 080", 1080.0,
     p44_ms["cell"]["mean"], _dp(1080.0, -1))
-cms("SI 2: not the median of 533", 533.0, p44_ms["cell"]["median"],
+cms("S2: not the median of 533", 533.0, p44_ms["cell"]["median"],
     _dp(533.0, 0))
-cms("SI 2: on one convention the ratio is 12.28x", 12.28,
+cms("S2: on one convention the ratio is 12.28x", 12.28,
     p49_ms["convention_consistency"]["ratio_one_convention"], _dp(12.28, 2))
-cms("SI 2: and not 11.76x", 11.76,
+cms("S2: and not 11.76x", 11.76,
     p49_ms["convention_consistency"]["ratio_as_published"], _dp(11.76, 2))
-cms("SI 2: a move of +4.5%", 4.5,
+cms("S2: a move of +4.5%", 4.5,
     100 * p49_ms["convention_consistency"]["rel_move"], _dp(4.5, 1))
-check("MS", "SI 2: the 2020-03 reconciliation is -3.2e-05", -3.22e-05,
+check("MS", "S2: the 2020-03 reconciliation is -3.2e-05", -3.22e-05,
       p29_ms["202003"]["reconciliation_rel_diff"], 5e-8)
-check("MS", "SI 2: and the 2020-12 one is +4.19e-06", 4.19e-06,
+check("MS", "S2: and the 2020-12 one is +4.19e-06", 4.19e-06,
       p29_ms["202012"]["reconciliation_rel_diff"], 5e-9)
-check("MS", "SI 2: the two reconciliations have opposite signs", 1.0,
+check("MS", "S2: the two reconciliations have opposite signs", 1.0,
       1.0 if (p29_ms["202003"]["reconciliation_rel_diff"]
               * p29_ms["202012"]["reconciliation_rel_diff"]) < 0 else 0.0, 1e-9)
-cms("SI 2: 2.28 people per masked cell in 2020-03", 2.28,
+cms("S2: 2.28 people per masked cell in 2020-03", 2.28,
     p29_ms["202003"]["per_cell_mean"], _dp(2.28, 2))
-cms("SI 2: 11.09% of volume in 2020-12", 11.09,
+cms("S2: 11.09% of volume in 2020-12", 11.09,
     100 * p29_ms["202012"]["measured_share"], _dp(11.09, 2))
-cms("SI 2: 11.60% in 2020-03", 11.60,
+cms("S2: 11.60% in 2020-03", 11.60,
     100 * p29_ms["202003"]["measured_share"], _dp(11.60, 2))
-cms("SI 2: against the 7.62% an interval midpoint would supply", 7.62,
+cms("S2: against the 7.62% an interval midpoint would supply", 7.62,
     100 * p29_ms["202012"]["assumed_mid_share"], _dp(7.62, 2))
-cms("SI 2: the district file masks 9.4% of its own cells", 9.4,
+cms("S2: the district file masks 9.4% of its own cells", 9.4,
     100 * p29_ms["202012"]["gu_own_masked_share"], _dp(9.4, 1))
-cms("SI 2: the window is served by 1 896 parquet files", 1896.0,
+cms("S2: the window is served by 1 896 parquet files", 1896.0,
     float(inv_ms["parquet_files"]), 1e-12)
 _G25_MS = sorted(r["jan"] for r in p2_ms["maskrate_age_gu"] if r["age"] == 25)
-check("MS", "SI 2: the 25-29 district mask rates cover 25 districts", 25.0,
+check("MS", "S2: the 25-29 district mask rates cover 25 districts", 25.0,
       float(len(_G25_MS)), 1e-9)
-cms("SI 2: 25-29 district mask rates start at 0.637", 0.637, _G25_MS[0],
+cms("S2: 25-29 district mask rates start at 0.637", 0.637, _G25_MS[0],
     _dp(0.637, 3))
-cms("SI 2: with a median of 0.676", 0.676, _G25_MS[len(_G25_MS) // 2],
+cms("S2: with a median of 0.676", 0.676, _G25_MS[len(_G25_MS) // 2],
     _dp(0.676, 3))
-cms("SI 2: and a maximum of 0.734", 0.734, _G25_MS[-1], _dp(0.734, 3))
-cms("SI 2: the raw files hold 475 266 duplicate key groups", 475266.0,
+cms("S2: and a maximum of 0.734", 0.734, _G25_MS[-1], _dp(0.734, 3))
+cms("S2: the raw files hold 475 266 duplicate key groups", 475266.0,
     float(p2_ms["dedup"]["duplicate_keys"]), 1e-12)
 # The two ends of the dedup sentence, from the fork that measured it. The
 # reconciliation is the one validation that proves the volume column is right,
 # so both arms are gated and so is the sign flip between them.
 _FORK_MS = p43d_ms["p29_fork"]["202012"]
-check("MS", "SI 2: per-path dedup leaves the reconciliation at +4.19e-06",
+check("MS", "S2: per-path dedup leaves the reconciliation at +4.19e-06",
       4.19e-06, _FORK_MS["raw"]["recon_rel"], 5e-9)
-check("MS", "SI 2: an unconditional dedup degrades it to -1.52e-04", -1.52e-04,
+check("MS", "S2: an unconditional dedup degrades it to -1.52e-04", -1.52e-04,
       _FORK_MS["dedup"]["recon_rel"], 5e-7)
-check("MS", "SI 2: and flips its sign", 1.0,
+check("MS", "S2: and flips its sign", 1.0,
       1.0 if _FORK_MS["raw"]["recon_rel"] * _FORK_MS["dedup"]["recon_rel"] < 0
       else 0.0, 1e-9)
 
@@ -5428,98 +5514,98 @@ for _ym_ms, _row_ms in (("202312", (("half_l1", 0.0588, 0.3285, 5.6),
             _CMP_MS[_ym_ms][_st_ms]["survey"], _dp(_s_ms, 4))
         cms(f"SI Table S1 {_ym_ms} {_st_ms} multiple", _r_ms,
             _CMP_MS[_ym_ms][_st_ms]["ratio"], _dp(_r_ms, 1))
-cms("SI 3: the diary survey records 4.809 contacts per person per day", 4.809,
+cms("S3: the diary survey records 4.809 contacts per person per day", 4.809,
     p27_ms["reproduction"]["per_person_day"], _dp(4.809, 3))
-cms("SI 3: the 79-month normalised mutual information starts at 0.0021", 0.0021,
+cms("S3: the 79-month normalized mutual information starts at 0.0021", 0.0021,
     p37["summary_dong"]["nmi_min"], _dp(0.0021, 4))
-cms("SI 3: and reaches 0.0073", 0.0073, p37["summary_dong"]["nmi_max"],
+cms("S3: and reaches 0.0073", 0.0073, p37["summary_dong"]["nmi_max"],
     _dp(0.0073, 4))
-cms("SI 3: the leading spectral share has median 0.9823", 0.9823,
+cms("S3: the leading spectral share has median 0.9823", 0.9823,
     p37["spectrum_dong"]["sigma1_share_median"], _dp(0.9823, 4))
-cms("SI 3: and minimum 0.9702", 0.9702,
+cms("S3: and minimum 0.9702", 0.9702,
     p37["spectrum_dong"]["sigma1_share_min"], _dp(0.9702, 4))
 # --- SI 7's phase-69 paragraph. The factor, the two ends of the ladder, and the
 # three claims that are properties of the run rather than numbers in it.
 _P69K = {r["design"]: r for r in p69_ms["conversion"]}
 _P69L = {r["beta"]: r["arms"] for r in p69_ms["ladder"]}
-cms("SI 7: the factor is 0.928 at a true value of 0.22", 0.928,
+cms("S7: the factor is 0.928 at a true value of 0.22", 0.928,
     _P69K[0.95]["k_integerised_subsample"], _dp(0.928, 3))
-cms("SI 7: and 0.961 at 0.35", 0.961,
+cms("S7: and 0.961 at 0.35", 0.961,
     _P69K[0.99]["k_integerised_subsample"], _dp(0.961, 3))
-cms("SI 7: pooling within cells falls from 0.2038 at one venue", 0.2038,
+cms("S7: pooling within cells falls from 0.2038 at one venue", 0.2038,
     _P69L[0.95]["within-cell"]["1"], _dp(0.2038, 4))
-cms("SI 7: to 0.0188 at the whole cell", 0.0188,
+cms("S7: to 0.0188 at the whole cell", 0.0188,
     _P69L[0.95]["within-cell"]["cell"], _dp(0.0188, 4))
 # "identical to four decimal places at a given occupancy" -- the same r_true
 # read at two requested betas, which is the claim that the factor is a function
 # of occupancy and not of beta.
 _P69S = {(r["beta"], r["r_true_target"]): r["wor_over_wr"] for r in p69_ms["surface"]}
-check("MS", "SI 7: the factor agrees to four places across requested beta", 1.0,
+check("MS", "S7: the factor agrees to four places across requested beta", 1.0,
       1.0 if abs(_P69S[(0.5, 0.03)] - _P69S[(0.96, 0.03)]) < 5e-5 else 0.0, 1e-9)
 # "pooling at random halves the reading at every doubling" -- the slope-one
 # decay law, checked as a ratio rather than trusted as a description.
 _P69R = _P69L[0.95]["random"]
 _gs = ["1", "2", "4", "8", "16", "32", "64"]
-check("MS", "SI 7: random pooling halves the reading at every doubling", 1.0,
+check("MS", "S7: random pooling halves the reading at every doubling", 1.0,
       1.0 if max(abs(_P69R[_gs[i + 1]] / _P69R[_gs[i]] - 0.5)
                  for i in range(len(_gs) - 1)) < 0.01 else 0.0, 1e-9)
 # 9e-4, not 8e-4: the largest deviation is 8.0032e-4, which sits above the
 # quote by four parts in ten thousand of itself. At one significant figure the
 # only true upper bound is 9e-4.
-cms("SI 7: rounding to whole people changes the factor by at most 9e-4", 9e-4,
+cms("S7: rounding to whole people changes the factor by at most 9e-4", 9e-4,
     max(abs(_P69K[b]["k_integerised_subsample"]
             - _P69K[b]["k_fractional_subsample"]) for b in (0.95, 0.96, 0.97,
                                                             0.98, 0.99)),
     _dp(9e-4, 4), bound="upper")
 # The bottom of Table S2's column, which SI 7 states as a bound and nothing was
 # watching. It is already rounded the right way: 0.18135 up to 0.1814.
-cms("SI 7: at the unidentified end of the column the bound is 0.1814 or less",
+cms("S7: at the unidentified end of the column the bound is 0.1814 or less",
     0.1814,
     max(_v["bound_on_A"] for _v in p69_ms["verdicts"] if _v["excludes"]),
     _dp(0.1814, 4), bound="upper")
-cms("SI 7: and the axis by 5e-5", 5e-5,
+cms("S7: and the axis by 5e-5", 5e-5,
     max(abs(_P69K[b]["realised_C_integerised"]
             - _P69K[b]["realised_C_fractional_subsample"])
         for b in (0.95, 0.96, 0.97, 0.98, 0.99)), _dp(5e-5, 5))
-cms("SI 7: the axis is reported from a requested beta of 0.8 upwards", 0.8,
+cms("S7: the axis is reported from a requested beta of 0.8 upwards", 0.8,
     p69_ms["axis_defined_from"]["integerised"], 1e-9)
 # The 4 000 cells are a declared constant of the run, so the row reads the
 # literal out of the script the way the p36 thread-count row does.
 _p69src = open(f"{ROOT}/eda/p69_betacollapse.py").read()
 _m69 = _re.search(r"LADDER_CELLS = (\d+)", _p69src)
-cms("SI 7: 4 000 cells", 4000.0,
+cms("S7: 4 000 cells", 4000.0,
     float(_m69.group(1)) if _m69 else 0.0, 1e-9)
 
-cms("SI 3: the rank-one gap has a median of 0.00150", 0.00150,
+cms("S3: the rank-one gap has a median of 0.00150", 0.00150,
     p37["spectrum_dong"]["gap_to_pm_median"], _dp(0.00150, 5))
 # The maximum of that difference is printed in the same SI sentence and was
 # gated nowhere once the abstract stopped quoting it.
-cms("SI 3: and a maximum of 0.00202", 0.00202,
+cms("S3: and a maximum of 0.00202", 0.00202,
     p37["spectrum_dong"]["gap_to_pm_max"], _dp(0.00202, 5))
 # The distance the difference is a lower bound ON, both ends of it, from the
 # file that measures it.
-cms("SI 3: the distance is 0.0209 at the median", 0.0209,
+cms("S3: the distance is 0.0209 at the median", 0.0209,
     p67_ms["summary"]["gap_rel_median"], _dp(0.0209, 4))
-cms("SI 3: and 0.02573 at the maximum", 0.02573,
+cms("S3: and 0.02573 at the maximum", 0.02573,
     p67_ms["summary"]["gap_rel_max"], _dp(0.02573, 5))
-cms("SI 3: aggregating to districts raises the leading share to 99.45%", 99.45,
+cms("S3: aggregating to districts raises the leading share to 99.45%", 99.45,
     100 * _SP_MS["passive|202312|WE|gu"]["sigma1_share"], _dp(99.45, 2))
-cms("SI 3: sigma2/sigma1 = 0.0661 there", 0.0661,
+cms("S3: sigma2/sigma1 = 0.0661 there", 0.0661,
     _SP_MS["passive|202312|WE|gu"]["sigma2_over_sigma1"], _dp(0.0661, 4))
-cms("SI 3: and to 99.84% at the city", 99.84,
+cms("S3: and to 99.84% at the city", 99.84,
     100 * _SP_MS["passive|202312|WE|city"]["sigma1_share"], _dp(99.84, 2))
-cms("SI 3: the survey's leading share is 54.93% in February 2024", 54.93,
+cms("S3: the survey's leading share is 54.93% in February 2024", 54.93,
     100 * _SP_MS["survey|202402|WE|seoul"]["sigma1_share"], _dp(54.93, 2))
-cms("SI 3: the six published months top out at 0.02136", 0.02136,
+cms("S3: the six published months top out at 0.02136", 0.02136,
     p37["summary_dong"]["published_six_max"], _dp(0.02136, 5))
-cms("SI 3: their upper edge is 21% below the 79-month maximum", 21.0,
+cms("S3: their upper edge is 21% below the 79-month maximum", 21.0,
     100 * (p37["summary_dong"]["assort_max"]
            / p37["summary_dong"]["published_six_max"] - 1), _dp(21.0, 0))
-check("MS", "SI 3: December 2020 is the lowest of all 79 months", 202012.0,
+check("MS", "S3: December 2020 is the lowest of all 79 months", 202012.0,
       float(_WE_MS[0]["ym"]), 1e-9)
-cms("SI 3: on the Seoul arm IPF moves the nMI multiple to 33.7x", 33.7,
+cms("S3: on the Seoul arm IPF moves the nMI multiple to 33.7x", 33.7,
     p32_ms["ipf_calibration"]["months"]["202312"]["gap_after"], _dp(33.7, 1))
-cms("SI 3: and to 39.3x", 39.3,
+cms("S3: and to 39.3x", 39.3,
     p32_ms["ipf_calibration"]["months"]["202402"]["gap_after"], _dp(39.3, 1))
 # THE NATIONAL ARM'S IPF, added 2026-09-03. Until now the SI carried only the
 # Seoul arm's 4.4%/1.2% and 33.7x/39.3x, while the abstract's "33 to 35 times"
@@ -5530,38 +5616,38 @@ cms("SI 3: and to 39.3x", 39.3,
 # SI 3 beside the Seoul arm it is contrasted with. They are the same p51 fields
 # 3.2's rows read; the numbers are quoted twice on purpose, once in the claim
 # and once in its derivation, and each copy is gated where it is printed.
-cms("SI 3: the national arm absorbs 23.6% of the gap in December 2023", 23.6,
+cms("S3: the national arm absorbs 23.6% of the gap in December 2023", 23.6,
     100 * _IPF_MS["202312"]["national"]["absorbed_frac"], _dp(23.6, 1))
-cms("SI 3: and 27.2% in February 2024", 27.2,
+cms("S3: and 27.2% in February 2024", 27.2,
     100 * _IPF_MS["202402"]["national"]["absorbed_frac"], _dp(27.2, 1))
-cms("SI 3: leaving a normalised-mutual-information factor of 34.8x", 34.8,
+cms("S3: leaving a normalized-mutual-information factor of 34.8x", 34.8,
     _IPF_MS["202312"]["national"]["gap_after"], _dp(34.8, 1))
-cms("SI 3: and 33.1x", 33.1, _IPF_MS["202402"]["national"]["gap_after"],
+cms("S3: and 33.1x", 33.1, _IPF_MS["202402"]["national"]["gap_after"],
     _dp(33.1, 1))
 # "in either arm in either month" is a universal, so it is counted over all
 # four fits rather than asserted of the one the main text names.
-check("MS", "SI 3: none of the four IPF fits converges", 0.0,
+check("MS", "S3: none of the four IPF fits converges", 0.0,
       float(sum(1 for _ym_ms in ("202312", "202402")
                 for _arm_ms in ("seoul", "national")
                 if _IPF_MS[_ym_ms][_arm_ms]["converged"])), 1e-9)
 _DVG_MS = p40_ms["divergence_vs_passive_signal"]
-cms("SI 3: the Seoul-to-national population shift is 3.01x the passive excess",
+cms("S3: the Seoul-to-national population shift is 3.01x the passive excess",
     3.01, _DVG_MS["202312"]["assortativity"]["multiple"], _dp(3.01, 2))
-cms("SI 3: and 8.62x the normalised mutual information", 8.62,
+cms("S3: and 8.62x the normalized mutual information", 8.62,
     _DVG_MS["202312"]["nmi"]["multiple"], _dp(8.62, 2))
-cms("SI 3: 3.21x in February 2024", 3.21,
+cms("S3: 3.21x in February 2024", 3.21,
     _DVG_MS["202402"]["assortativity"]["multiple"], _dp(3.21, 2))
-cms("SI 3: and 4.00x", 4.00, _DVG_MS["202402"]["nmi"]["multiple"], _dp(4.00, 2))
-cms("SI 3: only 1.13x on half-L1", 1.13,
+cms("S3: and 4.00x", 4.00, _DVG_MS["202402"]["nmi"]["multiple"], _dp(4.00, 2))
+cms("S3: only 1.13x on half-L1", 1.13,
     _DVG_MS["202312"]["half_l1"]["multiple"], _dp(1.13, 2))
-cms("SI 3: and 0.80x on Cramer's V", 0.80,
+cms("S3: and 0.80x on Cramer's V", 0.80,
     _DVG_MS["202312"]["cramers_v"]["multiple"], _dp(0.80, 2))
 for _ym_ms, _want_ms in (("202312", 7.0), ("202402", 6.0)):
-    check("MS", f"SI 3: Seoul is outside the 95% null band on {_want_ms:.0f} "
+    check("MS", f"S3: Seoul is outside the 95% null band on {_want_ms:.0f} "
                 f"of nine quantities, {_ym_ms}", _want_ms,
           float(sum(1 for _v in p40_ms["seoul_vs_national"][_ym_ms]["null"].values()
                     if not _v["inside_null"])), 1e-9)
-cms("SI 3: beta moves by only 0.0130 across the scope change", 0.0130,
+cms("S3: beta moves by only 0.0130 across the scope change", 0.0130,
     p53_ms["asymmetry"]["spread"], _dp(0.0130, 4))
 # 2026-09-03: 2.2 declares Seoul primary and now gives the reason AT the
 # declaration instead of twenty pages later in Limitations, so it restates
@@ -5578,78 +5664,78 @@ check("MS", "2.2: while beta moves by only 0.0130", 0.0130,
 # with no month attached, which reads as though the pair agreed; it now names
 # February and carries December in parentheses, so both months are quoted and
 # both are gated.
-cms("SI 3: the floor ratio moves by a factor of 3.2 in February 2024", 3.2,
+cms("S3: the floor ratio moves by a factor of 3.2 in February 2024", 3.2,
     p51_ms["cells"]["202402|seoul"]["floor_over_passive_median"]
     / p51_ms["cells"]["202402|national"]["floor_over_passive_median"],
     _dp(3.2, 1))
-cms("SI 3: and by 3.15 in December 2023", 3.15,
+cms("S3: and by 3.15 in December 2023", 3.15,
     p51_ms["cells"]["202312|seoul"]["floor_over_passive_median"]
     / p51_ms["cells"]["202312|national"]["floor_over_passive_median"],
     _dp(3.15, 2))
-cms("SI 3: 2 369 954 device-equivalents in December 2023", 2369954.0,
+cms("S3: 2 369 954 device-equivalents in December 2023", 2369954.0,
     p33_live["R1_effective_sample"]["202312"]["n_device_equiv"], _dp(2369954, 0))
-check("MS", "SI 3: on 400 parametric bootstrap replicates", 400.0,
+check("MS", "S3: on 400 parametric bootstrap replicates", 400.0,
       float(p33_live["R1_effective_sample"]["202312"]["n_boot"]), 1e-9)
 # THE SEOUL FLOOR ITSELF, added 2026-09-03. SI 3 gave the two RATIOS (3.6x,
 # 4.9x) and never the floor they are ratios to, so the level a reader would
 # need in order to place the exceedance count of SI 5 -- which is taken against
 # the national arm's much lower floor -- existed nowhere in the SI. Both months
 # are registered, because the sentence now names both.
-cms("SI 3: the Seoul arm's permutation floor is 0.0713 bits in December 2023",
+cms("S3: the Seoul arm's permutation floor is 0.0713 bits in December 2023",
     0.0713, p32_ms["survey_floor_measured"]["202312"]["mi_perm_median"],
     _dp(0.0713, 4))
-cms("SI 3: and 0.0868 bits in February 2024", 0.0868,
+cms("S3: and 0.0868 bits in February 2024", 0.0868,
     p32_ms["survey_floor_measured"]["202402"]["mi_perm_median"], _dp(0.0868, 4))
 # "none of the 79 reaches either" is a universal over both floors, so it is
 # counted over both rather than over the December one the prose leads with.
-check("MS", "SI 3: no month of the 79 reaches either Seoul floor", 0.0,
+check("MS", "S3: no month of the 79 reaches either Seoul floor", 0.0,
       float(sum(1 for _v in _MI79
                 for _ym_ms in ("202312", "202402")
                 if _v > p32_ms["survey_floor_measured"][_ym_ms]["mi_perm_median"])),
       1e-9)
-cms("SI 3: the national arm rests on 1 987 respondents", 1987.0,
+cms("S3: the national arm rests on 1 987 respondents", 1987.0,
     float(p35_live["survey_bootstrap"]["202312|national"]["n_respondents"]),
     1e-9)
-cms("SI 3: the survey's own floor is 3.6x the passive excess in December 2023",
+cms("S3: the survey's own floor is 3.6x the passive excess in December 2023",
     3.6, (p32_ms["survey_floor_measured"]["202312"]["mi_perm_median"]
           / p32_ms["null_floor"]["202312"]["passive"]["observed"]), _dp(3.6, 1))
-cms("SI 3: and 4.9x in February 2024", 4.9,
+cms("S3: and 4.9x in February 2024", 4.9,
     (p32_ms["survey_floor_measured"]["202402"]["mi_perm_median"]
      / p32_ms["null_floor"]["202402"]["passive"]["observed"]), _dp(4.9, 1))
-cms("SI 3: on the national arm it is 1.17x", 1.17,
+cms("S3: on the national arm it is 1.17x", 1.17,
     p51_ms["cells"]["202312|national"]["floor_over_passive_median"],
     _dp(1.17, 2))
-cms("SI 3: and 1.54x", 1.54,
+cms("S3: and 1.54x", 1.54,
     p51_ms["cells"]["202402|national"]["floor_over_passive_median"],
     _dp(1.54, 2))
-cms("SI 3: 17.2% of the national permutation draws fall below the passive value",
+cms("S3: 17.2% of the national permutation draws fall below the passive value",
     17.2, 100 * p51_ms["cells"]["202312|national"]["passive_frac_below_perm_null"],
     _dp(17.2, 1))
 _DEC61_MS = p61["permutation_null_floor_decomposition"]["202312"]
-cms("SI 3: the permutation null's closed form contributes 0.0129", 0.0129,
+cms("S3: the permutation null's closed form contributes 0.0129", 0.0129,
     _DEC61_MS["closed_form_sigma2_over_sigma1"], _dp(0.0129, 4))
-cms("SI 3: about a tenth of the null median", 0.10,
+cms("S3: about a tenth of the null median", 0.10,
     _DEC61_MS["closed_form_sigma2_over_sigma1"] / _pm61["median"], _dp(0.10, 2))
-cms("SI 3: a multinomial null whose truth is rank one gives 0.0518", 0.0518,
+cms("S3: a multinomial null whose truth is rank one gives 0.0518", 0.0518,
     p61["survey_multinomial_null"]["202312"]["sigma2_over_sigma1"]["median"],
     _dp(0.0518, 4))
-cms("SI 3: the emptiness slope extrapolates to only 0.135", 0.135,
+cms("S3: the emptiness slope extrapolates to only 0.135", 0.135,
     _em61["linear_extrapolation_to_observed_emptiness"], _dp(0.135, 3))
-cms("SI 3: the emptiness regression has r = 0.06", 0.06,
+cms("S3: the emptiness regression has r = 0.06", 0.06,
     _em61["pearson_r"], _dp(0.06, 2))
-cms("SI 3: emptiness buys 0.00044 of sigma2/sigma1 per empty cell", 0.00044,
+cms("S3: emptiness buys 0.00044 of sigma2/sigma1 per empty cell", 0.00044,
     _em61["slope_sigma2_per_empty_cell"], _dp(0.00044, 5))
 
 # --- SI 4: the coverage profile and what survives it
-cms("SI 4: Korea's population vector totals 52 673 955", 52673955.0,
+cms("S4: Korea's population vector totals 52 673 955", 52673955.0,
     p50_ms["vectors"]["202312"]["national_total"], 1e-12)
 _FILL_MS = p19_ms["measured_fill"]
 for _band_ms, _q_ms in (("20-24", 2.27), ("25-29", 2.07), ("30-34", 2.26),
                         ("35-39", 2.59), ("40-44", 2.81)):
-    cms(f"SI 4: the measured fill at {_band_ms} is {_q_ms}", _q_ms,
+    cms(f"S4: the measured fill at {_band_ms} is {_q_ms}", _q_ms,
         _FILL_MS[_band_ms], _dp(_q_ms, 2))
 _CV_MS = [r["cv"] for r in p8_ms["weight_by_month"]]
-check("MS", "SI 4: the weight panel covers 32 age x sex strata", 32.0,
+check("MS", "S4: the weight panel covers 32 age x sex strata", 32.0,
       float(len(_CV_MS)), 1e-9)
 # p8_panel.py still calls itself "the 8-month panel" in its docstring, because
 # that is what was on disk when it was first run (202001-202005, 202007-202009).
@@ -5657,13 +5743,13 @@ check("MS", "SI 4: the weight panel covers 32 age x sex strata", 32.0,
 # landed widened the panel to twelve without renaming anything, and the SI
 # inherited the old adjective. The column count is the fact, so it is gated:
 # every row of weight_by_month carries its months plus "index" and "cv".
-check("MS", "SI 4: and twelve months, not the eight in the script's name", 12.0,
+check("MS", "S4: and twelve months, not the eight in the script's name", 12.0,
       float(len([_k for _k in p8_ms["weight_by_month"][0]
                  if _k not in ("index", "cv")])), 1e-9)
 # 0.0124: the largest of the 32 strata is 0.0123263.
-cms("SI 4: the cross-month coefficient of variation is at most 0.0124", 0.0124,
+cms("S4: the cross-month coefficient of variation is at most 0.0124", 0.0124,
     max(_CV_MS), _dp(0.0124, 4), bound="upper")
-check("MS", "SI 4: with a median of exactly zero", 0.0,
+check("MS", "S4: with a median of exactly zero", 0.0,
       sorted(_CV_MS)[len(_CV_MS) // 2], 0.0)
 
 # --- SI 5: the school calendar in full
@@ -5680,17 +5766,17 @@ _ORD_MS = p41_ms["calendar"]["rank_order"]
 _NFOLD_MS = {_m: _CAL_MS[str(_m)]["n"] for _m in range(1, 13)}
 _N17_MS = {_NFOLD_MS[_m] for _m in range(1, 8)}
 _N812_MS = {_NFOLD_MS[_m] for _m in range(8, 13)}
-check("MS", "SI 5: January to July fold seven readings each", 7.0,
+check("MS", "S5: January to July fold seven readings each", 7.0,
       float(next(iter(_N17_MS))) if len(_N17_MS) == 1 else -1.0, 1e-9)
-check("MS", "SI 5: August to December fold six", 6.0,
+check("MS", "S5: August to December fold six", 6.0,
       float(next(iter(_N812_MS))) if len(_N812_MS) == 1 else -1.0, 1e-9)
-check("MS", "SI 5: the twelve run 3 9 4 11 5 6 10 12 8 7 1 2", 1.0,
+check("MS", "S5: the twelve run 3 9 4 11 5 6 10 12 8 7 1 2", 1.0,
       _eq(_ORD_MS, [3, 9, 4, 11, 5, 6, 10, 12, 8, 7, 1, 2]), 1e-9)
-check("MS", "SI 5: the seven term months take the top seven places", 7.0,
+check("MS", "S5: the seven term months take the top seven places", 7.0,
       float(sum(1 for _m in _ORD_MS[:7] if _m in (3, 4, 5, 6, 9, 10, 11))),
       1e-9)
-check("MS", "SI 5: December is eighth", 12.0, float(_ORD_MS[7]), 1e-9)
-check("MS", "SI 5: the four vacation months are the bottom four", 4.0,
+check("MS", "S5: December is eighth", 12.0, float(_ORD_MS[7]), 1e-9)
+check("MS", "S5: the four vacation months are the bottom four", 4.0,
       float(sum(1 for _m in _ORD_MS[8:] if _m in (1, 2, 7, 8))), 1e-9)
 # THE THREE MEDIANS THEMSELVES, added 2026-09-03. The comment above says the
 # order "is the part the three printed values do not carry", and it was written
@@ -5698,26 +5784,26 @@ check("MS", "SI 5: the four vacation months are the bottom four", 4.0,
 # only the ordering, so the three numbers 3.1 quotes had their derivation
 # nowhere. The fold is described here, so the values it produces belong here
 # too. Same p41 field 3.1's rows read.
-cms("SI 5: March's calendar-month median is 0.0242", 0.0242,
+cms("S5: March's calendar-month median is 0.0242", 0.0242,
     _CAL_MS["3"]["median"], _dp(0.0242, 4))
-cms("SI 5: September's is 0.0230", 0.0230, _CAL_MS["9"]["median"],
+cms("S5: September's is 0.0230", 0.0230, _CAL_MS["9"]["median"],
     _dp(0.0230, 4))
-cms("SI 5: February's is 0.0176", 0.0176, _CAL_MS["2"]["median"],
+cms("S5: February's is 0.0176", 0.0176, _CAL_MS["2"]["median"],
     _dp(0.0176, 4))
-cms("SI 5: the mean contrast over 2021-2026 is 0.0040", 0.0040, _MEAN6_MS,
+cms("S5: the mean contrast over 2021-2026 is 0.0040", 0.0040, _MEAN6_MS,
     _dp(0.0040, 4))
-cms("SI 5: the 79-month median it is measured against is 0.0194", 0.0194,
+cms("S5: the 79-month median it is measured against is 0.0194", 0.0194,
     p37["summary_dong"]["assort_median"], _dp(0.0194, 4))
 _RAT_MS = sorted(_v["control_over_others_min"] for _v in _VAR_MS.values())
-cms("SI 5: the median 2020-to-smallest ratio across the ten readings is 0.10",
+cms("S5: the median 2020-to-smallest ratio across the ten readings is 0.10",
     0.10, 0.5 * (_RAT_MS[4] + _RAT_MS[5]), _dp(0.10, 2))
-check("MS", "SI 5: it is below one third in nine of the ten", 9.0,
+check("MS", "S5: it is below one third in nine of the ten", 9.0,
       float(sum(1 for _r in _RAT_MS if _r < 1.0 / 3.0)), 1e-9)
-cms("SI 5: the exception is the city level, at 0.55", 0.55,
+cms("S5: the exception is the city level, at 0.55", 0.55,
     _VAR_MS["WE|city|assortativity"]["control_over_others_min"], _dp(0.55, 2))
-cms("SI 5: 2020's 25-and-over contrast is +0.00029", 0.00029,
+cms("S5: 2020's 25-and-over contrast is +0.00029", 0.00029,
     _GRP_MS["adult_25plus"]["control"], _dp(0.00029, 5))
-cms("SI 5: against a median of +0.00057", 0.00057,
+cms("S5: against a median of +0.00057", 0.00057,
     _GRP_MS["adult_25plus"]["others_median"], _dp(0.00057, 5))
 # The ratio of those two. It was the old Figure 2(c)'s own number and left the
 # pair with that caption, leaving "retaining half of its usual size" as the
@@ -5725,27 +5811,27 @@ cms("SI 5: against a median of +0.00057", 0.00057,
 # supports is not bookkeeping: the adult half keeping half its size in the year
 # the school-age half goes negative is what separates the school reading from a
 # pandemic effect that flattened seasonality across the whole population.
-cms("SI 5: a retention of 0.507 of its usual size", 0.507,
+cms("S5: a retention of 0.507 of its usual size", 0.507,
     _GRP_MS["adult_25plus"]["retention"], _dp(0.507, 3))
-check("MS", "SI 5: the adult contrast is positive in all seven years", 7.0,
+check("MS", "S5: the adult contrast is positive in all seven years", 7.0,
       float(_GRP_MS["adult_25plus"]["sign_test"]["n_positive"]), 1e-9)
-cms("SI 5: the adult sign test gives an exact one-sided p of 0.008", 0.008,
+cms("S5: the adult sign test gives an exact one-sided p of 0.008", 0.008,
     _GRP_MS["adult_25plus"]["sign_test"]["p_one_sided"], _dp(0.008, 3))
-cms("SI 5: and a permutation p of 0.010", 0.010,
+cms("S5: and a permutation p of 0.010", 0.010,
     _GRP_MS["adult_25plus"]["p_count_at_least"], _dp(0.010, 3))
-cms("SI 5: the sign test's 8/128 is 0.0625", 0.0625,
+cms("S5: the sign test's 8/128 is 0.0625", 0.0625,
     p41_ms["sign_test"]["contrast"]["numerator"]
     / p41_ms["sign_test"]["contrast"]["denominator"], 1e-12)
-cms("SI 5: two-sided 0.125", 0.125,
+cms("S5: two-sided 0.125", 0.125,
     p41_ms["sign_test"]["contrast"]["p_two_sided"], 1e-12)
-cms("SI 5: the panel-respecting permutation p is 0.068", 0.068,
+cms("S5: the panel-respecting permutation p is 0.068", 0.068,
     p41_ms["permutation"]["p_count_at_least"], _dp(0.068, 3))
 # The two enumeration counts behind that p. They were Fig 2(b) rows while the
 # caption described p41's within-year relabelling bands; the caption no longer
 # draws that null, and SI 5 is now the only place either number is stated.
-cms("SI 5: the within-year null enumerates 330 relabellings in a full year",
+cms("S5: the within-year null enumerates 330 relabellings in a full year",
     330.0, float(p41_ms["permutation"]["per_year"]["2021"]["n_perm"]), 1e-12)
-check("MS", "SI 5: and 35 in the partial year 2026", 35.0,
+check("MS", "S5: and 35 in the partial year 2026", 35.0,
       float(p41_ms["permutation"]["per_year"]["2026"]["n_perm"]), 1e-9)
 # The per-year bands that enumeration draws, which were also Figure 2(b) and
 # also left the pair with the caption. "2026 sits exactly on its own upper
@@ -5757,41 +5843,41 @@ check("MS", "SI 5: and 35 in the partial year 2026", 35.0,
 # the observation by one ulp is the claim ceasing to be true.
 _PY_MS = p41_ms["per_year"]
 _PM_MS = p41_ms["permutation"]["per_year"]
-check("MS", "SI 5: the contrast is above its own band in five years", 5.0,
+check("MS", "S5: the contrast is above its own band in five years", 5.0,
       float(sum(1 for _y in _PY_MS
                 if _PY_MS[_y]["contrast_median"] > _PM_MS[_y]["null_hi"])),
       1e-9)
-check("MS", "SI 5: and inside the band in 2020", 1.0,
+check("MS", "S5: and inside the band in 2020", 1.0,
       1.0 if (_PM_MS["2020"]["null_lo"] <= _PY_MS["2020"]["contrast_median"]
               <= _PM_MS["2020"]["null_hi"]) else 0.0, 1e-9)
-check("MS", "SI 5: 2026's observation IS its 97.5th percentile", 0.0,
+check("MS", "S5: 2026's observation IS its 97.5th percentile", 0.0,
       _PY_MS["2026"]["contrast_median"] - _PM_MS["2026"]["null_hi"], 0.0)
-cms("SI 5: and that value is 0.004221", 0.004221,
+cms("S5: and that value is 0.004221", 0.004221,
     _PY_MS["2026"]["contrast_median"], _dp(0.004221, 6))
-check("MS", "SI 5: 2 of the 35 relabellings reach it", 2.0,
+check("MS", "S5: 2 of the 35 relabellings reach it", 2.0,
       _PM_MS["2026"]["p_ge_observed"] * _PM_MS["2026"]["n_perm"], 1e-9)
-cms("SI 5: 2026's own exact one-sided p is 2/35 = 0.057", 0.057,
+cms("S5: 2026's own exact one-sided p is 2/35 = 0.057", 0.057,
     _PM_MS["2026"]["p_ge_observed"], _dp(0.057, 3))
-check("MS", "SI 5: 2026 is a partial year of seven months", 7.0,
+check("MS", "S5: 2026 is a partial year of seven months", 7.0,
       float(_PY_MS["2026"]["n_months"]), 1e-9)
-cms("SI 5: the smallest p 35 relabellings can return is 1/35 = 0.029", 0.029,
+cms("S5: the smallest p 35 relabellings can return is 1/35 = 0.029", 0.029,
     1.0 / _PM_MS["2026"]["n_perm"], _dp(0.029, 3))
-cms("SI 5: 2020's deepest per-band deficit is 0.32 of its usual value", 0.32,
+cms("S5: 2020's deepest per-band deficit is 0.32 of its usual value", 0.32,
     p41_ms["bands"]["level_2020_vs_rest"][
         p41_ms["bands"]["deepest_level_deficit"]]["ratio"], _dp(0.32, 2))
-check("MS", "SI 5: and it is the 80-and-over band", 1.0,
+check("MS", "S5: and it is the 80-and-over band", 1.0,
       _eq(p41_ms["bands"]["deepest_level_deficit"], "80+"), 1e-9)
-cms("SI 5: the superseded within-year p is 4.97e-06", 4.97e-06,
+cms("S5: the superseded within-year p is 4.97e-06", 4.97e-06,
     p54_ms["corrected"]["p_term_ge"], _dp(4.97e-06, 8))
-cms("SI 5: the circular-shift p is 0.0506", 0.0506, _ps58["p"], _dp(0.0506, 4))
-check("MS", "SI 5: three of the 78 alternatives also place all 17 in term", 3.0,
+cms("S5: the circular-shift p is 0.0506", 0.0506, _ps58["p"], _dp(0.0506, 4))
+check("MS", "S5: three of the 78 alternatives also place all 17 in term", 3.0,
       float(_ps58["n_shifts_at_or_above"]), 1e-9)
-check("MS", "SI 5: all three are multiples of twelve", 3.0,
+check("MS", "S5: all three are multiples of twelve", 3.0,
       float(sum(1 for _k in _ps58["shifts_at_or_above_observed"]
                 if _k % 12 == 0)), 1e-9)
-check("MS", "SI 5: the 17 clearing months fall in nine runs", 9.0,
+check("MS", "S5: the 17 clearing months fall in nine runs", 9.0,
       float(p58["run_structure"]["n_runs"]), 1e-9)
-check("MS", "SI 5: the term margin is invariant at 46", 46.0,
+check("MS", "S5: the term margin is invariant at 46", 46.0,
       float(_a58["A5"]["margin"]), 1e-9)
 # 2026-08-31 (advisor 3.2, via p64): "the smallest attainable p is 1/79 =
 # 0.0127" was removed from the SI along with the caption -- the 79 rotations
@@ -5799,96 +5885,96 @@ check("MS", "SI 5: the term margin is invariant at 46", 46.0,
 # never the honest floor. Replaced by the same 1/12 / 1/6 pair Figure 2(b)
 # and 3.1 use; check(), not cms(), because both are already registered there
 # and a second registration would double-count the same literal.
-check("MS", "SI 5: the 79 rotations realise twelve distinct calendars", 12.0,
+check("MS", "S5: the 79 rotations realize twelve distinct calendars", 12.0,
       float(p64["effective_alignments"]["E_exact"]), 1e-9)
-check("MS", "SI 5: so the smallest resolvable p is 1/12 = 0.083", 0.083,
+check("MS", "S5: so the smallest resolvable p is 1/12 = 0.083", 0.083,
       p64["deduplicated"]["exact"]["resolution_floor"], _dp(0.083, 3))
-check("MS", "SI 5: collapsing the near-duplicate coarsens it to 1/6 = 0.17",
+check("MS", "S5: collapsing the near-duplicate coarsens it to 1/6 = 0.17",
       0.17, p64["deduplicated"]["advisor"]["resolution_floor"], _dp(0.17, 2))
-cms("SI 5: the level of the statistic trends by a factor of 1.70", 1.70,
+cms("S5: the level of the statistic trends by a factor of 1.70", 1.70,
     _cap(_c63, 2, "a", "level trend over the period"), _dp(1.70, 2))
 # The per-year term margins, moved here from the old panel (e) (advisor 3.2).
-check("MS", "SI 5: the true per-year margins are 7,7,7,7,7,7,4", 1.0,
+check("MS", "S5: the true per-year margins are 7,7,7,7,7,7,4", 1.0,
       _eq([p58["per_year_margins"]["identity"][str(_y)]
            for _y in range(2020, 2027)], [7, 7, 7, 7, 7, 7, 4]), 1e-9)
-check("MS", "SI 5: across the rotations they range from 3", 3.0,
+check("MS", "S5: across the rotations they range from 3", 3.0,
       float(p58["per_year_margins"]["overall_min"]), 1e-9)
-check("MS", "SI 5: up to 8", 8.0,
+check("MS", "S5: up to 8", 8.0,
       float(p58["per_year_margins"]["overall_max"]), 1e-9)
 for _ym_ms in ("202312", "202402"):
-    check("MS", f"SI 5: {_ym_ms} sits below 31 of the 46 term months", 31.0,
+    check("MS", f"S5: {_ym_ms} sits below 31 of the 46 term months", 31.0,
           float(p54_ms["survey_months"][_ym_ms]["n_term_months_above"]), 1e-9)
-check("MS", "SI 5: the count moves between 13 and 21 across five offsets", 5.0,
+check("MS", "S5: the count moves between 13 and 21 across five offsets", 5.0,
       float(len(p54_ms["floor_sensitivity"]["counts_at_offsets"])), 1e-9)
 _OFF_MS = [_v["n"] for _v
            in p54_ms["floor_sensitivity"]["counts_at_offsets"].values()]
-check("MS", "SI 5: the lowest of those five counts is 13", 13.0,
+check("MS", "S5: the lowest of those five counts is 13", 13.0,
       float(min(_OFF_MS)), 1e-9)
-check("MS", "SI 5: and the highest is 21", 21.0, float(max(_OFF_MS)), 1e-9)
-check("MS", "SI 5: every offset keeps the all-term property", 5.0,
+check("MS", "S5: and the highest is 21", 21.0, float(max(_OFF_MS)), 1e-9)
+check("MS", "S5: every offset keeps the all-term property", 5.0,
       float(sum(1 for _v in p54_ms["floor_sensitivity"]["counts_at_offsets"]
                 .values() if _v["all_term"])), 1e-9)
 _TV_MS = {r["age"]: r for r in p25_ms["G_tv_bounds"] if r["imputation"] == "mid"}
-cms("SI 5: label mixing runs from 20.9% at 65-69", 20.9,
+cms("S5: label mixing runs from 20.9% at 65-69", 20.9,
     100 * _TV_MS["65-69"]["tv_hour_x_samedong"], _dp(20.9, 1))
-cms("SI 5: to 27.7% at 80 and over", 27.7,
+cms("S5: to 27.7% at 80 and over", 27.7,
     100 * _TV_MS["80+"]["tv_hour_x_samedong"], _dp(27.7, 1))
 
 # --- SI 6: resolution scaling
-cms("SI 6: the district rung retains 29.8%", 29.8,
+cms("S6: the district rung retains 29.8%", 29.8,
     100 * p37["ladder"]["kept_median"], _dp(29.8, 1))
-cms("SI 6: with a low of 27.6%", 27.6, 100 * p37["ladder"]["kept_min"],
+cms("S6: with a low of 27.6%", 27.6, 100 * p37["ladder"]["kept_min"],
     _dp(27.6, 1))
-cms("SI 6: and a high of 32.6%", 32.6, 100 * p37["ladder"]["kept_max"],
+cms("S6: and a high of 32.6%", 32.6, 100 * p37["ladder"]["kept_max"],
     _dp(32.6, 1))
-cms("SI 6: as raw ratios the district level is a median 0.469 of dong", 0.469,
+cms("S6: as raw ratios the district level is a median 0.469 of dong", 0.469,
     _ax60["spatial"]["gu_over_dong"]["median"], _dp(0.469, 3))
-cms("SI 6: and the city level 0.245", 0.245,
+cms("S6: and the city level 0.245", 0.245,
     _ax60["spatial"]["city_over_dong"]["median"], _dp(0.245, 3))
-check("MS", "SI 6: the adjacency graph has 424 nodes", 424.0,
+check("MS", "S6: the adjacency graph has 424 nodes", 424.0,
       float(p34["adjacency"]["n_nodes"]), 1e-9)
-cms("SI 6: the local slope runs from 0.178", 0.178,
+cms("S6: the local slope runs from 0.178", 0.178,
     p38["exponent"]["assortativity"]["named_lo"], _dp(0.178, 3))
-cms("SI 6: to 0.478", 0.478, p38["exponent"]["assortativity"]["named_hi"],
+cms("S6: to 0.478", 0.478, p38["exponent"]["assortativity"]["named_hi"],
     _dp(0.478, 3))
-cms("SI 6: and all 158 curves bend upward", 158.0,
+cms("S6: and all 158 curves bend upward", 158.0,
     float(p38["exponent"]["assortativity"]["n_bending_up"]), 1e-12)
-cms("SI 6: the survey level would be reached at about 5 632 locations", 5632.0,
+cms("S6: the survey level would be reached at about 5 632 locations", 5632.0,
     p44_ms["beta"]["reach"]["locations_slope1"], _dp(5632.0, 0))
-cms("SI 6: whereas the measured slope would take about 509 996", 509996.0,
+cms("S6: whereas the measured slope would take about 509 996", 509996.0,
     p44_ms["beta"]["reach"]["locations_ladder"], _dp(509996.0, 0))
 # "a factor of 90" is stated to the nearest ten -- the sentence beside it is
 # qualitative ("that difference measures the magnitude of spatial
 # correlation") -- so it is checked as that rounding rather than given a
 # tolerance stretched until 90.56 fits inside 90.
-check("MS", "SI 6: the two answers differ by a factor of 90, to the nearest ten",
+check("MS", "S6: the two answers differ by a factor of 90, to the nearest ten",
       90.0, float(round(p44_ms["beta"]["reach"]["locations_ladder"]
                         / p44_ms["beta"]["reach"]["locations_slope1"], -1)),
       1e-9)
-cms("SI 6: the measured spatial slope at n = 424 is 0.36", 0.36,
+cms("S6: the measured spatial slope at n = 424 is 0.36", 0.36,
     p44_ms["beta"]["reach"]["ladder_slope"], _dp(0.36, 2))
-cms("SI 6: the B075 band's 79-month median lower edge is 0.0286", 0.0286,
+cms("S6: the B075 band's 79-month median lower edge is 0.0286", 0.0286,
     _stats.median([_v["r_polygon_lo"] for _v in _POLY_MS.values()]),
     _dp(0.0286, 4))
-cms("SI 6: and its upper edge 0.0316", 0.0316,
+cms("S6: and its upper edge 0.0316", 0.0316,
     _stats.median([_v["r_polygon_hi"] for _v in _POLY_MS.values()]),
     _dp(0.0316, 4))
-check("MS", "SI 6: the S1 identity was verified over 395 cases", 395.0,
+check("MS", "S6: the S1 identity was verified over 395 cases", 395.0,
       float(len(p60["per_month"]) * 5), 1e-9)
-check("MS", "SI 6: to 2.01e-16", 2.012e-16,
+check("MS", "S6: to 2.01e-16", 2.012e-16,
       _m60["within_group_excess_identity_max_abs_diff"], 5e-19)
-cms("SI 6: the ratio factorises into 2.2708", 2.2708,
+cms("S6: the ratio factorizes into 2.2708", 2.2708,
     _m60["numerator_gain"]["median"], _dp(2.2708, 4))
-cms("SI 6: and 1.7100", 1.7100, _m60["denominator_shrink"]["median"],
+cms("S6: and 1.7100", 1.7100, _m60["denominator_shrink"]["median"],
     _dp(1.7100, 4))
 _SPH_MS = p60["semester_posthoc"]
-cms("SI 6: the three-band 2020 contrast is +0.00226", 0.00226,
+cms("S6: the three-band 2020 contrast is +0.00226", 0.00226,
     _SPH_MS["lim3"]["control_year_value"], _dp(0.00226, 5))
-cms("SI 6: against -0.00010 at sixteen bands", -0.00010,
+cms("S6: against -0.00010 at sixteen bands", -0.00010,
     _SPH_MS["r16"]["control_year_value"], _dp(0.00010, 5))
-check("MS", "SI 6: three bands give 7 of 7 positive years", 7.0,
+check("MS", "S6: three bands give 7 of 7 positive years", 7.0,
       float(_SPH_MS["lim3"]["n_positive"]), 1e-9)
-check("MS", "SI 6: sixteen bands give 6 of 7", 6.0,
+check("MS", "S6: sixteen bands give 6 of 7", 6.0,
       float(_SPH_MS["r16"]["n_positive"]), 1e-9)
 # THE FIRST FORBIDDEN PAIRING'S TWO NUMBERS, added 2026-09-03. SI 6's closing
 # paragraph named the pairing and then pointed at the main text for the size of
@@ -5896,46 +5982,46 @@ check("MS", "SI 6: sixteen bands give 6 of 7", 6.0,
 # 3.3 makes the claim and SI 6 is where the two matrices being paired are
 # defined. Both are derived from the two medians rather than restated, exactly
 # as 3.3's rows are, so a move in either matrix moves both copies together.
-cms("SI 6: like for like the forbidden pairing's gap is 11.5x", 11.5,
+cms("S6: like for like the forbidden pairing's gap is 11.5x", 11.5,
     _RSV_MS / _s60["r16"]["median"], _dp(11.5, 1))
-cms("SI 6: and the mismatched pairing returns 2.69x", 2.69,
+cms("S6: and the mismatched pairing returns 2.69x", 2.69,
     _RSV_MS / _s60["lim3"]["median"], _dp(2.69, 2))
 
 # --- SI 7: the recovery experiment
-check("MS", "SI 7: the clean arm reads +0.00000 to five places", 0.0,
+check("MS", "S7: the clean arm reads +0.00000 to five places", 0.0,
       round(_ARMS_MS["clean"]["median"], 5), 0.0)
-cms("SI 7: the ratio of the two independent floors is 1.04", 1.04,
+cms("S7: the ratio of the two independent floors is 1.04", 1.04,
     p39_ms["null_arm"]["ratio_to_p33"], _dp(1.04, 2))
-cms("SI 7: recovery is 49% at beta = 0.5", 49.0, min(_REC_MS[0.5]), _dp(49.0, 0))
-cms("SI 7: ...to 53%", 53.0, max(_REC_MS[0.5]), _dp(53.0, 0))
-cms("SI 7: 21% at beta = 0.8", 21.0, min(_REC_MS[0.8]), _dp(21.0, 0))
-cms("SI 7: ...to 24%", 24.0, max(_REC_MS[0.8]), _dp(24.0, 0))
-cms("SI 7: 3.4% at beta = 0.99", 3.4, min(_REC_MS[0.99]), _dp(3.4, 1))
-cms("SI 7: ...to 5.3%", 5.3, max(_REC_MS[0.99]), _dp(5.3, 1))
-cms("SI 7: the four rules agree to 0.00073 on the refined grid", 0.00073,
+cms("S7: recovery is 49% at beta = 0.5", 49.0, min(_REC_MS[0.5]), _dp(49.0, 0))
+cms("S7: ...to 53%", 53.0, max(_REC_MS[0.5]), _dp(53.0, 0))
+cms("S7: 21% at beta = 0.8", 21.0, min(_REC_MS[0.8]), _dp(21.0, 0))
+cms("S7: ...to 24%", 24.0, max(_REC_MS[0.8]), _dp(24.0, 0))
+cms("S7: 3.4% at beta = 0.99", 3.4, min(_REC_MS[0.99]), _dp(3.4, 1))
+cms("S7: ...to 5.3%", 5.3, max(_REC_MS[0.99]), _dp(5.3, 1))
+cms("S7: the four rules agree to 0.00073 on the refined grid", 0.00073,
     p59["beta_star"]["spread"], _dp(0.00073, 5))
-cms("SI 7: they spread over 0.0153 on the original grid", 0.0153,
+cms("S7: they spread over 0.0153 on the original grid", 0.0153,
     _sp39, _dp(0.0153, 4))
 # check(), not cms(): grep of the manuscript pair finds this value nowhere,
 # so the document assertion was never true. It stayed green because _forms()
 # offers coarse spellings and the region contained one. Verified, not quoted.
-check("MS", "SI 7: from the largest measured beta to beta* is 0.027", 0.027,
+check("MS", "S7: from the largest measured beta to beta* is 0.027", 0.027,
       p59["beta_star"]["primary_value"] - p59["claim"]["largest_measured_beta"],
       _dp(0.027, 3) * 0.027)
 # check(), not cms(): the pair prints 0.0316 in SI 6 and no 0.031 anywhere.
 # The substring of the former was answering for the latter, which is the
 # same coarse-spelling cover its sibling row above carried.
-check("MS", "SI 7: and 0.031 from the national arm", 0.031,
+check("MS", "S7: and 0.031 from the national arm", 0.031,
       p59["beta_star"]["primary_value"] - p53_ms["asymmetry"]["beta_national"],
       _dp(0.031, 3) * 0.031)
-cms("SI 7: venue pairing with replacement gives 0.9616", 0.9616,
+cms("S7: venue pairing with replacement gives 0.9616", 0.9616,
     p44_ms["beta"]["betas"]["venue-level, with replacement"]["beta"],
     _dp(0.9616, 4))
-cms("SI 7: it retains 62% under a within-place shuffle", 62.0,
+cms("S7: it retains 62% under a within-place shuffle", 62.0,
     100 * p44_ms["pairing"]["null_shuffled"]["share_wr"], _dp(62.0, 0))
-cms("SI 7: against 14% for the convention we use", 14.0,
+cms("S7: against 14% for the convention we use", 14.0,
     100 * p44_ms["pairing"]["null_shuffled"]["share_wor"], _dp(14.0, 0))
-cms("SI 7: the eleventh reading is beta = 0.9387", 0.9387,
+cms("S7: the eleventh reading is beta = 0.9387", 0.9387,
     p44_ms["beta"]["betas"]["survey contact matrix (star pairs)"]["beta"],
     _dp(0.9387, 4))
 # TABLE S2, added 2026-09-03. 3.3 says "SI 7 gives all twelve" and SI 7 named
@@ -5947,21 +6033,21 @@ cms("SI 7: the eleventh reading is beta = 0.9387", 0.9387,
 # and a second registration of those would double-count the same literal in
 # the same region, so they are not repeated.
 _CONV53_MS = p53_ms["convention_sensitivity"]["arms"]
-cms("SI 7: Table S2's national one-convention reading is 0.9375", 0.9375,
+cms("S7: Table S2's national one-convention reading is 0.9375", 0.9375,
     _CONV53_MS["national (korea)"]["beta_one_convention"], _dp(0.9375, 4))
-cms("SI 7: and its Seoul one-convention reading is 0.9250", 0.9250,
+cms("S7: and its Seoul one-convention reading is 0.9250", 0.9250,
     _CONV53_MS["seoul"]["beta_one_convention"], _dp(0.9250, 4))
 for _k_ms, _q_ms in ((2.0, 0.7927), (3.0, 0.6933), (5.0, 0.6003)):
-    cms(f"SI 7: Table S2 reads {_q_ms} at venue size k = {_k_ms:g}", _q_ms,
+    cms(f"S7: Table S2 reads {_q_ms} at venue size k = {_k_ms:g}", _q_ms,
         _KS_MS[_k_ms]["beta"], _dp(_q_ms, 4))
 # "all twelve" is the claim the table is answering, so the count is gated and
 # not left to the eye: eleven retained readings in p59's register plus the one
 # reading it vetoes.
-check("MS", "SI 7: Table S2 carries all twelve readings", 12.0,
+check("MS", "S7: Table S2 carries all twelve readings", 12.0,
       float(len(p59["claim"]["measured_betas"]) + 1), 1e-9)
-check("MS", "SI 7: eleven of the twelve are retained", 11.0,
+check("MS", "S7: eleven of the twelve are retained", 11.0,
       float(len(p59["claim"]["measured_betas"])), 1e-9)
-check("MS", "SI 7: and the vetoed one is the only reading above 0.95", 1.0,
+check("MS", "S7: and the vetoed one is the only reading above 0.95", 1.0,
       1.0 if (p59["claim"]["all_below_0p95"]
               and p59["claim"]["excluded_reading"]["beta"] > 0.95) else 0.0,
       1e-9)
@@ -5969,121 +6055,121 @@ check("MS", "SI 7: and the vetoed one is the only reading above 0.95", 1.0,
 # unquantified while 3.3 printed both halves of it. It is recomputed over the
 # whole beta = 0.95 slice for the reason 3.3's copy is: the sentence is about
 # the slice, and the second row is what makes one printed figure honest.
-check("MS", "SI 7: a synthetic cell holds eleven venues at the median", 11.0,
+check("MS", "S7: a synthetic cell holds eleven venues at the median", 11.0,
       p39_ms["design"]["venues_per_cell_median"], 1e-9)
-check("MS", "SI 7: the beta = 0.95 slice carries ten true values", 10.0,
+check("MS", "S7: the beta = 0.95 slice carries ten true values", 10.0,
       float(len(_BTW95_MS)), 1e-9)
-cms("SI 7: the finite-venue leak is 9.2% of the truth at beta = 0.95", 9.2,
+cms("S7: the finite-venue leak is 9.2% of the truth at beta = 0.95", 9.2,
     max(_BTW95_MS), _dp(9.2, 1))
-check("MS", "SI 7: ...and that share is flat across the slice, to 0.01 pp", 1.0,
+check("MS", "S7: ...and that share is flat across the slice, to 0.01 pp", 1.0,
       1.0 if max(_BTW95_MS) - min(_BTW95_MS) < 0.01 else 0.0, 1e-9)
-cms("SI 7: the venue-scale estimator retains 90.9% of the survey", 90.9,
+cms("S7: the venue-scale estimator retains 90.9% of the survey", 90.9,
     100 * _VEN_MS["venue-visit (ego,date,place)"]["keep"], _dp(90.9, 1))
-cms("SI 7: 96.1% on the Seoul arm", 96.1,
+cms("S7: 96.1% on the Seoul arm", 96.1,
     100 * {r["grouping"]: r
            for r in p44_ms["ladder"]["seoul|202312"]["rows"]}[
         "venue-visit (ego,date,place)"]["keep"], _dp(96.1, 1))
-cms("SI 7: the bracket's floor is 0.00246", 0.00246,
+cms("S7: the bracket's floor is 0.00246", 0.00246,
     p44_ms["beta"]["bracket"]["floor"], _dp(0.00246, 5))
-cms("SI 7: its ceiling is 0.03682", 0.03682,
+cms("S7: its ceiling is 0.03682", 0.03682,
     p44_ms["beta"]["bracket"]["ceiling"], _dp(0.03682, 5))
-cms("SI 7: the observation is 6.8 times the floor", 6.8,
+cms("S7: the observation is 6.8 times the floor", 6.8,
     p44_ms["beta"]["bracket"]["measured_over_floor"], _dp(6.8, 1))
-cms("SI 7: and 46% of the ceiling", 46.0,
+cms("S7: and 46% of the ceiling", 46.0,
     100 * p44_ms["beta"]["bracket"]["measured_over_ceiling"], _dp(46.0, 0))
-cms("SI 7: the noiseless data field reads 32.7%", 32.7,
+cms("S7: the noiseless data field reads 32.7%", 32.7,
     100 * p39_ms["ladder"]["noiseless"]["data"], _dp(32.7, 1))
-cms("SI 7: the archetype field reads 14.9% and misses the band", 14.9,
+cms("S7: the archetype field reads 14.9% and misses the band", 14.9,
     100 * p39_ms["ladder"]["noiseless"]["archetype"], _dp(14.9, 1))
-cms("SI 7: the real December 2023 rung is 30.1%", 30.1,
+cms("S7: the real December 2023 rung is 30.1%", 30.1,
     100 * p39_ms["ladder"]["real_rung"], _dp(30.1, 1))
 
 # --- SI 8: the coverage family in full
-check("MS", "SI 8: the cell-level reconstruction reproduces the published "
+check("MS", "S8: the cell-level reconstruction reproduces the published "
             "reading exactly, in all four combinations", 4.0,
       float(sum(1 for _a in p33_live["anchor"]
                 if _a["rel_r"] == 0.0 and _a["rel_lambda"] == 0.0)), 1e-9)
-cms("SI 8: December 2023 runs 0.01704 at theta = -1", 0.01704,
+cms("S8: December 2023 runs 0.01704 at theta = -1", 0.01704,
     _TH12_MS[-1.0]["assortativity"], _dp(0.01704, 5))
-cms("SI 8: 0.02115 at theta = 0", 0.02115, _TH12_MS[0.0]["assortativity"],
+cms("S8: 0.02115 at theta = 0", 0.02115, _TH12_MS[0.0]["assortativity"],
     _dp(0.02115, 5))
-cms("SI 8: 0.05099 at theta = +1", 0.05099, _TH12_MS[1.0]["assortativity"],
+cms("S8: 0.05099 at theta = +1", 0.05099, _TH12_MS[1.0]["assortativity"],
     _dp(0.05099, 5))
-cms("SI 8: February 2024 runs 0.01459", 0.01459,
+cms("S8: February 2024 runs 0.01459", 0.01459,
     _TH02_MS[-1.0]["assortativity"], _dp(0.01459, 5))
-cms("SI 8: 0.01851", 0.01851, _TH02_MS[0.0]["assortativity"], _dp(0.01851, 5))
-cms("SI 8: and 0.04740", 0.04740, _TH02_MS[1.0]["assortativity"],
+cms("S8: 0.01851", 0.01851, _TH02_MS[0.0]["assortativity"], _dp(0.01851, 5))
+cms("S8: and 0.04740", 0.04740, _TH02_MS[1.0]["assortativity"],
     _dp(0.04740, 5))
 _GAP12_MS = {r["theta"]: r for r in p33_live["R2_gaps_vs_survey"]["202312"]}
-cms("SI 8: the assortativity multiple runs from 4.37x", 4.37,
+cms("S8: the assortativity multiple runs from 4.37x", 4.37,
     min(_r["assortativity"] for _r in _GAP12_MS.values()), _dp(4.37, 2))
-cms("SI 8: to 13.07x", 13.07,
+cms("S8: to 13.07x", 13.07,
     max(_r["assortativity"] for _r in _GAP12_MS.values()), _dp(13.07, 2))
-cms("SI 8: the nMI multiple from 16.46x", 16.46,
+cms("S8: the nMI multiple from 16.46x", 16.46,
     min(_r["nmi"] for _r in _GAP12_MS.values()), _dp(16.46, 2))
-cms("SI 8: to 47.82x", 47.82, max(_r["nmi"] for _r in _GAP12_MS.values()),
+cms("S8: to 47.82x", 47.82, max(_r["nmi"] for _r in _GAP12_MS.values()),
     _dp(47.82, 2))
-cms("SI 8: the smallest multiple in February 2024 is 3.49x", 3.49,
+cms("S8: the smallest multiple in February 2024 is 3.49x", 3.49,
     min(_r[_s] for _r in p33_live["R2_gaps_vs_survey"]["202402"]
         for _s in ("assortativity", "half_l1", "cramers_v", "nmi")),
     _dp(3.49, 2))
-check("MS", "SI 8: the leading band at theta = 0 is 15-19 in December 2023",
+check("MS", "S8: the leading band at theta = 0 is 15-19 in December 2023",
       1.0, _eq(_TH12_MS[0.0]["top_band"], "15-19"), 1e-9)
-check("MS", "SI 8: 40-44 at negative theta", 1.0,
+check("MS", "S8: 40-44 at negative theta", 1.0,
       _eq(_TH12_MS[-1.0]["top_band"], "40-44"), 1e-9)
-check("MS", "SI 8: 0-9 at positive theta", 1.0,
+check("MS", "S8: 0-9 at positive theta", 1.0,
       _eq(_TH12_MS[1.0]["top_band"], "0-9"), 1e-9)
-check("MS", "SI 8: February 2024 moves 40-44 -> 75-79 -> 0-9", 1.0,
+check("MS", "S8: February 2024 moves 40-44 -> 75-79 -> 0-9", 1.0,
       1.0 if [_TH02_MS[_t]["top_band"] for _t in (-1.0, 0.0, 1.0)]
       == ["40-44", "75-79", "0-9"] else 0.0, 1e-9)
-cms("SI 8: the masking band is 0.00230 wide in February 2024", 0.00230,
+cms("S8: the masking band is 0.00230 wide in February 2024", 0.00230,
     _MVC_MS["202402"]["mask_width"], _dp(0.00230, 5))
-cms("SI 8: and the coverage family 0.03281", 0.03281,
+cms("S8: and the coverage family 0.03281", 0.03281,
     _MVC_MS["202402"]["theta_width"], _dp(0.03281, 5))
-cms("SI 8: imputing zero gives 0.02263", 0.02263, _MVC_MS["202312"]["mask_imp0"],
+cms("S8: imputing zero gives 0.02263", 0.02263, _MVC_MS["202312"]["mask_imp0"],
     _dp(0.02263, 5))
-cms("SI 8: the measured fill gives 0.02062", 0.02062,
+cms("S8: the measured fill gives 0.02062", 0.02062,
     _MVC_MS["202312"]["mask_measured"], _dp(0.02062, 5))
-cms("SI 8: and 0.01800", 0.01800, _MVC_MS["202402"]["mask_measured"],
+cms("S8: and 0.01800", 0.01800, _MVC_MS["202402"]["mask_measured"],
     _dp(0.01800, 5))
-cms("SI 8: 0.02115 falls to 0.01677", 0.01677, _ST12_MS["bias_corrected"],
+cms("S8: 0.02115 falls to 0.01677", 0.01677, _ST12_MS["bias_corrected"],
     _dp(0.01677, 5))
-cms("SI 8: 95% CI 0.01670", 0.01670, _ST12_MS["ci"][0], _dp(0.01670, 5))
-cms("SI 8: ...to 0.01683", 0.01683, _ST12_MS["ci"][1], _dp(0.01683, 5))
-cms("SI 8: February 2024 moves 0.01851 to 0.01427", 0.01427,
+cms("S8: 95% CI 0.01670", 0.01670, _ST12_MS["ci"][0], _dp(0.01670, 5))
+cms("S8: ...to 0.01683", 0.01683, _ST12_MS["ci"][1], _dp(0.01683, 5))
+cms("S8: February 2024 moves 0.01851 to 0.01427", 0.01427,
     _ST02_MS["bias_corrected"], _dp(0.01427, 5))
 _NS12_MS = p33_live["R1_effective_sample"]["202312"]["stats"]
-cms("SI 8: the half-L1 noise share is 4.5%", 4.5,
+cms("S8: the half-L1 noise share is 4.5%", 4.5,
     100 * _NS12_MS["half_l1"]["noise_bias"] / _NS12_MS["half_l1"]["point"],
     _dp(4.5, 1))
-cms("SI 8: Cramer's V 7.7%", 7.7,
+cms("S8: Cramer's V 7.7%", 7.7,
     100 * _NS12_MS["cramers_v"]["noise_bias"] / _NS12_MS["cramers_v"]["point"],
     _dp(7.7, 1))
-cms("SI 8: normalised mutual information 12.8%", 12.8,
+cms("S8: normalized mutual information 12.8%", 12.8,
     100 * _NS12_MS["nmi"]["noise_bias"] / _NS12_MS["nmi"]["point"], _dp(12.8, 1))
-cms("SI 8: the dominant eigenvalue is 1.15639", 1.15639,
+cms("S8: the dominant eigenvalue is 1.15639", 1.15639,
     _NS12_MS["lead_eigenvalue"]["point"], _dp(1.15639, 5))
-cms("SI 8: falling to 1.15624", 1.15624,
+cms("S8: falling to 1.15624", 1.15624,
     _NS12_MS["lead_eigenvalue"]["bias_corrected"], _dp(1.15624, 5))
-cms("SI 8: it moves from 1.1564 at theta = 0", 1.1564,
+cms("S8: it moves from 1.1564 at theta = 0", 1.1564,
     _TH12_MS[0.0]["lead_eigenvalue"], _dp(1.1564, 4))
-cms("SI 8: to 1.5198 at theta = -1", 1.5198,
+cms("S8: to 1.5198 at theta = -1", 1.5198,
     _TH12_MS[-1.0]["lead_eigenvalue"], _dp(1.5198, 4))
-cms("SI 8: and 2.0857 at theta = +1", 2.0857,
+cms("S8: and 2.0857 at theta = +1", 2.0857,
     _TH12_MS[1.0]["lead_eigenvalue"], _dp(2.0857, 4))
-cms("SI 8: 1.2340 in February 2024", 1.2340,
+cms("S8: 1.2340 in February 2024", 1.2340,
     _TH02_MS[0.0]["lead_eigenvalue"], _dp(1.2340, 4))
-cms("SI 8: 1.6328", 1.6328, _TH02_MS[-1.0]["lead_eigenvalue"], _dp(1.6328, 4))
-cms("SI 8: and 2.3899", 2.3899, _TH02_MS[1.0]["lead_eigenvalue"], _dp(2.3899, 4))
+cms("S8: 1.6328", 1.6328, _TH02_MS[-1.0]["lead_eigenvalue"], _dp(1.6328, 4))
+cms("S8: and 2.3899", 2.3899, _TH02_MS[1.0]["lead_eigenvalue"], _dp(2.3899, 4))
 _WB12_MS = p33_live["R3_within_band"]["202312"]
 _Z9_MS = {r["phi"]: r for r in _WB12_MS["zero_to_nine"]}
 for _phi_ms, _q_ms in ((0.1, 0.02102), (0.3, 0.02097), (0.5, 0.02122)):
-    cms(f"SI 8: re-attributing phi = {_phi_ms} moves it to {_q_ms}", _q_ms,
+    cms(f"S8: re-attributing phi = {_phi_ms} moves it to {_q_ms}", _q_ms,
         _Z9_MS[_phi_ms]["assortativity"], _dp(_q_ms, 5))
 _AB_MS = {r["phi"]: r for r in _WB12_MS["all_bands"]}
-cms("SI 8: the generalised version moves it to 0.01997", 0.01997,
+cms("S8: the generalized version moves it to 0.01997", 0.01997,
     _AB_MS[0.5]["assortativity"], _dp(0.01997, 5))
-cms("SI 8: a change of -5.6%", -5.6,
+cms("S8: a change of -5.6%", -5.6,
     100 * (_AB_MS[0.5]["assortativity"] / _TH12_MS[0.0]["assortativity"] - 1),
     _dp(5.6, 1))
 
@@ -6100,26 +6186,26 @@ _MX_MS = p35_live["matrices"]
 for _key_ms, _c_ms, _e_ms in (("202312|passive_dong", 1.092, 5.505),
                               ("202312|passive_gu", 1.085, 5.463),
                               ("202312|survey", 3.259, 18.479)):
-    cms(f"SI 9: {_key_ms} mean daily contacts {_c_ms}", _c_ms,
+    cms(f"S9: {_key_ms} mean daily contacts {_c_ms}", _c_ms,
         _MX_MS[_key_ms]["mean_contacts"], _dp(_c_ms, 3))
-    cms(f"SI 9: {_key_ms} dominant eigenvalue {_e_ms}", _e_ms,
+    cms(f"S9: {_key_ms} dominant eigenvalue {_e_ms}", _e_ms,
         _MX_MS[_key_ms]["rho_unscaled"], _dp(_e_ms, 3))
-check("MS", "SI 9: the finite-difference anchor is 4.94e-04", 4.94e-4,
+check("MS", "S9: the finite-difference anchor is 4.94e-04", 4.94e-4,
       max(r["max_rel_err"]
           for r in p35_live["marginal_finite_difference_check"]), 5e-7)
-check("MS", "SI 9: the final-size anchor is 2.89e-06", 2.89e-6,
+check("MS", "S9: the final-size anchor is 2.89e-06", 2.89e-6,
       p35_live["final_size_anchor"]["max_abs_diff"], 5e-9)
-cms("SI 9: the Kendall tau is +0.390 at district level", 0.390,
+cms("S9: the Kendall tau is +0.390 at district level", 0.390,
     _CM12_MS["survey vs passive_gu"]["tau"], _dp(0.390, 3))
 _CM02_MS = {r["pair"]: r for r in p35_live["comparison_marginal"]["202402"]}
-cms("SI 9: +0.600 in February 2024 at dong", 0.600,
+cms("S9: +0.600 in February 2024 at dong", 0.600,
     _CM02_MS["survey vs passive_dong"]["tau"], _dp(0.600, 3))
-cms("SI 9: and +0.505 at district", 0.505,
+cms("S9: and +0.505 at district", 0.505,
     _CM02_MS["survey vs passive_gu"]["tau"], _dp(0.505, 3))
 _A13_MS = p35_live["allocation"]["202312|R0=1.3"]["cross_application"]
-cms("SI 9: the passive plan leaves 5.71 percentage points infected", 5.71,
+cms("S9: the passive plan leaves 5.71 percentage points infected", 5.71,
     100 * _A13_MS["attack_passive_plan"], _dp(5.71, 2))
-check("MS", "SI 9: while the survey plan extinguishes the epidemic", 1.6e-12,
+check("MS", "S9: while the survey plan extinguishes the epidemic", 1.6e-12,
       p35_live["allocation"]["202312|R0=1.3"]["survey"]["attack_with"], 5e-14)
 # THE TWELVE-POINT GRID, added 2026-09-03. SI 9 carried the three-point Seoul
 # reading and the R0 = 1.3 extinction case and stopped there, while 3.4's
@@ -6142,39 +6228,39 @@ for _cell_ms, _anch_ms, _adp_ms, _peak_ms in (
         ("202402|national", 11.2, 1, 62.6),
         ("202312|seoul", 7.5, 1, 20.2),
         ("202402|seoul", 23.3, 1, 25.4)):
-    cms(f"SI 9: {_cell_ms} regret is {_anch_ms}% at the R0 = 2.5 anchor",
+    cms(f"S9: {_cell_ms} regret is {_anch_ms}% at the R0 = 2.5 anchor",
         _anch_ms, 100 * _PS_MS["at_anchor"][_cell_ms], _dp(_anch_ms, _adp_ms))
-    cms(f"SI 9: {_cell_ms} peaks at {_peak_ms}%", _peak_ms,
+    cms(f"S9: {_cell_ms} peaks at {_peak_ms}%", _peak_ms,
         100 * _PS_MS["max_over_grid"][_cell_ms], _dp(_peak_ms, 1))
-cms("SI 9: a factor of 40 between the anchor and the peak in December 2023",
+cms("S9: a factor of 40 between the anchor and the peak in December 2023",
     40.0, _PS_MS["max_over_grid"]["202312|national"]
     / _PS_MS["at_anchor"]["202312|national"], _dp(40.0, 0))
 # The grid is printed value by value in the SI, so it is checked value by value
 # rather than by its length: a twelve-point list with the wrong points in it
 # would pass a count.
-check("MS", "SI 9: the point grid is 1.1 to 6.0 in twelve steps", 1.0,
+check("MS", "S9: the point grid is 1.1 to 6.0 in twelve steps", 1.0,
       _eq(list(p52_ms["declaration"]["r0_point"]),
           [1.1, 1.2, 1.3, 1.5, 1.8, 2.1, 2.5, 3.0, 3.5, 4.0, 5.0, 6.0]), 1e-9)
-check("MS", "SI 9: the bootstrap grid is 1.2, 1.5, 1.8, 2.5, 3.5", 1.0,
+check("MS", "S9: the bootstrap grid is 1.2, 1.5, 1.8, 2.5, 3.5", 1.0,
       _eq(list(p52_ms["declaration"]["r0_boot"]), [1.2, 1.5, 1.8, 2.5, 3.5]), 1e-9)
-check("MS", "SI 9: the anchor among the three original points is 2.5", 2.5,
+check("MS", "S9: the anchor among the three original points is 2.5", 2.5,
       float(p52_ms["declaration"]["r0_anchor"]), 1e-9)
-check("MS", "SI 9: February 2024 national peaks at R0 = 1.3", 1.3,
+check("MS", "S9: February 2024 national peaks at R0 = 1.3", 1.3,
       _PS_MS["argmax"]["202402|national"], 1e-9)
-check("MS", "SI 9: all four cells peak between R0 = 1.2 and 1.5", 1.0,
+check("MS", "S9: all four cells peak between R0 = 1.2 and 1.5", 1.0,
       1.0 if (min(_PS_MS["argmax"].values()) >= 1.2
               and max(_PS_MS["argmax"].values()) <= 1.5) else 0.0, 1e-9)
 # "the curves are not monotone above their peaks" is the sentence that keeps
 # the one verdict at R0 = 3.5 from reading as a contradiction of the interior
 # maximum, so it is measured rather than asserted: at least one cell rises
 # again somewhere above its own argmax.
-check("MS", "SI 9: at least one cell's regret rises again above its peak", 1.0,
+check("MS", "S9: at least one cell's regret rises again above its peak", 1.0,
       1.0 if any(
           any(_rows_ms[_i + 1]["regret"] > _rows_ms[_i]["regret"]
               for _i in range(len(_rows_ms) - 1)
               if _rows_ms[_i]["r0"] >= _PS_MS["argmax"][_cell_ms])
           for _cell_ms, _rows_ms in p52_ms["point"].items()) else 0.0, 1e-9)
-check("MS", "SI 9: the one verdict outside the 1.2-1.8 cluster is at R0 = 3.5",
+check("MS", "S9: the one verdict outside the 1.2-1.8 cluster is at R0 = 3.5",
       3.5, _a2_62["outlier"]["r0"], 1e-9)
 # The R0 = 2.5 attack rates the body's mechanism sentence points here for. Both
 # ends of all three ranges, so neither end can move alone.
@@ -6188,25 +6274,25 @@ check("MS", "SI 9: the one verdict outside the 1.2-1.8 cluster is at R0 = 3.5",
 # Two spans, four ends, and three of them were rounded to nearest and so fell
 # inside the values they were meant to enclose: 0.5415904, 0.7523625 and
 # 0.7750610 against 0.542, 0.752 and 0.775.
-cms("SI 9: at R0 = 2.5 the survey plan leaves at least 0.541", 0.541,
+cms("S9: at R0 = 2.5 the survey plan leaves at least 0.541", 0.541,
     min(_r["attack_own_plan"] for _r in _A25_MS.values()), _dp(0.541, 3),
     phrase="survey-derived plan leaves between 0.541 and 0.753", bound="lower")
-cms("SI 9: and at most 0.753", 0.753,
+cms("S9: and at most 0.753", 0.753,
     max(_r["attack_own_plan"] for _r in _A25_MS.values()), _dp(0.753, 3),
     phrase="survey-derived plan leaves between 0.541 and 0.753", bound="upper")
-cms("SI 9: the passive plan leaves at least 0.543", 0.543,
+cms("S9: the passive plan leaves at least 0.543", 0.543,
     min(_r["attack_passive_plan"] for _r in _A25_MS.values()), _dp(0.543, 3),
     phrase="passive-derived plan between 0.543 and 0.776", bound="lower")
-cms("SI 9: and at most 0.776", 0.776,
+cms("S9: and at most 0.776", 0.776,
     max(_r["attack_passive_plan"] for _r in _A25_MS.values()), _dp(0.776, 3),
     phrase="passive-derived plan between 0.543 and 0.776", bound="upper")
-cms("SI 9: with no allocation at all the range runs from 0.683", 0.683,
+cms("S9: with no allocation at all the range runs from 0.683", 0.683,
     min(_r["attack_no_plan"] for _r in _A25_MS.values()), _dp(0.683, 3),
     phrase="against 0.683 to 0.850 when nothing is allocated")
-cms("SI 9: to 0.850", 0.850,
+cms("S9: to 0.850", 0.850,
     max(_r["attack_no_plan"] for _r in _A25_MS.values()), _dp(0.850, 3),
     phrase="against 0.683 to 0.850 when nothing is allocated")
-check("MS", "SI 9: three of the four cells exceed 0.8 with no allocation", 3.0,
+check("MS", "S9: three of the four cells exceed 0.8 with no allocation", 3.0,
       float(sum(1 for _r in _A25_MS.values() if _r["attack_no_plan"] > 0.8)),
       1e-9)
 # check(), not cms(): the SI prints this exponent in Unicode superscripts
@@ -6216,19 +6302,19 @@ check("MS", "SI 9: three of the four cells exceed 0.8 with no allocation", 3.0,
 # space rules in _forms() exist to prevent -- and superscript digits are not a
 # spelling of a number, they are a different glyph set, so they belong here
 # rather than in _forms().
-check("MS", "SI 9: the rule's size at 200 draws is 10^-100.2", -100.2,
+check("MS", "S9: the rule's size at 200 draws is 10^-100.2", -100.2,
       _al62["log10"], 5e-2)
-check("MS", "SI 9: six of the seven pre-correction verdicts sat in the cells "
+check("MS", "S9: six of the seven pre-correction verdicts sat in the cells "
             "the correction touched", 7.0,
       float(p52_ms["answer"]["n_flips_published"]), 1e-9)
-cms("SI 9: the most marginal cell's margin is +0.015", 0.015,
+cms("S9: the most marginal cell's margin is +0.015", 0.015,
     _a2_62["outlier"]["margin"], _dp(0.015, 3))
-cms("SI 9: the achieved coverage of the 2.5th percentile runs from 1.1%", 1.1,
+cms("S9: the achieved coverage of the 2.5th percentile runs from 1.1%", 1.1,
     100 * _ef62["low_level_ci"][0], _dp(1.1, 1))
-cms("SI 9: to 5.7%", 5.7, 100 * _ef62["low_level_ci"][1], _dp(5.7, 1))
-cms("SI 9: the 97.5th covers 94.3%", 94.3, 100 * _ef62["high_level_ci"][0],
+cms("S9: to 5.7%", 5.7, 100 * _ef62["low_level_ci"][1], _dp(5.7, 1))
+cms("S9: the 97.5th covers 94.3%", 94.3, 100 * _ef62["high_level_ci"][0],
     _dp(94.3, 1))
-cms("SI 9: to 98.9%", 98.9, 100 * _ef62["high_level_ci"][1], _dp(98.9, 1))
+cms("S9: to 98.9%", 98.9, 100 * _ef62["high_level_ci"][1], _dp(98.9, 1))
 
 
 # ======================================================================
@@ -7001,21 +7087,21 @@ def main():
           "chronology's dates; the survey's 14-day diary window and its "
           "424/424 dong match; the product manual's structural-zero clause "
           "and the 99.03% empty grid it explains; docomo's published "
-          "ten-year bands; and SI 7's four detector deviations (6.66e-16, "
+          "ten-year bands; and S7's four detector deviations (6.66e-16, "
           "1.49e-15, 2.2e-4, and the 250-cell brute-force expansion into "
           "5 714 venues), which p39 prints to eda/memo/phase39-recovery.md "
-          "but not to its results file. SI 7's '26.8%' for the noisy data "
+          "but not to its results file. S7's '26.8%' for the noisy data "
           "field used to sit on this list as unstoreable; it is p39's "
           "ladder.points['data|0.02'].kept_median, it is now an ordinary "
           "gated row, and 3.5 quotes it. Four other manuscript figures used "
           "to sit on this list and no longer do, because the prose was "
           "corrected on "
           "2026-08-29 and every one of them is now an ordinary gated row: "
-          "3.4's '13.0%' for the measured decay law (12.8%); SI 8's "
-          "'+0.00431' for the device-noise arm, truncated where SI 7 rounded "
+          "3.4's '13.0%' for the measured decay law (12.8%); S8's "
+          "'+0.00431' for the device-noise arm, truncated where S7 rounded "
           "the same 0.0043161 to '+0.00432'; the 'factor of 86' beside it, "
           "which was the quotient of those two printed roundings and is 82 "
-          "computed from the arms; and SI 9's level sentence, whose three "
+          "computed from the arms; and S9's level sentence, whose three "
           "labels ran in the reverse of the order of the six values under "
           "them. eda/memo/phase44-beta.md still writes 'r = 0.0286（13.0%）' "
           "and the 08-21 letter still repeats it; both are frozen against "

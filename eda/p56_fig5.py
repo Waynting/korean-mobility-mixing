@@ -37,14 +37,26 @@ WHAT THE THREE PANELS CARRY, and why the middle one is new.
       curve here is p39/p59's inversion and nothing else.
 
       The measured beta is marked. It is 0.9217 (Seoul arm) to 0.9347 (national
-      arm, weighted to Korea), and at both the bound still sits below the
-      survey's 0.2227 -- which is the sentence, and it is visible rather than
-      asserted. p59 refined the grid to 0.95/0.96/0.97/0.98/0.99, so the
-      crossing is now a measured quantity rather than a step count: beta* =
-      0.9659, and the two rules that bracket it are 0.00073 apart instead of
-      the 0.01526 they spanned on p39's 0.04-wide grid. Both the crossing and
-      the beta = 0.95 grid point are ruled on the panel, because a reader's
-      first question is how far the margin is.
+      arm, weighted to Korea). p59 refined the grid to 0.95/0.96/0.97/0.98/
+      0.99, so the crossing is a measured quantity rather than a step count,
+      and p66 put it on the realised axis: beta* = 0.923, which the measured
+      band STRADDLES. So the panel's title does not say the survey is excluded;
+      it is at the Seoul arm's 0.9217 and is not at the national arm's 0.9326
+      and 0.9347, and the verdict is the caption's and section 3.3's to state,
+      not the title's. The old title, "the survey is excluded at every measured
+      beta", predated p66 and p69 and contradicted the panel's own hollow
+      markers.
+
+      THE INSET. p69 showed the crossing is not invariant to how venues are
+      paired: the calibration's realised beta divides by a venue-level truth
+      summed with replacement, the survey's by one summed without, and putting
+      the calibration on the survey's convention moves the crossing to 0.918,
+      below every arm. On an axis that runs 0 to 1 the two crossings are 0.005
+      apart and print as one line, so the measured region is enlarged in an
+      inset that draws the bound on both conventions and lets each crossing be
+      where its own curve meets the survey rule. Both crossings are on the
+      caption sheet, as are the five survey-convention grid points the inset
+      draws.
 
       Panel (a) stays on p39's five beta. Five curves is the readable maximum
       and the refined slices are all but on top of one another there; the
@@ -115,6 +127,7 @@ def main():
     p53 = json.load(open(f"{ROOT}/eda/results_p53.json"))
     p59 = json.load(open(f"{ROOT}/eda/results_p59.json"))
     p66 = json.load(open(f"{ROOT}/eda/results_p66.json"))
+    p69 = json.load(open(f"{ROOT}/eda/results_p69.json"))
 
     # ------------------------------------------------------------------ gates
     # p39's own invariants, re-asserted from the file before anything is drawn.
@@ -219,6 +232,27 @@ def main():
     b_star = bs["primary_value"]
     # the crossing on the axis this panel is drawn in
     b_star_real = p66["beta_star"]["primary_value"]
+    # ... and on the survey's own pairing convention (p69's C axis). p69 mirrors
+    # p66's A crossing; the two files must agree bit for bit, or the inset would
+    # be drawing two crossings from two different calibrations.
+    assert p69["beta_star"]["realised_A"] == b_star_real, \
+        "p69's copy of the realised-A crossing is not p66's; the inset cannot " \
+        "draw the two crossings as one comparison"
+    b_star_conv = p69["beta_star"]["realised_C"]
+    assert np.isfinite(b_star_conv), "p69 found no crossing on the C axis"
+    # The C axis is defined only from the design point p69 recorded, upwards,
+    # and by the arm p69 declared (integerised is the survey-shaped one). Read
+    # both from the file rather than assuming them.
+    _c_key = f"realised_C_{p69['axis_used']}"
+    _c_from = p69["axis_defined_from"][p69["axis_used"]]
+    conv_c = {r["design"]: r[_c_key] for r in p69["conversion"]
+              if r["design"] >= _c_from}
+    assert 0.95 in conv_c and 0.99 in conv_c, \
+        f"p69's C axis does not cover the refined grid: {sorted(conv_c)}"
+    assert b_star_conv < b_star_real, \
+        "the survey-convention crossing is not below the world's-pairing one; " \
+        "p69's prediction (C sits below) no longer holds and the inset's " \
+        "labels would be the wrong way round"
     b_star_spread = bs["spread"]
     _rules = list(bs["estimates"])
     _old = [bs["on_p39_grid"][r] for r in _rules]
@@ -320,7 +354,10 @@ def main():
     # "it is not" was printing straight through this line of text. Under the
     # rule the whole left half of the panel is empty -- the bound does not
     # reach 0.2 until beta is past 0.95.
-    b_.text(0.02, r_survey * 0.90, f"the survey reads {r_survey:.3f}",
+    # x = 0.56, not 0.02: the inset's title now sits where this label used to,
+    # and the stretch under the rule to the right of the inset is empty (the
+    # curve does not reach 0.2 until beta is past 0.9).
+    b_.text(0.56, r_survey * 0.90, f"the survey reads {r_survey:.3f}",
             fontsize=7.8, color=RED, va="top")
     b_.axhline(r_corr, color=GREY, lw=1.0, ls="--")
     # Not x = 0.02: the bound leaves the dashed line at beta = 0 and climbs, so
@@ -337,7 +374,7 @@ def main():
     b_.annotate(f"measured $\\beta$: {min(b_seoul, b_nat):.4f}–"
                 f"{max(b_seoul, b_nat):.4f}",
                 xy=((b_seoul + b_nat) / 2, 0.46), xycoords=_xy,
-                xytext=(0.46, 0.29), textcoords=_xy,
+                xytext=(0.74, 0.27), textcoords=_xy,
                 fontsize=7.8, color="#0b5a61", ha="center",
                 arrowprops=dict(arrowstyle="->", lw=.9, color="#0b5a61"))
     # beta*, where the refined curve meets the survey rule. It is p59's declared
@@ -347,20 +384,19 @@ def main():
     # line: 0.95 and beta* are 0.016 apart on an axis that runs 0 to 1, so any
     # text sitting on either line lands on the other one.
     b_.axvline(b_star_real, color=VIOLET, lw=1.2, zorder=2)
-    b_.annotate(fr"$\beta^*$ = {b_star_real:.4f}",
+    # Three decimals, because that is the precision the caption and section
+    # 3.3 quote it at; a figure that prints one more digit than the text invites
+    # the reader to look for the discrepancy.
+    b_.annotate(fr"$\beta^*$ = {b_star_real:.3f}",
                 xy=(b_star_real, r_survey), xycoords="data",
                 xytext=(0.72, 0.955), textcoords="axes fraction",
                 fontsize=7.8, color=VIOLET, ha="center", va="center",
                 arrowprops=dict(arrowstyle="->", lw=.9, color=VIOLET,
                                 shrinkB=3))
-    # and the grid point the claim actually rests on: 0.95 is measured, sits
-    # above every measured beta, and the bound there is below the survey.
-    b_.axvline(conv[0.95], color=INK, lw=1.0, ls=":", zorder=2)
-    b_.annotate(f"at $\\beta$ = {conv[0.95]:.3f} the bound is {bound_95:.4f}",
-                xy=(conv[0.95], bound_95), xycoords="data",
-                xytext=(0.30, 0.62), textcoords="axes fraction",
-                fontsize=7.8, color=INK, ha="center", va="center",
-                arrowprops=dict(arrowstyle="->", lw=.9, color=INK, shrinkB=9))
+    # The rule and leader at the 0.95 grid point went with the old title: they
+    # marked "the grid point the claim rests on" when the claim was exclusion
+    # at every measured beta. The point itself is the leftmost one in the inset,
+    # and Table 1 quotes its bound; bound_95 stays on the sheet below.
     b_.set_yscale("log")
     # A strip below the lowest bound, so the conditionality note has somewhere
     # to sit that is not on the curve, the survey rule or the measured-beta
@@ -377,8 +413,12 @@ def main():
     # so the four words go inline and the panel note below carries the rest.
     b_.set_ylabel(r"largest $r_{\rm true}$ not rejected at that $\beta$"
                   "  (one-sided 5%)")
-    b_.set_title(plabel("b", r"the survey is excluded at every measured "
-                             r"$\beta$"), fontsize=10, loc="left")
+    # Neutral: what the panel draws, not a verdict. The verdict differs by arm
+    # and by pairing convention (see the docstring), and the caption and 3.3
+    # say so; a title that took one side contradicted the hollow markers under
+    # it.
+    b_.set_title(plabel("b", r"the bound against $\beta$, and where the "
+                             r"survey value sits"), fontsize=10, loc="left")
     b_.grid(alpha=.18, lw=.6, which="both")
     b_.legend(handles=[
         Line2D([], [], marker="o", ls="none", ms=8, color=INK,
@@ -394,6 +434,77 @@ def main():
                         r"pinned from outside these data",
             transform=b_.transAxes, fontsize=7.5, color=INK, ha="center",
             va="bottom")
+
+    # ---- the inset: the measured region, on both pairing conventions ------
+    # The refined grid, the band and both crossings all sit inside 0.90-0.95,
+    # four per cent of an axis that has to run from 0 to show the beta = 0
+    # bound. Enlarged, the two crossings separate: the solid curve is the bound
+    # on the axis the panel is drawn in (venues paired with replacement, the
+    # world's own scale), the dashed curve is the SAME bounds on p69's C axis
+    # (the survey's convention, without replacement), and each crossing is
+    # where its own curve meets the survey rule. The window is taken from the
+    # data, not typed: from just below the lowest refined point on either axis
+    # to just above the highest.
+    # p59's refined slices only: p69's C axis also carries design 0.8, whose
+    # realised C of 0.618 would drag the window a third of the way across the
+    # panel, which is the opposite of an enlargement.
+    _refined = [b for b in betas
+                if str(b) in p59["inversion_refined"] and b in conv_c]
+    assert len(_refined) == 5, f"expected the five refined slices, got {_refined}"
+    _xa = [conv[b] for b in _refined]
+    _xc = [conv_c[b] for b in _refined]
+    _yb = [merged[b] for b in _refined]
+    _ex = [merged[b] < r_survey for b in _refined]
+    _x0 = min(_xc) - 0.006
+    _x1 = max(_xa) + 0.006
+    # A little room below the lowest point; the legend no longer sits inside.
+    _y0, _y1 = min(_yb) - 0.03, max(_yb) + 0.02
+    # Left and up far enough that the main curve, which passes (0.48, 0.032),
+    # clears the inset's lower-right corner AND the legend hung below it.
+    ins = b_.inset_axes([0.06, 0.44, 0.46, 0.35])
+    ins.axvspan(min(b_seoul, b_nat), max(b_seoul, b_nat), color=TEAL,
+                alpha=.16, zorder=0)
+    ins.axhline(r_survey, color=RED, lw=1.1, zorder=1)
+    ins.plot(_xc, _yb, ls=(0, (3, 1.6)), marker="s", ms=3.2, lw=1.2,
+             color=GREY, markerfacecolor="white", zorder=2,
+             label="survey's pairing")
+    ins.plot(_xa, _yb, "-", lw=1.4, color=INK, zorder=3,
+             label="world's pairing")
+    for x, y, ex in zip(_xa, _yb, _ex):
+        ins.scatter([x], [y], s=26, zorder=4, color=(INK if ex else "white"),
+                    edgecolors=INK, lw=1.1)
+    ins.axvline(b_star_real, color=VIOLET, lw=1.1, zorder=2)
+    ins.axvline(b_star_conv, color=VIOLET, lw=1.1, ls=(0, (3, 1.6)), zorder=2)
+    # Each label on the far side of its own rule from the other one: the rules
+    # are 0.005 apart, which at this window is about the width of one label.
+    ins.text(b_star_real + 0.0012, _y1 - 0.004, f"{b_star_real:.3f}",
+             fontsize=7.5, color=VIOLET, ha="left", va="top")
+    ins.text(b_star_conv - 0.0012, _y1 - 0.004, f"{b_star_conv:.3f}",
+             fontsize=7.5, color=VIOLET, ha="right", va="top")
+    ins.set_xlim(_x0, _x1)
+    ins.set_ylim(_y0, _y1)
+    ins.tick_params(labelsize=7.5, length=2.5, pad=1.5)
+    ins.set_xticks([0.90, 0.92, 0.94])
+    ins.set_yticks([0.20, 0.25, 0.30])
+    # y labels on the RIGHT: on the left they ran into the main panel's spine,
+    # which sits 0.06 of the axes away, less than the width of "0.30". The
+    # strip to the right of the inset is empty down to the main curve.
+    ins.yaxis.tick_right()
+    # The legend hangs below the inset, under its x tick labels, instead of
+    # inside it: inside, the only free corner was the lower right, and both
+    # crossing rules run through it. One column, flush left: two columns
+    # reached the main curve and the measured-beta label to the right.
+    ins.legend(fontsize=7.5, frameon=False, loc="upper left",
+               bbox_to_anchor=(0.0, -0.12), handlelength=1.6,
+               borderaxespad=0.0, handletextpad=0.5, labelspacing=0.25)
+    ins.set_title("the boxed region, enlarged", fontsize=7.5, loc="left",
+                  pad=2)
+    for sp in ins.spines.values():
+        sp.set_edgecolor(GREY)
+    ins.grid(alpha=.18, lw=.6)
+    # and the box it enlarges, on the main panel
+    b_.add_patch(plt.Rectangle((_x0, _y0), _x1 - _x0, _y1 - _y0, fill=False,
+                               ec=GREY, lw=0.8, zorder=5))
     # THE NOTE KEY IS THE REQUESTED BETA, THE PANEL IS DRAWN IN THE REALISED
     # ONE. A grid point's stable name is the value it was asked for -- that is
     # what p39/p59 key their own files by, and what the gate addresses. The
@@ -411,6 +522,15 @@ def main():
     # point after 0.95; it moved to 0.97 the moment p59 measured three more
     # slices, which is what a grid artefact does. beta* is measured instead.
     note("b", "beta* where the bound meets the survey (p59 primary rule)", b_star)
+    # The two crossings the panel actually draws, both on the realised scale:
+    # p66's, on the axis the panel is in, and p69's, on the survey's convention.
+    note("b", "beta* drawn on the realised axis (p66 primary, world's pairing)",
+         b_star_real)
+    note("b", "beta* on the survey's pairing convention (p69 realised C)",
+         b_star_conv)
+    for b in _refined:
+        note("b", f"realised beta on the survey's convention at requested {b:g}",
+             conv_c[b])
     note("b", "spread of the four declared interpolation rules for beta*",
          b_star_spread)
     note("b", "bound at beta = 0.95, the measured grid point", bound_95)
@@ -482,7 +602,8 @@ def main():
     out = dict(caption_numbers=[dict(panel=p_, what=w, value=v)
                                 for p_, w, v in sheet],
                source="results_p39.json + results_p59.json "
-                      "(+ results_p44/p53 for the measured beta)",
+                      "(+ results_p44/p53 for the measured beta, "
+                      "results_p66/p69 for the two crossings)",
                reps=cfg["reps"],
                refuses="the bound is never quoted without the beta it is "
                        "conditional on; p39 does not identify beta. The panel "

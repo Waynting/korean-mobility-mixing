@@ -138,7 +138,7 @@ def main():
     assert abs(leak95 - LEAK_AT_0P95) < 0.05, (
         f"the beta = 0.95 slice leaves {leak95:.2f}% of the truth between "
         f"cells, not the {LEAK_AT_0P95}% the manuscript states at §3.3 and "
-        f"SI §7 -- one of the two is reading a different grid")
+        f"SI section S7 -- one of the two is reading a different grid")
     anch["b_leak_at_0p95"] = dict(recomputed=leak95, in_manuscript=LEAK_AT_0P95)
     say(f"  66.0b  beta = 0.95 leaves {leak95:.2f}% between cells "
         f"(manuscript: {LEAK_AT_0P95}%)   ok")

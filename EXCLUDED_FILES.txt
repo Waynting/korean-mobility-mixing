@@ -1,6 +1,6 @@
 # Files present in the source repository and deliberately not deposited
 #
-# Built from commit 4b3565c on 2026-09-20T17:03:29Z
+# Built from commit aacb8ec on 2026-10-04T13:47:52Z
 # Tier A payload: withheld
 #
 # Reasons, by prefix:
@@ -18,41 +18,6 @@
 # derived/ (9.2 GB), raw/ (~77 GB of source zips) and .env. The download
 # helpers under eda/ retrieve the source files and verify them by SHA-256.
 
-CLAUDE.md
-Email_Discussion/Data_Questions_Prof.md
-Email_Discussion/Technical notes 20260822.md
-Email_Discussion/advisor_report_20260818.md
-Email_Discussion/advisor_report_20260819.md
-Email_Discussion/advisor_report_20260821.md
-Email_Discussion/advisor_report_20260824.md
-Email_Discussion/advisor_report_20260827.md
-Email_Discussion/advisor_report_20260830.md
-Email_Discussion/advisor_report_20260831.md
-Email_Discussion/advisor_report_20260903.md
-Email_Discussion/advisor_report_20260905.md
-Email_Discussion/advisor_report_20260911.md
-Email_Discussion/advisor_report_20260916.md
-Email_Discussion/advisor_report_20260918.md
-Email_Discussion/advisor_suggestion_20260816.md
-Email_Discussion/advisor_suggestion_20260819.md
-Email_Discussion/advisor_suggestion_20260821.md
-Email_Discussion/advisor_suggestion_20260824.md
-Email_Discussion/advisor_suggestion_20260827.md
-Email_Discussion/advisor_suggestion_20260831.md
-Email_Discussion/advisor_suggestion_20260903.md
-Email_Discussion/advisor_suggestion_20260905.md
-Email_Discussion/advisor_suggestion_20260909.md
-Email_Discussion/advisor_suggestion_20260915.md
-Email_Discussion/bigdata_campus_application_20260821.md
-Email_Discussion/figure_captions_20260824.md
-Email_Discussion/figure_captions_20260827.md
-Email_Discussion/jrsi_editorial_enquiry_20260901.md
-Email_Discussion/nims_enquiry_20260824.md
-Email_Discussion/nims_reply_20260901.md
-JRSI_投稿規定整理.md
-OVERVIEW.md
-archive/README.md
-archive/REVISION_PLAN.md
 archive/advisor_20260831_contradictions.md
 archive/decisions_and_todos.md
 archive/figure_captions_draft.md
@@ -66,10 +31,13 @@ archive/jrsi_exemplar_benchmarks_20260831.md
 archive/letter_to_advisor.md
 archive/literature_expansion_20260831.md
 archive/manuscript_JBI.md
+archive/README.md
 archive/reference_verification_20260903.md
 archive/reference_verification_20260918.md
+archive/reference_verification_20260922.md
 archive/related_work_lim2026.md
 archive/report.html
+archive/REVISION_PLAN.md
 archive/rewrite_log_20260830.md
 archive/section_coverage_draft.md
 archive/section_semester_draft.md
@@ -78,6 +46,7 @@ authors.md
 cases/daily_panel.csv
 cases/daily_panel.parquet
 cases/kdca_20230831.xlsx
+CLAUDE.md
 drive_todo_20260907.md
 eda/archive/20260818/results_p19.json
 eda/archive/20260818/results_p21.json
@@ -141,15 +110,15 @@ eda/results_p29b.json
 eda/results_p30.json
 eda/results_p32.json
 eda/results_p33.json
-eda/results_p34.json
 eda/results_p34_E.json
 eda/results_p34_W.json
+eda/results_p34.json
 eda/results_p35.json
 eda/results_p36.json
 eda/results_p37.json
-eda/results_p38.json
 eda/results_p38_E.json
 eda/results_p38_W.json
+eda/results_p38.json
 eda/results_p39.json
 eda/results_p4.json
 eda/results_p40.json
@@ -187,11 +156,50 @@ eda/results_p69.json
 eda/results_p6b.json
 eda/results_p8.json
 eda/results_p9.json
+Email_Discussion/advisor_report_20260818.md
+Email_Discussion/advisor_report_20260819.md
+Email_Discussion/advisor_report_20260821.md
+Email_Discussion/advisor_report_20260824.md
+Email_Discussion/advisor_report_20260827.md
+Email_Discussion/advisor_report_20260830.md
+Email_Discussion/advisor_report_20260831.md
+Email_Discussion/advisor_report_20260903.md
+Email_Discussion/advisor_report_20260905.md
+Email_Discussion/advisor_report_20260911.md
+Email_Discussion/advisor_report_20260916.md
+Email_Discussion/advisor_report_20260918.md
+Email_Discussion/advisor_report_20260922.md
+Email_Discussion/advisor_suggestion_20260816.md
+Email_Discussion/advisor_suggestion_20260819.md
+Email_Discussion/advisor_suggestion_20260821.md
+Email_Discussion/advisor_suggestion_20260824.md
+Email_Discussion/advisor_suggestion_20260827.md
+Email_Discussion/advisor_suggestion_20260831.md
+Email_Discussion/advisor_suggestion_20260903.md
+Email_Discussion/advisor_suggestion_20260905.md
+Email_Discussion/advisor_suggestion_20260909.md
+Email_Discussion/advisor_suggestion_20260915.md
+Email_Discussion/advisor_suggestion_20260921.md
+Email_Discussion/advisor_suggestion_20261004.md
+Email_Discussion/bigdata_campus_application_20260821.md
+Email_Discussion/Data_Questions_Prof.md
+Email_Discussion/figure_captions_20260824.md
+Email_Discussion/figure_captions_20260827.md
+Email_Discussion/jrsi_editorial_enquiry_20260901.md
+Email_Discussion/nims_enquiry_20260824.md
+Email_Discussion/nims_reply_20260901.md
+Email_Discussion/Technical notes 20260822.md
+Email_Discussion/zenodo_renew.md
+JRSI_投稿規定整理.md
 meeting_note_20260827.md
+OVERVIEW.md
 paper/ai_use_record.md
 paper/editorial_constraints.md
 paper/figure_rework_20260831.md
-paper/figure_sheet/README.md
+paper/figure_sheet_SI/figureS1.md
+paper/figure_sheet_SI/figureS1.pdf
+paper/figure_sheet_SI/figureS1.png
+paper/figure_sheet_SI/README.md
 paper/figure_sheet/figure1.md
 paper/figure_sheet/figure1.pdf
 paper/figure_sheet/figure1.png
@@ -210,13 +218,13 @@ paper/figure_sheet/figure5.png
 paper/figure_sheet/figure6.md
 paper/figure_sheet/figure6.pdf
 paper/figure_sheet/figure6.png
-paper/figure_sheet_SI/README.md
-paper/figure_sheet_SI/figureS1.md
-paper/figure_sheet_SI/figureS1.pdf
-paper/figure_sheet_SI/figureS1.png
+paper/figure_sheet/README.md
 paper/jrsi_caption_style_20260902.md
 paper/jrsi_compliance_20260831.md
 paper/jrsi_figure_style_audit_20260831.md
+paper/latex/JRSI_SI/.olcli.json
+paper/latex/JRSI_SI/figures/figureS1.png
+paper/latex/JRSI_SI/main.tex
 paper/latex/JRSI/.olcli.json
 paper/latex/JRSI/figures/figure1.png
 paper/latex/JRSI/figures/figure2.png
@@ -225,12 +233,9 @@ paper/latex/JRSI/figures/figure4.png
 paper/latex/JRSI/figures/figure5.png
 paper/latex/JRSI/figures/figure6.png
 paper/latex/JRSI/main.tex
-paper/latex/JRSI_SI/.olcli.json
-paper/latex/JRSI_SI/figures/figureS1.png
-paper/latex/JRSI_SI/main.tex
 paper/latex/README.md
-paper/manuscript_JRSI.md
 paper/manuscript_JRSI_SI.md
+paper/manuscript_JRSI.md
 paper/media_summary.md
 paper/paper_structure.md
 paper/preprint_plan.md

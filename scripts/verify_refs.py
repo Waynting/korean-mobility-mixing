@@ -71,6 +71,13 @@ def parse_entries(text):
 def fields_of(text):
     m = re.search(r"doi:(10\.\S+)", text)          # greedy: DOIs contain ')'
     doi = m.group(1).rstrip(".,") if m else None
+    # Royal Society sets a DOI as "(doi:10.xxxx/yyy)", and the reference list
+    # has printed it that way since 2026-09-22. The greedy match above swallows
+    # the closing bracket, and rstrip cannot simply take it off: Nold 1980's DOI
+    # is 10.1016/0025-5564(80)90069-3 and ends in a ')' of its own. A trailing
+    # bracket is the wrapper only when it closes nothing inside the DOI.
+    while doi and doi.endswith(")") and doi.count("(") < doi.count(")"):
+        doi = doi[:-1].rstrip(".,")
     m = re.search(r"<?(https?://[^\s<>)]+)", text)  # never swallow the autolink's '>'
     url = m.group(1).rstrip(".,") if m else None
     first_author = text.split(".")[0].split(",")[0].strip()

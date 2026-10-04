@@ -323,7 +323,9 @@ def main():
     # "Times at 9 pt averages 0.0063 in per character", which is close enough
     # to be wrong quietly: one trap line ran a word past the dashed box and
     # nothing complained, because a character count cannot know that "(hap),"
-    # is wider than "in a". `_w` asks the renderer, `wrap_to` wraps on what it
+    # -- the romanised column name, dropped from the figure on 2026-09-22
+    # because nothing in the paper defined it -- is wider than "in a". `_w`
+    # asks the renderer, `wrap_to` wraps on what it
     # answers, and `panel` asserts every line it draws actually fits the box it
     # draws it in -- so an overflow becomes a failed run rather than a figure
     # that looks finished.
@@ -427,7 +429,7 @@ def main():
     TW = LW - TIN
     traps = flow("Not recorded", TW, TITLE_PT, "bold", RED)
     for t in ["no date column, one row per weekday",
-              "monthly sums over like weekdays (hap), never daily means",
+              "monthly sums over like weekdays, never daily means",
               f"{mask_rate:.1%} of cells masked, nearly all of it in {mat_range}",
               "age-varying expansion weights, unrecorded",
               "a code space frozen at 2020, districts since moved"]:

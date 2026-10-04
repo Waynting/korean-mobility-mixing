@@ -164,7 +164,7 @@ def in_text_citations(md: str, num: str, skip_from: int, skip_to: int) -> list[i
     # `(?!\d)` stops "Figure 1" from matching inside "Figure 12". It must not
     # also exclude "(", or the panel references the prose actually uses --
     # "Figure 3(c) shows the same absence" -- are the ones that go unlisted.
-    pattern = re.compile(rf'\bFigure\s+{re.escape(num)}\b(?!\d)')
+    pattern = re.compile(rf'\b[Ff]igure\s+{re.escape(num)}\b(?!\d)')
     lines = []
     for m in pattern.finditer(md):
         if skip_from <= m.start() < skip_to:
